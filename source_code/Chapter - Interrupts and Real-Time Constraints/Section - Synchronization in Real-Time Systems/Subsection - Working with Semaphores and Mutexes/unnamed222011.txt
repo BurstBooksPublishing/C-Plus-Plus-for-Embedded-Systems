@@ -1,0 +1,8 @@
+#include 
+
+std::mutex mtx;
+
+void task() {
+    std::lock_guard lock(mtx); // Automatically locks and unlocks the mutex
+    // Access shared resource
+}
