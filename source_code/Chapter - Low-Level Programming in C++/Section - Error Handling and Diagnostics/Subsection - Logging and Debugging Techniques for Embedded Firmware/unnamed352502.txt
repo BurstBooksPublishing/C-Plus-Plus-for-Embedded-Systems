@@ -1,0 +1,7 @@
+#include 
+
+void process_data(int* data, size_t size) {
+    assert(data != nullptr && "Data pointer must not be null");
+    assert(size > 0 && "Data size must be greater than zero");
+    // Process data
+}
