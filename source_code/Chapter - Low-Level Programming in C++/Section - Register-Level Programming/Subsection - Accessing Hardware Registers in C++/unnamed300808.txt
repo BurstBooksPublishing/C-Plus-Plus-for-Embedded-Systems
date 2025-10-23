@@ -1,0 +1,4 @@
+Bit 31: Enable (EN)
+Bits 30-28: Mode (MODE)
+Bits 27-24: Reserved
+Bits 23-0: Data (DATA)
