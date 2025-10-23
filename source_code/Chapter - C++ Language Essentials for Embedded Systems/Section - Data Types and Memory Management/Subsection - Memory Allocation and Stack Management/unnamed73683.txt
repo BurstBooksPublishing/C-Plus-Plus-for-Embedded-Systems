@@ -1,0 +1,15 @@
+class MemoryPool {
+public:
+    MemoryPool(size_t size) : pool(new char[size]), size(size) {}
+    ~MemoryPool() { delete[] pool; }
+    void* allocate(size_t bytes) {
+        // Custom allocation logic
+        return static_cast(pool + offset);
+    }
+private:
+    char* pool;
+    size_t size;
+    size_t offset = 0;
+};
+
+MemoryPool pool(1024); // Preallocate 1KB of memory
