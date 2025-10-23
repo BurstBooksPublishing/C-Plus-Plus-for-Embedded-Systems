@@ -1,0 +1,16 @@
+class Singleton {
+public:
+    static Singleton& getInstance() {
+        static Singleton instance;
+        return instance;
+    }
+
+    void doSomething() {
+        // Implementation for singleton functionality
+    }
+
+private:
+    Singleton() {} // Private constructor to prevent instantiation
+    Singleton(const Singleton&) = delete; // Delete copy constructor
+    Singleton& operator=(const Singleton&) = delete; // Delete assignment operator
+};
