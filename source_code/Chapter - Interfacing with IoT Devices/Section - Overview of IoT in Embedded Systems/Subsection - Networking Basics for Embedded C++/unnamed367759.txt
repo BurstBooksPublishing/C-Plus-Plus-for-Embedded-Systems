@@ -1,0 +1,12 @@
+#include 
+
+void publish_message(const std::string& topic, const std::string& message) {
+    mqtt::client client("tcp://localhost:1883", "client_id");
+    mqtt::connect_options conn_opts;
+    client.connect(conn_opts);
+
+    mqtt::message_ptr pubmsg = mqtt::make_message(topic, message);
+    client.publish(pubmsg);
+
+    client.disconnect();
+}
