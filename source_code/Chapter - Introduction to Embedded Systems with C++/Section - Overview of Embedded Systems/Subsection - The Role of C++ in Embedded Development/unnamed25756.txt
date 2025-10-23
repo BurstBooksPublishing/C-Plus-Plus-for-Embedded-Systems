@@ -1,0 +1,5 @@
+std::vector sensor_data;
+sensor_data.reserve(100);
+for (int i = 0; i < 100; ++i) {
+    sensor_data.push_back(sensor.read());
+}
