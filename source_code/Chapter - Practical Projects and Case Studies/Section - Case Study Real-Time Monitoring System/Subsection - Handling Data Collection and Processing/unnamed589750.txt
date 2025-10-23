@@ -1,0 +1,15 @@
+#include 
+#include 
+
+class MovingAverageFilter {
+public:
+    MovingAverageFilter(size_t windowSize) : window(windowSize, 0.0f), index(0) {}
+    float process(float newValue) {
+        window[index] = newValue;
+        index = (index + 1) % window.size();
+        return std::accumulate(window.begin(), window.end(), 0.0f) / window.size();
+    }
+private:
+    std::vector window;
+    size_t index;
+};
