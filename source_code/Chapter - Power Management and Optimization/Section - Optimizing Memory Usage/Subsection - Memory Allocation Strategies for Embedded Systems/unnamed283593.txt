@@ -1,0 +1,2 @@
+alignas(std::max_align_t) char buffer[sizeof(MyClass)];
+MyClass* obj = new(buffer) MyClass();
