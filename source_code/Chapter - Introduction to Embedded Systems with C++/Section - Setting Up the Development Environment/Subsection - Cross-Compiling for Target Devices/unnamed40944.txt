@@ -1,0 +1,6 @@
+#include 
+
+int main() {
+    std::cout << "Hello, embedded world!" << std::endl;
+    return 0;
+}
