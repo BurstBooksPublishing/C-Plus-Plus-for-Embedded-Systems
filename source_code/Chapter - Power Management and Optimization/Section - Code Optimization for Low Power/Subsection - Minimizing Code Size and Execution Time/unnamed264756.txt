@@ -1,0 +1,2 @@
+g++ -pg -o program program.cpp
+gprof program gmon.out > analysis.txt
