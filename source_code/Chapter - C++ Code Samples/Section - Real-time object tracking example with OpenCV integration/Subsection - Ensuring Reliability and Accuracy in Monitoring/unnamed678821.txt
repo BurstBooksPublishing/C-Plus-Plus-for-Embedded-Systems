@@ -1,0 +1,47 @@
+#include 
+#include 
+#include 
+
+int main() {
+    // Open a video file or capture device
+    cv::VideoCapture video("input_video.mp4");
+    if (!video.isOpened()) {
+        std::cerr << "Error: Could not open video." << std::endl;
+        return -1;
+    }
+
+    // Read the first frame
+    cv::Mat frame;
+    video.read(frame);
+
+    // Select a bounding box for the object to track
+    cv::Rect2d bbox = cv::selectROI("Tracking", frame, false);
+
+    // Initialize the tracker (using KCF tracker)
+    cv::Ptr tracker = cv::TrackerKCF::create();
+    tracker->init(frame, bbox);
+
+    while (video.read(frame)) {
+        // Update the tracker with the current frame
+        bool success = tracker->update(frame, bbox);
+
+        if (success) {
+            // Draw the bounding box on the frame
+            cv::rectangle(frame, bbox, cv::Scalar(255, 0, 0), 2, 1);
+        } else {
+            // Tracking failure
+            cv::putText(frame, "Tracking failure detected", cv::Point(100, 80),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.75, cv::Scalar(0, 0, 255), 2);
+        }
+
+        // Display the frame with the tracked object
+        cv::imshow("Tracking", frame);
+
+        // Exit if ESC key is pressed
+        if (cv::waitKey(1) == 27) break;
+    }
+
+    video.release();
+    cv::destroyAllWindows();
+    return 0;
+}
