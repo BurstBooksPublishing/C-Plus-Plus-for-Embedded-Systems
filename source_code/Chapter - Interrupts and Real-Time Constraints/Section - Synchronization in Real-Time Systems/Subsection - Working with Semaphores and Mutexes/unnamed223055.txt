@@ -1,0 +1,14 @@
+#include 
+#include 
+
+std::timed_mutex mtx;
+
+void task() {
+    if (mtx.try_lock_for(std::chrono::milliseconds(100))) {
+        // Mutex acquired within 100 milliseconds
+        // Access shared resource
+        mtx.unlock();
+    } else {
+        // Handle timeout
+    }
+}
