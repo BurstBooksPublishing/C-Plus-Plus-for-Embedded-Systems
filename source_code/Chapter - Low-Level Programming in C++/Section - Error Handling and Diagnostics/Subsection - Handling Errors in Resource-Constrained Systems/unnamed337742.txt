@@ -1,0 +1,17 @@
+enum class ErrorCode {
+    Success,
+    OutOfMemory,
+    InvalidInput,
+    DeviceBusy
+};
+
+ErrorCode processData(const uint8_t* data, size_t size) {
+    if (data == nullptr || size == 0) {
+        return ErrorCode::InvalidInput;
+    }
+    if (!allocateMemory(size)) {
+        return ErrorCode::OutOfMemory;
+    }
+    // Process data
+    return ErrorCode::Success;
+}
