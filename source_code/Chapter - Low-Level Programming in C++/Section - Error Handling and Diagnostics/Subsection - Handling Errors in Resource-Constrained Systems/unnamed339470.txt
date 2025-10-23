@@ -1,0 +1,13 @@
+struct SystemStatus {
+    unsigned memoryError : 1;
+    unsigned communicationError : 1;
+    unsigned criticalError : 1;
+};
+
+SystemStatus checkSystem() {
+    SystemStatus status = {0};
+    if (!checkMemory()) status.memoryError = 1;
+    if (!checkCommunication()) status.communicationError = 1;
+    if (!checkCritical()) status.criticalError = 1;
+    return status;
+}
