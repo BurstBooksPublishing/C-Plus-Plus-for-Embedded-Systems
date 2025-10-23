@@ -1,0 +1,13 @@
+// Task A
+mtx1.lock();
+mtx2.lock();
+// Critical section
+mtx2.unlock();
+mtx1.unlock();
+
+// Task B
+mtx2.lock();
+mtx1.lock();
+// Critical section
+mtx1.unlock();
+mtx2.unlock();
