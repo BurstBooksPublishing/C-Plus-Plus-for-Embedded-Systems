@@ -1,0 +1,26 @@
+class I2CTest {
+public:
+    void testStartCondition() {
+        // Simulate start condition
+        assert(startConditionDetected());
+    }
+
+    void testAddress() {
+        // Simulate sending address
+        uint8_t address = 0x50;
+        sendAddress(address);
+        assert(addressAcknowledged());
+    }
+
+    void testDataTransfer() {
+        // Simulate data transfer
+        uint8_t data = 0xAB;
+        sendData(data);
+        assert(dataReceived() == data);
+    }
+
+    void testStopCondition() {
+        // Simulate stop condition
+        assert(stopConditionDetected());
+    }
+};
