@@ -1,0 +1,4 @@
+bool readButton() {
+    // Check if PB1 is high
+    return (GPIOB->IDR & (1 << 1)) != 0;
+}
