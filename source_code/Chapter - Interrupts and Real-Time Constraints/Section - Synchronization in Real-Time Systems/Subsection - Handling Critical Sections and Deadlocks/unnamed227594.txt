@@ -1,0 +1,4 @@
+void add_to_buffer(int value) {
+    std::lock_guard guard(mtx);
+    buffer.push_back(value);
+}
