@@ -1,0 +1,4 @@
+#include 
+
+uint8_t sensorValue = 0xFF; // 8-bit unsigned integer
+int16_t temperature = -273; // 16-bit signed integer
