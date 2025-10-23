@@ -1,0 +1,3 @@
+void DMA_Init() {
+// Your configuration here
+}
