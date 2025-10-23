@@ -1,0 +1,5 @@
+// Standard C++: Runtime calculation
+int value = calculateValue();
+
+// Embedded C++: Compile-time calculation
+constexpr int value = calculateValue();
