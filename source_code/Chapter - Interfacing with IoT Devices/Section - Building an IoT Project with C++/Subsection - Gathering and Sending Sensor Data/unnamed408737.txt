@@ -1,0 +1,3 @@
+float convertTemperature(float raw_voltage, float k, float offset) {
+    return (raw_voltage / k) + offset;
+}
