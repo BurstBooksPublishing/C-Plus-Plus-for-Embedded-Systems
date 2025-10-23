@@ -1,0 +1,10 @@
+template 
+class FixedArray {
+public:
+    T& operator[](size_t index) { return data[index]; }
+    const T& operator[](size_t index) const { return data[index]; }
+    size_t size() const { return N; }
+
+private:
+    T data[N];
+};
