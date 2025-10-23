@@ -1,0 +1,7 @@
+void enterSleepMode() {
+    disableUnusedPeripherals();
+    reduceClockSpeed();
+    while (!wakeCondition()) {
+        // Sleep until an interrupt wakes the system
+    }
+}
