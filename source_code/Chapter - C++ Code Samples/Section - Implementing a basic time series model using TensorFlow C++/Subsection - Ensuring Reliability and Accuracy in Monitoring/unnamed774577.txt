@@ -1,0 +1,49 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define a simple linear model for time series forecasting
+    Scope root = Scope::NewRootScope();
+
+    // Placeholder for input data (time steps)
+    auto input = Placeholder(root, DT_FLOAT);
+
+    // Model parameters (weights and bias)
+    auto weights = Variable(root, {1, 1}, DT_FLOAT);
+    auto bias = Variable(root, {1}, DT_FLOAT);
+
+    // Initialize variables
+    auto assign_weights = Assign(root, weights, RandomNormal(root, {1, 1}, DT_FLOAT));
+    auto assign_bias = Assign(root, bias, RandomNormal(root, {1}, DT_FLOAT));
+
+    // Model: y = x * weights + bias
+    auto output = Add(root, MatMul(root, input, weights), bias);
+
+    // Create a session to run the model
+    ClientSession session(root);
+
+    // Initialize variables
+    TF_CHECK_OK(session.Run({assign_weights, assign_bias}, nullptr));
+
+    // Example input data (time steps)
+    Tensor input_data(DT_FLOAT, TensorShape({5, 1}));
+    auto input_data_mapped = input_data.tensor();
+    input_data_mapped.setValues({{1.0f}, {2.0f}, {3.0f}, {4.0f}, {5.0f}});
+
+    // Run the model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{input, input_data}}, {output}, &outputs));
+
+    // Print the output (predicted values)
+    auto output_values = output[0].tensor();
+    for (int i = 0; i < output_values.dimension(0); ++i) {
+        std::cout << "Predicted value at time step " << i + 1 << ": "
+                  << output_values(i, 0) << std::endl;
+    }
+
+    return 0;
+}
