@@ -1,0 +1,5 @@
+// Standard C++: Using std::string
+std::string str = "Hello, World!";
+
+// Embedded C++: Using a character array
+char str[] = "Hello, World!";
