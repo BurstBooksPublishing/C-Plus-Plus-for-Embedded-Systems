@@ -1,0 +1,3 @@
+#include 
+
+std::array data; // Fixed-size array allocated on the stack
