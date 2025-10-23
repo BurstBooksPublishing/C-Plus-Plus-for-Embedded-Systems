@@ -1,0 +1,16 @@
+#include 
+
+class TemperatureSensor {
+public:
+    TemperatureSensor(uint8_t sensorPin) : pin(sensorPin) {}
+    float readTemperature() {
+        uint16_t rawValue = readAnalog(pin);
+        return (rawValue * 0.25) - 50.0; // Example conversion formula
+    }
+private:
+    uint8_t pin;
+    uint16_t readAnalog(uint8_t pin) {
+        // Simulate reading from ADC
+        return 750; // Example raw value
+    }
+};
