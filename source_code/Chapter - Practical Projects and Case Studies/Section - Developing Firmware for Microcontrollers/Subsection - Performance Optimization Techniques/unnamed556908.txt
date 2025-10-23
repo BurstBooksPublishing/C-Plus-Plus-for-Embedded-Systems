@@ -1,0 +1,2 @@
+// Direct register manipulation
+PORTA |= (1 << PA0);  // Set PA0 high
