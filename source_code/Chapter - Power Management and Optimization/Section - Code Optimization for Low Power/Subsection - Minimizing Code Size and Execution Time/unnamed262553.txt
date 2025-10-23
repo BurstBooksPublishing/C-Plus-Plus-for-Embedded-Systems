@@ -1,0 +1,2 @@
+std::array fixed_array; // Fixed-size array
+std::vector dynamic_vector(100); // Dynamic vector
