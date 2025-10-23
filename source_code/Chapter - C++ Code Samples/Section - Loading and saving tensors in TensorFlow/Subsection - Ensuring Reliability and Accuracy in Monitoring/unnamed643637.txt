@@ -1,0 +1,60 @@
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/public/session.h"
+#include "tensorflow/core/platform/env.h"
+
+using namespace tensorflow;
+
+void SaveTensor(const Tensor& tensor, const std::string& file_path) {
+    // Create a TFRecordWriter to save the tensor
+    std::unique_ptr file;
+    TF_CHECK_OK(Env::Default()->NewWritableFile(file_path, &file));
+    TF_CHECK_OK(file->Append(tensor.tensor_data()));
+    TF_CHECK_OK(file->Close());
+}
+
+Tensor LoadTensor(const std::string& file_path, const TensorShape& shape) {
+    // Read the tensor data from the file
+    std::unique_ptr file;
+    TF_CHECK_OK(Env::Default()->NewRandomAccessFile(file_path, &file));
+
+    // Get the file size
+    uint64 file_size;
+    TF_CHECK_OK(Env::Default()->GetFileSize(file_path, &file_size));
+
+    // Allocate a buffer to hold the tensor data
+    Tensor tensor(DT_FLOAT, shape);
+    auto buffer = tensor.tensor_data();
+
+    // Read the file content into the tensor buffer
+    StringPiece result;
+    TF_CHECK_OK(file->Read(0, file_size, &result, const_cast(buffer.data())));
+
+    return tensor;
+}
+
+int main() {
+    // Example usage: Save and load a tensor
+    Tensor tensor(DT_FLOAT, TensorShape({2, 2}));
+    auto tensor_map = tensor.tensor();
+    tensor_map(0, 0) = 1.0f; tensor_map(0, 1) = 2.0f;
+    tensor_map(1, 0) = 3.0f; tensor_map(1, 1) = 4.0f;
+
+    // Save the tensor to a file
+    SaveTensor(tensor, "tensor_data.bin");
+
+    // Load the tensor from the file
+    Tensor loaded_tensor = LoadTensor("tensor_data.bin", TensorShape({2, 2}));
+
+    // Print the loaded tensor
+    auto loaded_map = loaded_tensor.tensor();
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            std::cout << loaded_map(i, j) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
+}
