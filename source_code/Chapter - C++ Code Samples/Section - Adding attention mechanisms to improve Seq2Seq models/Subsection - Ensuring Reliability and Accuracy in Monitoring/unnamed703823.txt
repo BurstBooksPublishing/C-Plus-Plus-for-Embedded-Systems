@@ -1,0 +1,47 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define a function to create an attention mechanism
+Output AttentionMechanism(const Scope& scope, const Output& query, 
+                          const Output& values, const Output& keys) {
+    // Compute attention scores using dot-product attention
+    auto scores = MatMul(scope, query, keys, MatMul::TransposeB(true));
+    auto attention_weights = Softmax(scope, scores);
+
+    // Apply attention weights to values
+    auto context = MatMul(scope, attention_weights, values);
+
+    return context;
+}
+
+// Example of integrating attention into a Seq2Seq model
+void Seq2SeqWithAttention(const Scope& scope) {
+    // Placeholder for input sequences (e.g., encoder outputs)
+    auto encoder_outputs = Placeholder(scope, DT_FLOAT);
+
+    // Placeholder for decoder inputs (e.g., previous decoder states)
+    auto decoder_inputs = Placeholder(scope, DT_FLOAT);
+
+    // Compute attention context
+    auto attention_context = AttentionMechanism(scope, decoder_inputs, 
+                                                encoder_outputs, encoder_outputs);
+
+    // Combine attention context with decoder inputs
+    auto combined_input = Concat(scope, {decoder_inputs, attention_context}, 1);
+
+    // Example of a simple RNN cell for the decoder
+    auto cell = BasicRNNCell(scope, 128); // 128 hidden units
+    auto decoder_outputs = RNN(scope, cell, combined_input);
+
+    // Further processing (e.g., output projection) can be added here
+}
+
+int main() {
+    Scope scope = Scope::NewRootScope();
+    Seq2SeqWithAttention(scope);
+    return 0;
+}
