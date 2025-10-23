@@ -1,0 +1,16 @@
+double calculateBER(const std::vector& transmitted, const std::vector& received) {
+    int bitErrors = 0;
+    int totalBits = transmitted.size() * 8;
+
+    for (size_t i = 0; i < transmitted.size(); ++i) {
+        for (int j = 0; j < 8; ++j) {
+            bool transmittedBit = (transmitted[i] >> j) & 1;
+            bool receivedBit = (received[i] >> j) & 1;
+            if (transmittedBit != receivedBit) {
+                ++bitErrors;
+            }
+        }
+    }
+
+    return static_cast(bitErrors) / totalBits;
+}
