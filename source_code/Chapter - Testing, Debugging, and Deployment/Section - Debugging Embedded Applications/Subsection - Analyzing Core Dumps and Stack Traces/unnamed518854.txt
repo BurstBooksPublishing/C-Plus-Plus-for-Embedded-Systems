@@ -1,0 +1,6 @@
+import gdb
+
+gdb.execute("file ./my_embedded_app")
+gdb.execute("core core")
+stack_trace = gdb.execute("bt", to_string=True)
+print(stack_trace)
