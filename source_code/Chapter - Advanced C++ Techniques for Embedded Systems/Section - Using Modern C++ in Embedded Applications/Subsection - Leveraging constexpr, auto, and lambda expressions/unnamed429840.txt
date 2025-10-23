@@ -1,0 +1,1 @@
+auto sensorReading = readSensorData(); // Type deduced from return value
