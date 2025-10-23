@@ -1,0 +1,4 @@
+alignas(32) struct CacheAlignedData {
+    int a;
+    float b;
+};
