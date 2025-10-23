@@ -1,0 +1,72 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <tensorflow/core/public/session.h>
+#include <tensorflow/core/protobuf/meta_graph.pb.h>
+#include <cpprest/http_listener.h>
+#include <cpprest/json.h>
+
+using namespace web;
+using namespace web::http;
+using namespace web::http::experimental::listener;
+
+// Load TensorFlow model
+tensorflow::Status LoadModel(tensorflow::Session*& session, const std::string& model_path) {
+    tensorflow::GraphDef graph_def;
+    TF_RETURN_IF_ERROR(tensorflow::ReadBinaryProto(tensorflow::Env::Default(), model_path, &graph_def));
+    TF_RETURN_IF_ERROR(tensorflow::NewSession(tensorflow::SessionOptions(), &session));
+    TF_RETURN_IF_ERROR(session->Create(graph_def));
+    return tensorflow::Status::OK();
+}
+
+// Handle POST requests for model inference
+void handle_post(http_request request) {
+    request.extract_json().then([=](pplx::task<json::value> task) {
+        try {
+            auto json_data = task.get();
+            // Extract input data from JSON
+            auto input_data = json_data.at("input").as_array();
+
+            // Convert JSON input to TensorFlow tensor
+            tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, static_cast<int64_t>(input_data.size())}));
+            auto input_tensor_mapped = input_tensor.tensor<float, 2>();
+            for (size_t i = 0; i < input_data.size(); ++i) {
+                input_tensor_mapped(0, i) = static_cast<float>(input_data[i].as_double());
+            }
+
+            // Run inference
+            std::vector<tensorflow::Tensor> outputs;
+            tensorflow::Session* session;
+            TF_CHECK_OK(LoadModel(session, "path/to/your/model.pb"));
+            TF_CHECK_OK(session->Run({{"input_layer_name", input_tensor}}, {"output_layer_name"}, {}, &outputs));
+
+            // Prepare JSON response
+            json::value response = json::value::object();
+            auto output_tensor = outputs[0].tensor<float, 2>();
+            for (int i = 0; i < output_tensor.dimension(1); ++i) {
+                response[U("output")][i] = json::value::number(output_tensor(0, i));
+            }
+
+            // Send response
+            request.reply(status_codes::OK, response);
+        } catch (const std::exception& e) {
+            request.reply(status_codes::InternalError, e.what());
+        }
+    });
+}
+
+int main() {
+    http_listener listener(U("http://localhost:8080/api"));
+    listener.support(methods::POST, handle_post);
+
+    try {
+        listener.open().wait();
+        std::cout << "Listening for requests at: " << listener.uri().to_string() << std::endl;
+        std::cin.get();
+        listener.close().wait();
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
