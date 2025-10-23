@@ -1,0 +1,5 @@
+void debugFunction() {
+    toggleLED(); // Indicate function entry
+    // Function logic
+    toggleLED(); // Indicate function exit
+}
