@@ -1,0 +1,7 @@
+extern "C" void TIM2_IRQHandler() {
+    // High-priority task
+}
+
+extern "C" void USART1_IRQHandler() {
+    // Lower-priority task, preempted by TIM2
+}
