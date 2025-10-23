@@ -1,0 +1,42 @@
+#include "tensorflow/cc/saved_model/loader.h"
+#include "tensorflow/cc/saved_model/tag_constants.h"
+#include "tensorflow/core/public/session.h"
+
+// Function to save a TensorFlow model
+void SaveModel(const std::string& export_dir, 
+               tensorflow::Session* session) {
+    tensorflow::SavedModelBundle bundle;
+    bundle.session.reset(session);
+    
+    // Save the model to the specified directory
+    tensorflow::Status status = tensorflow::SavedModelBundle::Save(
+        export_dir, 
+        tensorflow::kSavedModelTagServe, 
+        bundle.meta_graph_def, 
+        bundle.session.get());
+    
+    if (!status.ok()) {
+        LOG(ERROR) << "Failed to save model: " << status.ToString();
+    }
+}
+
+// Function to restore a TensorFlow model
+tensorflow::Status RestoreModel(const std::string& export_dir, 
+                                tensorflow::Session* session) {
+    tensorflow::SavedModelBundle bundle;
+    
+    // Restore the model from the specified directory
+    tensorflow::Status status = tensorflow::SavedModelBundle::Load(
+        export_dir, 
+        {tensorflow::kSavedModelTagServe}, 
+        &bundle);
+    
+    if (!status.ok()) {
+        LOG(ERROR) << "Failed to restore model: " << status.ToString();
+        return status;
+    }
+    
+    // Assign the restored session to the provided session pointer
+    session = bundle.session.release();
+    return tensorflow::Status::OK();
+}
