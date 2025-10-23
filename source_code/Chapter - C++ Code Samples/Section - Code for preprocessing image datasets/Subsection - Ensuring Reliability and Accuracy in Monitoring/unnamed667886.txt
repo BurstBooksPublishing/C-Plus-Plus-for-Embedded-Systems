@@ -1,0 +1,50 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include  // Include OpenCV for image processing
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void preprocessImage(const std::string& imagePath, Tensor& outputTensor) {
+    // Load image using OpenCV
+    cv::Mat image = cv::imread(imagePath, cv::IMREAD_COLOR);
+    if (image.empty()) {
+        std::cerr << "Error: Could not load image!" << std::endl;
+        return;
+    }
+
+    // Resize image to the required input size for the model
+    cv::resize(image, image, cv::Size(224, 224)); // Resize to 224x224
+
+    // Convert image to float and normalize pixel values to[0, 1]
+    image.convertTo(image, CV_32F, 1.0 / 255.0);
+
+    // Create a TensorFlow tensor from the OpenCV image
+    Tensor tensor(DT_FLOAT, TensorShape({1, 224, 224, 3}));
+    auto tensorMap = tensor.tensor();
+    for (int y = 0; y < 224; ++y) {
+        for (int x = 0; x < 224; ++x) {
+            cv::Vec3f pixel = image.at(y, x);
+            tensorMap(0, y, x, 0) = pixe[2]; // Red channel
+            tensorMap(0, y, x, 1) = pixe[1]; // Green channel
+            tensorMap(0, y, x, 2) = pixe[0]; // Blue channel
+        }
+    }
+
+    // Assign the processed tensor to the output tensor
+    outputTensor = tensor;
+}
+
+int main() {
+    // Example usage
+    Tensor processedImage;
+    preprocessImage("path_to_image.jpg", processedImage);
+
+    // Further processing or feeding into a TensorFlow model
+    // ...
+
+    return 0;
+}
