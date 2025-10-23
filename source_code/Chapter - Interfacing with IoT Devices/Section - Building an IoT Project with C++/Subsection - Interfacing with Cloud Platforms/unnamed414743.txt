@@ -1,0 +1,23 @@
+#include 
+#include 
+
+void sendDataToCloud(const std::string& url, const std::string& data) {
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            std::cerr << "cURL error: " << curl_easy_strerror(res) << std::endl;
+        }
+        curl_easy_cleanup(curl);
+    }
+}
+
+int main() {
+    std::string cloudUrl = "https://api.cloudplatform.com/data";
+    std::string sensorData = "{\"temperature\": 23.5, \"humidity\": 60}";
+    sendDataToCloud(cloudUrl, sensorData);
+    return 0;
+}
