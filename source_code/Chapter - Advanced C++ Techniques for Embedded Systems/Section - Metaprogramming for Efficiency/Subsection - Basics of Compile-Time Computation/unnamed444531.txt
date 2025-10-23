@@ -1,0 +1,7 @@
+constexpr int abs(int x) {
+    if constexpr (x < 0) {
+        return -x;
+    } else {
+        return x;
+    }
+}
