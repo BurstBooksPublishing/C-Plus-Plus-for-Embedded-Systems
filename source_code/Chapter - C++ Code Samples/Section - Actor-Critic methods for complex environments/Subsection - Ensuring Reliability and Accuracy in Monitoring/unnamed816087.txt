@@ -1,0 +1,67 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the Actor-Critic network
+class ActorCritic {
+public:
+    ActorCritic(int state_dim, int action_dim) {
+        // Placeholder for state input
+        state_ = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                             Placeholder::Shape({-1, state_dim}));
+
+        // Actor network: outputs action probabilities
+        auto actor_fc1 = FullyConnected(Scope::NewRootScope(), state_, 
+                                        128, "actor_fc1");
+        auto actor_output = FullyConnected(Scope::NewRootScope(), actor_fc1, 
+                                           action_dim, "actor_output");
+        action_probs_ = Softmax(Scope::NewRootScope(), actor_output);
+
+        // Critic network: outputs state value
+        auto critic_fc1 = FullyConnected(Scope::NewRootScope(), state_, 
+                                         128, "critic_fc1");
+        state_value_ = FullyConnected(Scope::NewRootScope(), critic_fc1, 
+                                      1, "critic_output");
+    }
+
+    // Get action probabilities
+    Output GetActionProbs() const { return action_probs_; }
+
+    // Get state value
+    Output GetStateValue() const { return state_value_; }
+
+private:
+    Output state_;
+    Output action_probs_;
+    Output state_value_;
+};
+
+int main() {
+    // Initialize environment and network
+    int state_dim = 4;  // Example state dimension
+    int action_dim = 2; // Example action dimension
+    ActorCritic ac_network(state_dim, action_dim);
+
+    // Example state input
+    Tensor state_tensor(DT_FLOAT, TensorShape({1, state_dim}));
+    auto state_map = state_tensor.tensor();
+    state_map(0, 0) = 0.5; state_map(0, 1) = -0.5;
+    state_map(0, 2) = 0.1; state_map(0, 3) = -0.1;
+
+    // Run session to get action probabilities and state value
+    ClientSession session(Scope::NewRootScope());
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{ac_network.GetActionProbs(), state_tensor},
+                             {ac_network.GetStateValue(), state_tensor}},
+                            &outputs));
+
+    // Output results
+    std::cout << "Action Probabilities: " << output[0].DebugString() << "\n";
+    std::cout << "State Value: " << output[1].DebugString() << "\n";
+
+    return 0;
+}
