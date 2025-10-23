@@ -1,0 +1,57 @@
+#include 
+#include 
+#include 
+#include "tensorflow_serving/apis/prediction_service.grpc.pb.h"
+
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+using tensorflow::serving::PredictRequest;
+using tensorflow::serving::PredictResponse;
+using tensorflow::serving::PredictionService;
+
+class TensorFlowServingClient {
+public:
+    TensorFlowServingClient(std::shared_ptr channel)
+        : stub_(PredictionService::NewStub(channel)) {}
+
+    // Method to send a prediction request to the TensorFlow Serving server
+    std::string Predict(const std::string& model_name, 
+                        const std::string& input_data) {
+        PredictRequest request;
+        PredictResponse response;
+        ClientContext context;
+
+        // Set the model name and input data in the request
+        request.mutable_model_spec()->set_name(model_name);
+        (*request.mutable_inputs()["input"].set_string_val(input_data);
+
+        // Send the request and receive the response
+        Status status = stub_->Predict(&context, request, &response);
+
+        // Check if the request was successful
+        if (status.ok()) {
+            return response.outputs().at("output").string_val(0);
+        } else {
+            std::cerr << "RPC failed: " << status.error_message() << std::endl;
+            return "RPC failed";
+        }
+    }
+
+private:
+    std::unique_ptr stub_;
+};
+
+int main() {
+    // Create a gRPC channel to connect to the TensorFlow Serving server
+    TensorFlowServingClient client(grpc::CreateChannel(
+        "localhost:8500", grpc::InsecureChannelCredentials()));
+
+    // Send a prediction request and print the result
+    std::string model_name = "my_model";
+    std::string input_data = "example_input";
+    std::string result = client.Predict(model_name, input_data);
+    std::cout << "Prediction result: " << result << std::endl;
+
+    return 0;
+}
