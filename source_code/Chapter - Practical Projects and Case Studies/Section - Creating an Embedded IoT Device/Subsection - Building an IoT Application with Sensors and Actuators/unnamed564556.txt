@@ -1,0 +1,29 @@
+#include 
+#include 
+
+const std::string SERVER_ADDRESS = "tcp://mqtt.eclipse.org:1883";
+const std::string CLIENT_ID = "actuator_client";
+const std::string TOPIC = "actuator/control";
+const int ledPin = 1;
+
+class MessageCallback : public mqtt::callback {
+public:
+    void message_arrived(mqtt::const_message_ptr msg) override {
+        std::string command = msg->to_string();
+        if (command == "ON") {
+            digitalWrite(ledPin, HIGH);
+        } else if (command == "OFF") {
+            digitalWrite(ledPin, LOW);
+        }
+    }
+};
+
+void setup() {
+    wiringPiSetup();
+    pinMode(ledPin, OUTPUT);
+    mqtt::async_client client(SERVER_ADDRESS, CLIENT_ID);
+    mqtt::connect_options connOpts;
+    client.set_callback(MessageCallback());
+    client.connect(connOpts);
+    client.subscribe(TOPIC, 1);
+}
