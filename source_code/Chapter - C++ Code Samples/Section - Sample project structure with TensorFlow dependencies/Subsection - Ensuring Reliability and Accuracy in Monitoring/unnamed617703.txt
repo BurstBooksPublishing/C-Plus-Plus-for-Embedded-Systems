@@ -1,0 +1,45 @@
+// main.cpp
+#include 
+#include 
+#include 
+
+int main() {
+    // Initialize a TensorFlow session
+    tensorflow::Session* session;
+    tensorflow::Status status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Load a TensorFlow model (example: saved_model.pb)
+    tensorflow::GraphDef graph_def;
+    status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), "saved_model.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error reading model: " << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph: " << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Run the session (example: placeholder input)
+    tensorflow::Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 10}));
+    std::vector outputs;
+    status = session->Run({{"input_tensor", input}}, {"output_tensor"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running session: " << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Output the result
+    std::cout << "Output: " << output[0].DebugString() << "\n";
+
+    // Close the session
+    session->Close();
+    return 0;
+}
