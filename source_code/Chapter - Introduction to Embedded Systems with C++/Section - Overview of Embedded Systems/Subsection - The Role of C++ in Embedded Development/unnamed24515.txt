@@ -1,0 +1,8 @@
+class Sensor {
+public:
+    Sensor(int pin) : pin_(pin) {}
+    void init() { pinMode(pin_, INPUT); }
+    int read() { return analogRead(pin_); }
+private:
+    int pin_;
+};
