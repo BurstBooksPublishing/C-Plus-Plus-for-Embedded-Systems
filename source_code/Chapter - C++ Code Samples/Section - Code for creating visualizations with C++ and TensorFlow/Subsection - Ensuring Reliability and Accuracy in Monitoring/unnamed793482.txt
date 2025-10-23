@@ -1,0 +1,37 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+#include  // Include a plotting library like Matplot++
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+using namespace matplot;
+
+int main() {
+    // Create a TensorFlow session
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+
+    // Generate sample data for visualization
+    auto x_data = LinSpace(-10.0f, 10.0f, 100); // Generate 100 points between -10 and 10
+    auto y_data = Sin(x_data); // Compute sine of x_data
+
+    // Convert data to vectors for plotting
+    std::vector x_vals(x_data.flat().data(), 
+                              x_data.flat().data() + x_data.NumElements());
+    std::vector y_vals(y_data.flat().data(), 
+                              y_vals(y_data.flat().data() + y_data.NumElements());
+
+    // Plot the data using Matplot++
+    figure();
+    plot(x_vals, y_vals);
+    title("Sine Wave Visualization");
+    xlabel("X-axis");
+    ylabel("Y-axis");
+    show();
+
+    return 0;
+}
