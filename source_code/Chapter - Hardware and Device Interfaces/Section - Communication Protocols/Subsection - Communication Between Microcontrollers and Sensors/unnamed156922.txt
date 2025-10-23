@@ -1,0 +1,14 @@
+#include 
+
+void setup() {
+  Wire.begin(); // Initialize I\textsuperscript{2}C communication
+}
+
+void loop() {
+  Wire.beginTransmission(0x68); // Start communication with sensor at address 0x68
+  Wire.write(0x00); // Send register address
+  Wire.endTransmission(); // End transmission
+  Wire.requestFrom(0x68, 2); // Request 2 bytes of data from the sensor
+  uint8_t data1 = Wire.read(); // Read the first byte
+  uint8_t data2 = Wire.read(); // Read the second byte
+}
