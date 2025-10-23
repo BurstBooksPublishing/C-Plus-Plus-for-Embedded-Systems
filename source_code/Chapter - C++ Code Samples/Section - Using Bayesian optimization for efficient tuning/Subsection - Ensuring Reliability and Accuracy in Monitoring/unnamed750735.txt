@@ -1,0 +1,38 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Define the objective function to optimize (e.g., model accuracy)
+double objectiveFunction(const std::vector& hyperparams) {
+    // Placeholder for model training and evaluation
+    double accuracy = 0.0;
+    // Train model with hyperparameters and compute accuracy
+    return -accuracy; // Minimize negative accuracy
+}
+
+int main() {
+    // Define the search space for hyperparameters
+    bayesopt::Parameters params;
+    params.n_iterations = 50; // Number of optimization iterations
+    params.n_init_samples = 10; // Initial random samples
+
+    // Define hyperparameter bounds (e.g., learning rate, batch size)
+    std::vector lower_bounds = {0.0001, 32};
+    std::vector upper_bounds = {0.1, 256};
+
+    // Initialize Bayesian optimization
+    bayesopt::ContinuousModel model(2, lower_bounds, upper_bounds, 
+                                    objectiveFunction, params);
+
+    // Run optimization
+    std::vector optimal_hyperparams;
+    model.optimize(optimal_hyperparams);
+
+    // Output optimal hyperparameters
+    std::cout << "Optimal Learning Rate: " << optimal_hyperparam[0] << "\n";
+    std::cout << "Optimal Batch Size: " << optimal_hyperparam[1] << "\n";
+
+    return 0;
+}
