@@ -1,0 +1,6 @@
+int threshold = 10;
+auto checkThreshold = [threshold](int value) {
+    return value > threshold;
+};
+
+bool result = checkThreshold(15); // Returns true
