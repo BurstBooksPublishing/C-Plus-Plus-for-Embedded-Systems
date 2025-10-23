@@ -1,0 +1,10 @@
+#include 
+
+void processData(const std::vector& data) {
+    for (const auto& value : data) {
+        if (value > 0) {
+            // Perform task only for positive values
+            // Example: Log the value
+        }
+    }
+}
