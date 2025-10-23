@@ -1,0 +1,56 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the encoder-decoder model for translation
+Status BuildEncoderDecoderModel(const Tensor& input_sequence, 
+                                Tensor* output_sequence) {
+    Scope root = Scope::NewRootScope();
+
+    // Encoder: LSTM layer
+    auto encoder_cell = RNNCell::LSTMCell(root, 256, "encoder_lstm");
+    auto encoder_outputs = RNN::DynamicRNN(root, input_sequence, 
+                                           encoder_cell, "encoder_rnn");
+
+    // Decoder: LSTM layer with attention mechanism
+    auto decoder_cell = RNNCell::LSTMCell(root, 256, "decoder_lstm");
+    auto decoder_outputs = RNN::DynamicRNN(root, encoder_outputs.h, 
+                                           decoder_cell, "decoder_rnn");
+
+    // Dense layer to map decoder outputs to vocabulary size
+    auto logits = FullyConnected(root, decoder_outputs.h, 10000, 
+                                 "output_layer");
+
+    // Softmax to generate probabilities
+    auto probabilities = Softmax(root, logits, "softmax");
+
+    // Argmax to get the final output sequence
+    auto output = ArgMax(root, probabilities, 1, "argmax");
+
+    ClientSession session(root);
+    TF_RETURN_IF_ERROR(session.Run({output}, output_sequence));
+
+    return Status::OK();
+}
+
+int main() {
+    // Example input sequence tensor (batch_size=1, sequence_length=10)
+    Tensor input_sequence(DT_FLOAT, TensorShape({1, 10, 256}));
+
+    // Output sequence tensor
+    Tensor output_sequence;
+
+    // Build and run the encoder-decoder model
+    Status status = BuildEncoderDecoderModel(input_sequence, &output_sequence);
+    if (!status.ok()) {
+        LOG(ERROR) << "Error building model: " << status;
+        return -1;
+    }
+
+    // Output the translated sequence
+    LOG(INFO) << "Translated sequence: " << output_sequence.DebugString();
+    return 0;
+}
