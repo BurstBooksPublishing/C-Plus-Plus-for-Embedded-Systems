@@ -1,0 +1,11 @@
+void resetWatchdog() {
+    // Write to the watchdog register to reset the timer
+    *reinterpret_cast(0x4000) = 0xA5;
+}
+
+void mainLoop() {
+    while (true) {
+        performTask();
+        resetWatchdog();
+    }
+}
