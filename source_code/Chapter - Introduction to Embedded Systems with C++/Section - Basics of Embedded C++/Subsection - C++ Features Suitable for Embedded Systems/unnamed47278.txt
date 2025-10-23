@@ -1,0 +1,5 @@
+inline int max(int a, int b) {
+    return a > b ? a : b;
+}
+
+int result = max(10, 20); // Function call replaced by code
