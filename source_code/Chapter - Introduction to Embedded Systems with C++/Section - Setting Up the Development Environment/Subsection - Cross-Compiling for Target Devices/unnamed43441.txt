@@ -1,0 +1,2 @@
+./configure --host=riscv64-unknown-linux-gnu --prefix=/opt/riscv
+make && make install
