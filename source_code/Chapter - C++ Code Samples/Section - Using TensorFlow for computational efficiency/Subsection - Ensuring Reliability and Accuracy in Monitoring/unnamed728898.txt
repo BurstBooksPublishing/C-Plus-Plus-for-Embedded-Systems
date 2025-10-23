@@ -1,0 +1,35 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define a scope for TensorFlow operations
+    Scope root = Scope::NewRootScope();
+
+    // Create a 2D tensor (matrix) for input data
+    Tensor input_data(DT_FLOAT, TensorShape({3, 3}));
+    auto input_data_map = input_data.tensor();
+    input_data_map.setValues({{1.0, 2.0, 3.0},
+                              {4.0, 5.0, 6.0},
+                              {7.0, 8.0, 9.0}});
+
+    // Perform Singular Value Decomposition (SVD) for dimensionality reduction
+    auto svd = Svd(root, input_data, true, true);
+
+    // Create a client session to run the computation
+    ClientSession session(root);
+    std::vector outputs;
+
+    // Run the session to compute the SVD
+    TF_CHECK_OK(session.Run({svd.s, svd.u, svd.v}, &outputs));
+
+    // Output the results (singular values, U, and V matrices)
+    std::cout << "Singular values:\n" << output[0].tensor() << "\n\n";
+    std::cout << "U matrix:\n" << output[1].tensor() << "\n\n";
+    std::cout << "V matrix:\n" << output[2].tensor() << "\n";
+
+    return 0;
+}
