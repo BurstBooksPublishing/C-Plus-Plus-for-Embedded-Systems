@@ -1,0 +1,60 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the autoencoder model
+Scope root = Scope::NewRootScope();
+
+// Input placeholder
+auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 784}));
+
+// Encoder layers
+auto encoder_fc1 = FullyConnected(root.WithOpName("encoder_fc1"), input, 256);
+auto encoder_act1 = Relu(root.WithOpName("encoder_act1"), encoder_fc1);
+auto encoder_fc2 = FullyConnected(root.WithOpName("encoder_fc2"), encoder_act1, 128);
+auto encoder_act2 = Relu(root.WithOpName("encoder_act2"), encoder_fc2);
+
+// Latent space representation
+auto latent_space = FullyConnected(root.WithOpName("latent_space"), encoder_act2, 64);
+
+// Decoder layers
+auto decoder_fc1 = FullyConnected(root.WithOpName("decoder_fc1"), latent_space, 128);
+auto decoder_act1 = Relu(root.WithOpName("decoder_act1"), decoder_fc1);
+auto decoder_fc2 = FullyConnected(root.WithOpName("decoder_fc2"), decoder_act1, 256);
+auto decoder_act2 = Relu(root.WithOpName("decoder_act2"), decoder_fc2);
+
+// Output layer
+auto output = FullyConnected(root.WithOpName("output"), decoder_act2, 784);
+
+// Loss function (Mean Squared Error)
+auto loss = ReduceMean(root.WithOpName("loss"), Square(root, Subtract(root, output, input)));
+
+// Optimizer
+auto optimizer = ApplyGradientDescent(root.WithOpName("optimizer"), 0.01f);
+
+// Train the model
+ClientSession session(root);
+std::vector outputs;
+
+// Example training loop (simplified)
+for (int i = 0; i < 1000; ++i) {
+    TF_CHECK_OK(session.Run({{input, training_data}}, {loss}, &outputs));
+    if (i % 100 == 0) {
+        std::cout << "Loss at step " << i << ": " << output[0].scalar() << std::endl;
+    }
+}
+
+// Anomaly detection: Compute reconstruction error
+TF_CHECK_OK(session.Run({{input, test_data}}, {loss}, &outputs));
+float reconstruction_error = output[0].scalar();
+
+// Threshold for anomaly detection
+float threshold = 0.1f;
+if (reconstruction_error > threshold) {
+    std::cout << "Anomaly detected!" << std::endl;
+} else {
+    std::cout << "No anomaly detected." << std::endl;
+}
