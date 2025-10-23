@@ -1,0 +1,38 @@
+#include 
+#include 
+
+// Function to generate polynomial features
+std::vector> generatePolynomialFeatures(
+    const std::vector>& data, int degree) {
+    std::vector> polynomialFeatures;
+
+    for (const auto& row : data) {
+        std::vector newRow;
+        for (int d = 1; d <= degree; ++d) {
+            for (size_t i = 0; i < row.size(); ++i) {
+                newRow.push_back(std::pow(ro[i], d)); // Raise feature to power d
+            }
+        }
+        polynomialFeatures.push_back(newRow);
+    }
+
+    return polynomialFeatures;
+}
+
+int main() {
+    // Example usage
+    std::vector> data = {{1.0, 2.0}, {3.0, 4.0}};
+    int degree = 2;
+
+    auto polynomialData = generatePolynomialFeatures(data, degree);
+
+    // Output the polynomial features
+    for (const auto& row : polynomialData) {
+        for (double val : row) {
+            std::cout << val << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
+}
