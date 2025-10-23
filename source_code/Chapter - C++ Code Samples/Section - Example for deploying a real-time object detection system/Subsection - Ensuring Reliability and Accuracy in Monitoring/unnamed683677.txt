@@ -1,0 +1,66 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+using namespace cv;
+
+int main() {
+    // Load the pre-trained TensorFlow model
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+
+    // Load the input image using OpenCV
+    Mat image = imread("input_image.jpg");
+    if (image.empty()) {
+        std::cerr << "Error: Could not load image." << std::endl;
+        return -1;
+    }
+
+    // Preprocess the image (resize, normalize, etc.)
+    Mat resized_image;
+    resize(image, resized_image, Size(300, 300));
+    Tensor input_tensor(DT_FLOAT, TensorShape({1, 300, 300, 3}));
+    float* p = input_tensor.flat().data();
+    for (int y = 0; y < resized_image.rows; ++y) {
+        for (int x = 0; x < resized_image.cols; ++x) {
+            Vec3b pixel = resized_image.at(y, x);
+            *p++ = pixe[2] / 255.0; // R
+            *p++ = pixe[1] / 255.0; // G
+            *p++ = pixe[0] / 255.0; // B
+        }
+    }
+
+    // Run the model inference
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{"input_tensor", input_tensor}}, 
+                            {"detection_boxes", "detection_scores", 
+                             "detection_classes", "num_detections"}, 
+                            &outputs));
+
+    // Post-process the output (e.g., draw bounding boxes)
+    Tensor boxes = output[0];
+    Tensor scores = output[1];
+    Tensor classes = output[2];
+    Tensor num_detections = output[3];
+
+    // Display the results
+    for (int i = 0; i < num_detections.scalar()(); ++i) {
+        float score = scores.flat()(i);
+        if (score > 0.5) { // Threshold for detection
+            int class_id = classes.flat()(i);
+            auto box = boxes.flat().data() + i * 4;
+            rectangle(image, Point(bo[1] * image.cols, bo[0] * image.rows),
+                      Point(bo[3] * image.cols, bo[2] * image.rows), 
+                      Scalar(0, 255, 0), 2);
+        }
+    }
+
+    imshow("Object Detection", image);
+    waitKey(0);
+
+    return 0;
+}
