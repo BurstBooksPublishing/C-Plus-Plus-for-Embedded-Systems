@@ -1,0 +1,56 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the generator network
+Output Generator(const Scope& scope, const Input& input) {
+    auto dense1 = FullyConnected(scope, input, 128, 
+        FullyConnected::Attrs().ActivationFn("relu"));
+    auto dense2 = FullyConnected(scope, dense1, 784, 
+        FullyConnected::Attrs().ActivationFn("sigmoid"));
+    return dense2;
+}
+
+// Define the discriminator network
+Output Discriminator(const Scope& scope, const Input& input) {
+    auto dense1 = FullyConnected(scope, input, 128, 
+        FullyConnected::Attrs().ActivationFn("relu"));
+    auto dense2 = FullyConnected(scope, dense1, 1, 
+        FullyConnected::Attrs().ActivationFn("sigmoid"));
+    return dense2;
+}
+
+int main() {
+    Scope scope = Scope::NewRootScope();
+
+    // Placeholder for real data and noise input
+    auto real_data = Placeholder(scope, DT_FLOAT, Placeholder::Shape({None, 784}));
+    auto noise = Placeholder(scope, DT_FLOAT, Placeholder::Shape({None, 100}));
+
+    // Build generator and discriminator
+    auto generated_data = Generator(scope, noise);
+    auto real_output = Discriminator(scope, real_data);
+    auto fake_output = Discriminator(scope, generated_data);
+
+    // Define loss functions
+    auto d_loss_real = ReduceMean(scope, 
+        Neg(Log(scope, real_output)), {0});
+    auto d_loss_fake = ReduceMean(scope, 
+        Neg(Log(scope, Sub(scope, 1.0f, fake_output))), {0});
+    auto d_loss = Add(scope, d_loss_real, d_loss_fake);
+    auto g_loss = ReduceMean(scope, 
+        Neg(Log(scope, fake_output)), {0});
+
+    // Optimizers
+    auto d_optimizer = ApplyGradientDescent(scope, d_loss, 0.001f);
+    auto g_optimizer = ApplyGradientDescent(scope, g_loss, 0.001f);
+
+    // Initialize variables and run session
+    ClientSession session(scope);
+    TF_CHECK_OK(session.Run({}, {d_optimizer, g_optimizer}));
+
+    return 0;
+}
