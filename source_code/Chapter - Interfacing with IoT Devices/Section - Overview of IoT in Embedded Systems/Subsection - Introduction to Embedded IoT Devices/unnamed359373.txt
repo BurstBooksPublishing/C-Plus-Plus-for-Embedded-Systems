@@ -1,0 +1,8 @@
+#include 
+
+constexpr uint8_t SENSOR_REGISTER = 0x20;
+
+uint16_t readSensor() {
+    volatile uint16_t* sensorPtr = reinterpret_cast(SENSOR_REGISTER);
+    return *sensorPtr;
+}
