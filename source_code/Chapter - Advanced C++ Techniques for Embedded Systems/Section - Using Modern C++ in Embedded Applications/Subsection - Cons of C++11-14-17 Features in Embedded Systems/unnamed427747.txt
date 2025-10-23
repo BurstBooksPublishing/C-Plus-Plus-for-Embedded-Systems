@@ -1,0 +1,1 @@
+auto result = some_complex_function(); // Type may not be obvious
