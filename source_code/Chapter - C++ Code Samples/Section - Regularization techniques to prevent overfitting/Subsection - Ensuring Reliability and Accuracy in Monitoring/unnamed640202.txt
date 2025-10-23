@@ -1,0 +1,43 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void applyRegularization() {
+    // Define placeholders for input data and labels
+    auto x = Placeholder(Scope::NewRootScope(), DT_FLOAT);
+    auto y = Placeholder(Scope::NewRootScope(), DT_FLOAT);
+
+    // Define weights and bias variables
+    auto W = Variable(Scope::NewRootScope(), {1, 1}, DT_FLOAT);
+    auto b = Variable(Scope::NewRootScope(), {1}, DT_FLOAT);
+
+    // Define the linear model
+    auto model = Add(Scope::NewRootScope(), MatMul(Scope::NewRootScope(), x, W), b);
+
+    // Define the loss function with L2 regularization
+    auto l2_regularization = Multiply(Scope::NewRootScope(), 
+        ReduceSum(Scope::NewRootScope(), Square(Scope::NewRootScope(), W), {0, 1}), 
+        0.01f); // Regularization parameter
+    auto loss = Add(Scope::NewRootScope(), 
+        ReduceMean(Scope::NewRootScope(), Square(Scope::NewRootScope(), Subtract(Scope::NewRootScope(), y, model)), {0}), 
+        l2_regularization);
+
+    // Define the optimizer
+    auto optimizer = GradientDescentOptimizer(Scope::NewRootScope(), 0.01f).Minimize(loss);
+
+    // Initialize variables and start a session
+    ClientSession session(Scope::NewRootScope());
+    TF_CHECK_OK(session.Run({Assign(Scope::NewRootScope(), W, RandomNormal(Scope::NewRootScope(), {1, 1}, DT_FLOAT)), 
+                             Assign(Scope::NewRootScope(), b, RandomNormal(Scope::NewRootScope(), {1}, DT_FLOAT))}, nullptr));
+
+    // Training loop
+    for (int i = 0; i < 1000; ++i) {
+        Tensor x_data(DT_FLOAT, {10, 1});
+        Tensor y_data(DT_FLOAT, {10, 1});
+        // Fill x_data and y_data with training data
+        TF_CHECK_OK(session.Run({{x, x_data}, {y, y_data}}, {optimizer}, nullptr));
+    }
+}
