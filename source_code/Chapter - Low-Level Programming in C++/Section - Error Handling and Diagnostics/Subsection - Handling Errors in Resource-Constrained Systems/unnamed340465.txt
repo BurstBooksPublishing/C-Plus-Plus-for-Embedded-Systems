@@ -1,0 +1,12 @@
+#include 
+
+bool safeMultiply(int a, int b, int& result) {
+    if (a > 0 && b > 0 && a > std::numeric_limits::max() / b) {
+        return false; // Overflow
+    }
+    if (a < 0 && b > 0 && a < std::numeric_limits::min() / b) {
+        return false; // Underflow
+    }
+    result = a * b;
+    return true;
+}
