@@ -1,0 +1,5 @@
+std::vector v{5, 3, 1};
+std::list l{"beta", "alpha"};
+sort_container(v);  // Uses std::sort
+sort_container(l);  // Uses list::sort
+sort_container(v, std::greater{});  // Descending
