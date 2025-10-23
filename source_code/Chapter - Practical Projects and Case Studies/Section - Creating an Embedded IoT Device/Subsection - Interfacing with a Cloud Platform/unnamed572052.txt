@@ -1,0 +1,16 @@
+int retryCount = 0;
+constexpr int maxRetries = 3;
+
+while (retryCount < maxRetries) {
+    if (client->Connect(connectOptions)) {
+        std::cout << "Connected to AWS IoT Core" << std::endl;
+        break;
+    } else {
+        std::cerr << "Connection failed, retrying..." << std::endl;
+        retryCount++;
+    }
+}
+
+if (retryCount == maxRetries) {
+    std::cerr << "Failed to connect after " << maxRetries << " attempts" << std::endl;
+}
