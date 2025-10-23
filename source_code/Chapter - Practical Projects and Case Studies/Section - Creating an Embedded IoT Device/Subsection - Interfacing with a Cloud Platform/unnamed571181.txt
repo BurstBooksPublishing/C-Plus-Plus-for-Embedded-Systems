@@ -1,0 +1,9 @@
+auto onMessageReceived = [](const std::string& topic, const std::string& message) {
+    std::cout << "Received message on topic " << topic << ": " << message << std::endl;
+};
+
+if (client->Subscribe("my/topic", onMessageReceived)) {
+    std::cout << "Subscribed to topic successfully" << std::endl;
+} else {
+    std::cerr << "Failed to subscribe to topic" << std::endl;
+}
