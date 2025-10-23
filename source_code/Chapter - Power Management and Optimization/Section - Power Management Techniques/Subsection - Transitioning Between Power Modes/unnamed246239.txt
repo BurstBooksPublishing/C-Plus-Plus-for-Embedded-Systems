@@ -1,0 +1,15 @@
+void handleInterrupt() {
+    // Wake up from Idle or Sleep Mode
+    wakeUp();
+    processInterrupt();
+}
+
+void managePowerMode() {
+    if (systemActive()) {
+        enterActiveMode();
+    } else if (waitingForEvent()) {
+        enterIdleMode();
+    } else {
+        enterSleepMode();
+    }
+}
