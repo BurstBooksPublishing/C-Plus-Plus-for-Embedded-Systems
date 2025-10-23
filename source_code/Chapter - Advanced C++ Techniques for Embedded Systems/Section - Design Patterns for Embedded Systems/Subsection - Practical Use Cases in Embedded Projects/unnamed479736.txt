@@ -1,0 +1,7 @@
+void setTimerCallback(std::function callback) {
+    // Set timer callback
+}
+
+setTimerCallback([]() {
+    // Handle timer interrupt
+});
