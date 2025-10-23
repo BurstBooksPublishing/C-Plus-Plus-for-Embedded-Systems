@@ -1,0 +1,8 @@
+void SensorController::update() {
+for (int i = 0; i < 1024; ++i) {
+if (sensors[i].isActive()) {
+dataBuffer.push(sensors[i].read());
+}
+}
+transmitData();
+}
