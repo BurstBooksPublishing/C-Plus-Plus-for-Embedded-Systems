@@ -1,0 +1,6 @@
+Task_High (Priority 3):
+Takes mutex M, computes for 8ms, releases M
+Task_Medium (Priority 2):
+Runs for 6ms (no shared resources)
+Task_Low (Priority 1):
+Takes mutex M, computes for 5ms, releases M
