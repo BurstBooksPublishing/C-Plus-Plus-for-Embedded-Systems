@@ -1,0 +1,61 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Function to build a single decision tree
+DecisionTree buildDecisionTree(const std::vector>& data, 
+                               const std::vector& labels) {
+    // Implementation of decision tree building logic
+    // (e.g., recursive splitting based on Gini impurity or entropy)
+    DecisionTree tree;
+    // ...
+    return tree;
+}
+
+// Function to build a random forest
+std::vector buildRandomForest(const std::vector>& data, 
+                                            const std::vector& labels, 
+                                            int numTrees, int maxDepth) {
+    std::vector forest;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, data.size() - 1);
+
+    for (int i = 0; i < numTrees; ++i) {
+        // Bootstrap sampling
+        std::vector> bootstrapSample;
+        std::vector bootstrapLabels;
+        for (int j = 0; j < data.size(); ++j) {
+            int idx = dis(gen);
+            bootstrapSample.push_back(dat[idx]);
+            bootstrapLabels.push_back(label[idx]);
+        }
+
+        // Build a decision tree with the bootstrap sample
+        DecisionTree tree = buildDecisionTree(bootstrapSample, bootstrapLabels);
+        forest.push_back(tree);
+    }
+
+    return forest;
+}
+
+int main() {
+    // Example dataset and labels
+    std::vector> data = {{1.0, 2.0}, {2.0, 3.0}, {3.0, 4.0}};
+    std::vector labels = {0, 1, 0};
+
+    // Build a random forest with 10 trees and max depth of 5
+    std::vector forest = buildRandomForest(data, labels, 10, 5);
+
+    // Use the forest for prediction (not shown here)
+    // ...
+
+    return 0;
+}
