@@ -1,0 +1,4 @@
+constexpr int scale = 1000; // Scaling factor for fixed-point arithmetic
+int fixedPointMultiply(int a, int b) {
+    return (a * b) / scale;
+}
