@@ -1,0 +1,6 @@
+#include 
+
+void enterLowPowerMode() {
+    ESP_LOGI("BLE", "Entering low power mode");
+    esp_deep_sleep_start();
+}
