@@ -1,0 +1,11 @@
+void isr() {
+    // Minimal ISR logic
+    rtos::signalTask(taskA); // Signal Task A
+}
+
+void taskA() {
+    while (true) {
+        rtos::waitForSignal();
+        // Handle time-critical processing
+    }
+}
