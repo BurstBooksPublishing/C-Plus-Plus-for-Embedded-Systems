@@ -1,0 +1,74 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to perform bounding box localization
+void localizeBoundingBox(tensorflow::Session* session, 
+                         const tensorflow::Tensor& input_tensor, 
+                         std::vector& bbox_coords) {
+    // Define input and output tensor names
+    std::vector> inputs = {
+        {"input_image", input_tensor}
+    };
+    std::vector outputs;
+
+    // Run the session to get bounding box coordinates
+    tensorflow::Status status = session->Run(inputs, {"output_bbox"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running session: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Extract bounding box coordinates from the output tensor
+    auto bbox_tensor = output[0].tensor();
+    for (int i = 0; i < 4; ++i) {
+        bbox_coords.push_back(bbox_tensor(0, i));
+    }
+}
+
+int main() {
+    // Initialize TensorFlow session
+    tensorflow::Session* session;
+    tensorflow::SessionOptions session_options;
+    tensorflow::Status status = tensorflow::NewSession(session_options, &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Load the pre-trained model
+    tensorflow::GraphDef graph_def;
+    status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), 
+                                         "path/to/model.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Prepare input tensor (e.g., from an image)
+    tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, {1, 224, 224, 3});
+    // Fill input_tensor with image data...
+
+    // Localize bounding box
+    std::vector bbox_coords;
+    localizeBoundingBox(session, input_tensor, bbox_coords);
+
+    // Output bounding box coordinates
+    std::cout << "Bounding Box Coordinates: ";
+    for (float coord : bbox_coords) {
+        std::cout << coord << " ";
+    }
+    std::cout << std::endl;
+
+    // Close the session
+    session->Close();
+    return 0;
+}
