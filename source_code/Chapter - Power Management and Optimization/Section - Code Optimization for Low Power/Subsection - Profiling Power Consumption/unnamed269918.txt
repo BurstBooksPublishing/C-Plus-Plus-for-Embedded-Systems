@@ -1,0 +1,4 @@
+void disableUnusedPeripheral() {
+    // Disable a peripheral (e.g., ADC) to save power
+    ADC->CR &= ~ADC_CR_ADEN; // Disable ADC
+}
