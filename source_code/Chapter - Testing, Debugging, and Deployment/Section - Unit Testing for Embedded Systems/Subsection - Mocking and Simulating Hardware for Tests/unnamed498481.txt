@@ -1,0 +1,20 @@
+class I2CSimulator {
+public:
+    I2CSimulator() : state_(State::Idle), data_(0) {}
+    void start() { state_ = State::Address; }
+    void write(uint8_t data) {
+        if (state_ == State::Address) {
+            // Process address
+            state_ = State::Data;
+        } else if (state_ == State::Data) {
+            // Process data
+            data_ = data;
+        }
+    }
+    uint8_t read() { return data_; }
+    void stop() { state_ = State::Idle; }
+private:
+    enum class State { Idle, Address, Data };
+    State state_;
+    uint8_t data_;
+};
