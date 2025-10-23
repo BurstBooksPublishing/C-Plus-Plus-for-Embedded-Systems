@@ -1,0 +1,40 @@
+#include 
+#include 
+
+const char* ssid = "your_SSID";
+const char* password = "your_PASSWORD";
+const char* mqtt_server = "broker.hivemq.com";
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  Serial.println("Connected to WiFi");
+
+  client.setServer(mqtt_server, 1883);
+
+  if (client.connect("ESP32Client")) {
+    client.publish("test/topic", "Hello, MQTT!");
+    Serial.println("Message published");
+  } else {
+    Serial.println("Failed to connect to MQTT broker");
+  }
+}
+
+void loop() {
+  if (!client.connected()) {
+    if (client.connect("ESP32Client")) {
+      client.publish("test/topic", "Hello, MQTT!");
+      Serial.println("Message published");
+    }
+  }
+  client.loop();
+}
