@@ -1,0 +1,60 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void buildKPIPredictionModel() {
+    // Define the scope for the TensorFlow graph
+    Scope root = Scope::NewRootScope();
+
+    // Placeholder for input data (e.g., historical KPI data)
+    auto input = Placeholder(root, DT_FLOAT);
+
+    // Define weights and bias for the linear regression model
+    auto weights = Variable(root, {1, 1}, DT_FLOAT);
+    auto bias = Variable(root, {1}, DT_FLOAT);
+
+    // Initialize weights and bias with zeros
+    auto assign_weights = Assign(root, weights, ZerosLike(root, weights));
+    auto assign_bias = Assign(root, bias, ZerosLike(root, bias));
+
+    // Define the linear regression model: y = weights * x + bias
+    auto output = Add(root, MatMul(root, input, weights), bias);
+
+    // Define the loss function (Mean Squared Error)
+    auto labels = Placeholder(root, DT_FLOAT);
+    auto loss = ReduceMean(root, Square(root, Subtract(root, labels, output)), {0});
+
+    // Define the optimizer (Gradient Descent)
+    auto optimizer = GradientDescentOptimizer(root, 0.01);
+    auto train_op = optimizer.Minimize(root, loss);
+
+    // Create a TensorFlow session to run the graph
+    ClientSession session(root);
+
+    // Initialize variables
+    TF_CHECK_OK(session.Run({assign_weights, assign_bias}, nullptr));
+
+    // Example training data (input and labels)
+    Tensor input_data(DT_FLOAT, {4, 1});
+    Tensor label_data(DT_FLOAT, {4, 1});
+    input_data.vec() << 1.0, 2.0, 3.0, 4.0;
+    label_data.vec() << 2.0, 4.0, 6.0, 8.0;
+
+    // Training loop
+    for (int i = 0; i < 1000; ++i) {
+        std::vector outputs;
+        TF_CHECK_OK(session.Run({{input, input_data}, {labels, label_data}}, {train_op}, &outputs));
+    }
+
+    // Predict using the trained model
+    Tensor test_data(DT_FLOAT, {1, 1});
+    test_data.vec() << 5.0;
+    std::vector predictions;
+    TF_CHECK_OK(session.Run({{input, test_data}}, {output}, &predictions));
+
+    // Output the prediction
+    std::cout << "Predicted KPI value: " << prediction[0].scalar() << std::endl;
+}
