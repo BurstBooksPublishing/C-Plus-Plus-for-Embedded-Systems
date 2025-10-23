@@ -1,0 +1,5 @@
+volatile uint32_t* const gpio_data = reinterpret_cast(0x4000A000);
+
+void set_gpio_high(int pin) {
+    *gpio_data |= (1 << pin);
+}
