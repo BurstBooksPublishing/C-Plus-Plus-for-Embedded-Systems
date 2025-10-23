@@ -1,0 +1,6 @@
+#define DEBUG_PRINT(...) \
+    if (ENABLE_DEBUG) { \
+        printf(__VA_ARGS__); \
+    }
+
+DEBUG_PRINT("Current state: %d\n", state);
