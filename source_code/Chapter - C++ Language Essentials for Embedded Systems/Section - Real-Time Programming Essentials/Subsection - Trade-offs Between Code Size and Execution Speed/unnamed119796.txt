@@ -1,0 +1,2 @@
+std::vector dynamicArray; // Dynamic allocation
+int staticArray[100];          // Static allocation
