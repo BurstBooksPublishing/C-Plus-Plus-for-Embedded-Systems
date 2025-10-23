@@ -1,0 +1,86 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Function to restore a model from the latest checkpoint
+bool restoreModel(tensorflow::Session* session, const std::string& checkpointDir) {
+    tensorflow::MetaGraphDef metaGraph;
+    std::string checkpointPath = tensorflow::train::GetLatestCheckpoint(checkpointDir);
+    if (checkpointPath.empty()) {
+        std::cerr << "No checkpoint found in directory: " << checkpointDir << std::endl;
+        return false;
+    }
+
+    tensorflow::Status status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), 
+                                                            checkpointPath + ".meta", 
+                                                            &metaGraph);
+    if (!status.ok()) {
+        std::cerr << "Error reading meta graph: " << status.ToString() << std::endl;
+        return false;
+    }
+
+    status = session->Create(metaGraph.graph_def());
+    if (!status.ok()) {
+        std::cerr << "Error creating graph in session: " << status.ToString() << std::endl;
+        return false;
+    }
+
+    tensorflow::Tensor checkpointPathTensor(tensorflow::DT_STRING, tensorflow::TensorShape());
+    checkpointPathTensor.scalar()() = checkpointPath;
+    status = session->Run({{metaGraph.saver_def().filename_tensor_name(), checkpointPathTensor}},
+                          {}, {metaGraph.saver_def().restore_op_name()}, nullptr);
+    if (!status.ok()) {
+        std::cerr << "Error restoring session from checkpoint: " << status.ToString() << std::endl;
+        return false;
+    }
+
+    std::cout << "Model restored from checkpoint: " << checkpointPath << std::endl;
+    return true;
+}
+
+// Function to save the model checkpoint
+void saveModel(tensorflow::Session* session, const std::string& checkpointDir, 
+               const std::string& checkpointPrefix) {
+    tensorflow::Tensor checkpointPathTensor(tensorflow::DT_STRING, tensorflow::TensorShape());
+    checkpointPathTensor.scalar()() = checkpointDir + "/" + checkpointPrefix;
+    tensorflow::Status status = session->Run({}, {}, {"save/control_dependency"}, 
+                                             nullptr, {{"save/Const", checkpointPathTensor}});
+    if (!status.ok()) {
+        std::cerr << "Error saving checkpoint: " << status.ToString() << std::endl;
+    } else {
+        std::cout << "Checkpoint saved to: " << checkpointDir << "/" << checkpointPrefix << std::endl;
+    }
+}
+
+int main() {
+    // Initialize TensorFlow session
+    tensorflow::Session* session;
+    tensorflow::SessionOptions sessionOptions;
+    tensorflow::Status status = tensorflow::NewSession(sessionOptions, &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating TensorFlow session: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Restore model from checkpoint if available
+    std::string checkpointDir = "./checkpoints";
+    if (!restoreModel(session, checkpointDir)) {
+        std::cerr << "Failed to restore model. Starting training from scratch." << std::endl;
+    }
+
+    // Training loop (simplified for demonstration)
+    for (int epoch = 0; epoch < 10; ++epoch) {
+        // Perform training steps here...
+
+        // Save model checkpoint periodically
+        if (epoch % 2 == 0) {
+            saveModel(session, checkpointDir, "model_checkpoint_" + std::to_string(epoch));
+        }
+    }
+
+    // Close the session
+    session->Close();
+    return 0;
+}
