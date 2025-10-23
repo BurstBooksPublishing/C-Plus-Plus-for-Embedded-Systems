@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <random>
+
+// Define the environment and agent parameters
+const int NUM_STATES = 5;
+const int NUM_ACTIONS = 2;
+const double LEARNING_RATE = 0.1;
+const double DISCOUNT_FACTOR = 0.9;
+const double EXPLORATION_RATE = 0.2;
+const int NUM_EPISODES = 1000;
+
+// Initialize Q-table with zeros
+std::vector<std::vector<double>> QTable(NUM_STATES, std::vector<double>(NUM_ACTIONS, 0.0));
+
+// Function to choose an action using epsilon-greedy strategy
+int chooseAction(int state) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+
+    if (dis(gen) < EXPLORATION_RATE) {
+        // Explore: choose a random action
+        return std::uniform_int_distribution<>(0, NUM_ACTIONS - 1)(gen);
+    } else {
+        // Exploit: choose the action with the highest Q-value
+        return std::distance(QTable[state].begin(), 
+                             std::max_element(QTable[state].begin(), 
+                                              QTable[state].end()));
+    }
+}
+
+// Function to update the Q-table using the Q-learning algorithm
+void updateQTable(int state, int action, int nextState, double reward) {
+    double maxNextQ = *std::max_element(QTable[nextState].begin(), QTable[nextState].end());
+    QTable[state][action] += LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxNextQ 
+                                              - QTable[state][action]);
+}
+
+int main() {
+    // Simulate the learning process over multiple episodes
+    for (int episode = 0; episode < NUM_EPISODES; ++episode) {
+        int state = 0; // Start from the initial state
+
+        while (state != NUM_STATES - 1) { // Continue until reaching the terminal state
+            int action = chooseAction(state);
+            int nextState = state + 1; // Simple state transition for demonstration
+            double reward = (nextState == NUM_STATES - 1) ? 1.0 : 0.0; // Reward at terminal state
+
+            updateQTable(state, action, nextState, reward);
+            state = nextState;
+        }
+    }
+
+    // Output the learned Q-table
+    std::cout << "Learned Q-table:\n";
+    for (int i = 0; i < NUM_STATES; ++i) {
+        for (int j = 0; j < NUM_ACTIONS; ++j) {
+            std::cout << QTable[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+
+    return 0;
+}
