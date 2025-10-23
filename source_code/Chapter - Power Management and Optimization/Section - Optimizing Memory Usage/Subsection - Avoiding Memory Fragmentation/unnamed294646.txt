@@ -1,0 +1,15 @@
+class MemoryPool {
+public:
+    MemoryPool(size_t block_size, size_t num_blocks) {
+        pool = new uint8_t[block_size * num_blocks];
+    }
+
+    uint8_t* allocate(size_t size) {
+        // Allocation logic here
+        return pool + (next_block++ * block_size);
+    }
+
+private:
+    uint8_t* pool;
+    size_t next_block = 0;
+};
