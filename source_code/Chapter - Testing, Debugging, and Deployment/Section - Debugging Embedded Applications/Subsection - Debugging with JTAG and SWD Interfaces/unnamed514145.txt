@@ -1,0 +1,2 @@
+attribute BOUNDARY_LENGTH of XC7A35T : entity is 154;
+attribute INSTRUCTION_LENGTH of XC7A35T : entity is 6;
