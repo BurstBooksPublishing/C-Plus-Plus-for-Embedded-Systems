@@ -1,0 +1,6 @@
+std::mutex myMutex;
+
+void criticalSection() {
+    std::lock_guard guard(myMutex);
+    // Access shared resource
+}
