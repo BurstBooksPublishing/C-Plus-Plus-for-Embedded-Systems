@@ -1,0 +1,30 @@
+template 
+class CircularBuffer {
+public:
+    bool push(const T& value) {
+        if (full()) {
+            return false; // Buffer is full
+        }
+        buffer[tail] = value;
+        tail = (tail + 1) % N;
+        return true;
+    }
+
+    bool pop(T& value) {
+        if (empty()) {
+            return false; // Buffer is empty
+        }
+        value = buffer[head];
+        head = (head + 1) % N;
+        return true;
+    }
+
+    bool empty() const { return head == tail; }
+
+    bool full() const { return (tail + 1) % N == head; }
+
+private:
+    T buffer[N];
+    size_t head = 0;
+    size_t tail = 0;
+};
