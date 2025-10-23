@@ -1,0 +1,4 @@
+float pid_update(float error, float integral, float prev_error) {
+const float Kp = 1.5, Ki = 0.2, Kd = 0.8;
+// Your implementation here
+}
