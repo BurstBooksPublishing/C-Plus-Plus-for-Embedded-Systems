@@ -1,0 +1,42 @@
+#include 
+#include 
+#include 
+
+// Function to handle missing data by replacing it with the mean value
+void handleMissingData(std::vector& data) {
+    double sum = 0.0;
+    int count = 0;
+
+    // Calculate the sum of non-missing values
+    for (double value : data) {
+        if (!std::isnan(value)) {
+            sum += value;
+            count++;
+        }
+    }
+
+    // Calculate the mean value
+    double mean = (count > 0) ? sum / count : 0.0;
+
+    // Replace missing values (NaN) with the mean
+    for (double& value : data) {
+        if (std::isnan(value)) {
+            value = mean;
+        }
+    }
+}
+
+int main() {
+    // Example dataset with missing values represented as NaN
+    std::vector data = {1.0, 2.0, NAN, 4.0, NAN, 5.0};
+
+    // Handle missing data
+    handleMissingData(data);
+
+    // Print the processed data
+    for (double value : data) {
+        std::cout << value << " ";
+    }
+
+    return 0;
+}
