@@ -1,0 +1,79 @@
+#include "tensorflow/core/public/session.h"
+#include "tensorflow/core/platform/env.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/data/dataset.h"
+#include "tensorflow/core/data/dataset_utils.h"
+
+using namespace tensorflow;
+using namespace tensorflow::data;
+
+int main() {
+    // Initialize a TensorFlow session
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        LOG(ERROR) << "Failed to create TensorFlow session: " << status;
+        return -1;
+    }
+
+    // Create a dataset from a list of filenames
+    std::vector filenames = {"data1.txt", "data2.txt", "data3.txt"};
+    DatasetBase* dataset;
+    status = TextLineDataset(filenames, &dataset);
+    if (!status.ok()) {
+        LOG(ERROR) << "Failed to create dataset: " << status;
+        return -1;
+    }
+
+    // Apply transformations to the dataset
+    dataset = dataset->Map([](const Tensor& input) {
+        // Example transformation: convert text to lowercase
+        Tensor output(DT_STRING, input.shape());
+        auto input_data = input.flat();
+        auto output_data = output.flat();
+        for (int i = 0; i < input_data.size(); ++i) {
+            string text = input_data(i);
+            std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+            output_data(i) = text;
+        }
+        return output;
+    });
+
+    // Batch the dataset
+    dataset = dataset->Batch(32);
+
+    // Create an iterator for the dataset
+    std::unique_ptr iterator;
+    status = dataset->MakeIterator(&iterator);
+    if (!status.ok()) {
+        LOG(ERROR) << "Failed to create iterator: " << status;
+        return -1;
+    }
+
+    // Iterate through the dataset and process the data
+    while (true) {
+        std::vector outputs;
+        status = iterator->GetNext(&outputs);
+        if (status.code() == error::OUT_OF_RANGE) {
+            break; // End of dataset
+        }
+        if (!status.ok()) {
+            LOG(ERROR) << "Error getting next batch: " << status;
+            return -1;
+        }
+
+        // Process the batch (e.g., feed to a model)
+        for (const Tensor& tensor : outputs) {
+            // Example processing: print tensor values
+            auto data = tensor.flat();
+            for (int i = 0; i < data.size(); ++i) {
+                LOG(INFO) << "Data: " << data(i);
+            }
+        }
+    }
+
+    // Clean up
+    session->Close();
+    delete session;
+    return 0;
+}
