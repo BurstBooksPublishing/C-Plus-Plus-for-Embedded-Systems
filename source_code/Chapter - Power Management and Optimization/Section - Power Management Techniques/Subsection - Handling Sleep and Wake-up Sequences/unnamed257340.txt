@@ -1,0 +1,24 @@
+#include "stm32f4xx.h" // Include the appropriate HAL library
+
+void configureRTCWakeup() {
+    RCC->APB1ENR |= RCC_APB1ENR_PWREN;  // Enable power control clock
+    PWR->CR |= PWR_CR_DBP;              // Enable RTC write access
+    RCC->BDCR |= RCC_BDCR_RTCEN;       // Enable RTC
+    RTC->WPR = 0xCA;                   // Disable write protection
+    RTC->WPR = 0x53;
+    RTC->CR |= RTC_CR_WUTE;            // Enable wake-up timer
+    RTC->WUTR = 10;                    // Set wake-up interval (e.g., 10 seconds)
+    RTC->CR |= RTC_CR_WUTIE;           // Enable wake-up interrupt
+    NVIC_EnableIRQ(RTC_WKUP_IRQn);     // Enable RTC wake-up interrupt
+}
+
+void enterDeepSleepMode() {
+    PWR->CR |= PWR_CR_PDDS;            // Enter deep sleep mode
+    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;  // Enable deep sleep
+    __WFI();                            // Wait for interrupt
+}
+
+void RTC_WKUP_IRQHandler() {
+    RTC->ISR &= ~RTC_ISR_WUTF;         // Clear wake-up flag
+    // Handle wake-up event
+}
