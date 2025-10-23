@@ -1,0 +1,15 @@
+#include 
+#include 
+#include 
+#include 
+
+uint32_t calculate_checksum(const std::vector& data) {
+    return std::accumulate(data.begin(), data.end(), 0);
+}
+
+int main() {
+    std::vector update_package = {0x01, 0x02, 0x03, 0x04};
+    uint32_t checksum = calculate_checksum(update_package);
+    std::cout << "Checksum: " << checksum << std::endl;
+    return 0;
+}
