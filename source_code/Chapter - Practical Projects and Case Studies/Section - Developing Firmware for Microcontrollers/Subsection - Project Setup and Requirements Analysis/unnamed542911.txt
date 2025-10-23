@@ -1,0 +1,2 @@
+constexpr int max_iterations = 1000;
+volatile uint8_t* const status_register = 0x40020000;
