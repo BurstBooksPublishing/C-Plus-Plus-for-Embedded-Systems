@@ -1,0 +1,9 @@
+#include 
+
+void initialize_watchdog() {
+    wdt_enable(WDTO_2S); // Enable watchdog with a 2-second timeout
+}
+
+void reset_watchdog() {
+    wdt_reset();
+}
