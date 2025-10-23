@@ -1,0 +1,12 @@
+void watchdogHandler() {
+    // Reset system or log error
+}
+
+void mainLoop() {
+    while (true) {
+        feedWatchdog();
+        if (!processTasks()) {
+            watchdogHandler();
+        }
+    }
+}
