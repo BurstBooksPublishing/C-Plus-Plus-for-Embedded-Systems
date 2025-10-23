@@ -1,0 +1,8 @@
+# Compile code with coverage flags
+g++ -fprofile-arcs -ftest-coverage -o my_program my_program.cpp
+
+# Run unit tests
+./my_program --gtest_output="xml:test_results.xml"
+
+# Generate coverage report
+gcov my_program.cpp
