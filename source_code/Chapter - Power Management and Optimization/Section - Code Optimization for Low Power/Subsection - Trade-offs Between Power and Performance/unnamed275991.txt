@@ -1,0 +1,7 @@
+// Using constexpr for compile-time computation
+constexpr int fibonacci(int n) {
+    return (n <= 1) ? n : fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Precomputing values at compile time
+constexpr int fib_10 = fibonacci(10);
