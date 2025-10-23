@@ -1,0 +1,4 @@
+void process_data() {
+    int local_array[100]; // Stack memory
+    // Process data
+}
