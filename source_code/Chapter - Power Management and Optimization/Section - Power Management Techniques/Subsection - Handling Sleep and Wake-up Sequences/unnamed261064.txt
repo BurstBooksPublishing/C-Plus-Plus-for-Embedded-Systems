@@ -1,0 +1,6 @@
+enum states {
+ACTIVE,     // Full operation
+LOW_POWER,  // Reduced sampling rate
+SLEEP,      // Wake-on-interrupt
+FAULT       // Error recovery
+};
