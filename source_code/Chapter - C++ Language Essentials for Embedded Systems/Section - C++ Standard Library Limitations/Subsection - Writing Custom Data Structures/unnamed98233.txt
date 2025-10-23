@@ -1,0 +1,59 @@
+template 
+class NodePool {
+public:
+    struct Node {
+        T value;
+        Node* next;
+    };
+
+    NodePool() {
+        for (size_t i = 0; i < N - 1; ++i) {
+            nodes[i].next = &nodes[i + 1];
+        }
+        nodes[N - 1].next = nullptr;
+        freeList = &nodes[0];
+    }
+
+    Node* allocate() {
+        if (freeList == nullptr) {
+            // Handle error: Out of nodes
+        }
+        Node* node = freeList;
+        freeList = freeList->next;
+        node->next = nullptr;
+        return node;
+    }
+
+    void deallocate(Node* node) {
+        node->next = freeList;
+        freeList = node;
+    }
+
+private:
+    Node nodes[N];
+    Node* freeList;
+};
+
+template 
+class LinkedList {
+public:
+    void push_front(const T& value) {
+        Node* node = pool.allocate();
+        node->value = value;
+        node->next = head;
+        head = node;
+    }
+
+    void pop_front() {
+        if (head == nullptr) {
+            // Handle error: List is empty
+        }
+        Node* node = head;
+        head = head->next;
+        pool.deallocate(node);
+    }
+
+private:
+    NodePool pool;
+    Node* head = nullptr;
+};
