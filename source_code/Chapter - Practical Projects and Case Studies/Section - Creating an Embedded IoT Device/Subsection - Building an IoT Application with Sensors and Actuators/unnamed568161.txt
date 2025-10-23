@@ -1,0 +1,2 @@
+SELECT timestamp, humidity FROM sensor_data
+WHERE timestamp >= datetime('now', '-24 hours');
