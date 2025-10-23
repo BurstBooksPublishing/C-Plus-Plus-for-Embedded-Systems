@@ -1,0 +1,3 @@
+using BenchmarkTools
+arr = @SArray rand(100)
+@btime fast_sum($arr) vs @btime sum($arr)
