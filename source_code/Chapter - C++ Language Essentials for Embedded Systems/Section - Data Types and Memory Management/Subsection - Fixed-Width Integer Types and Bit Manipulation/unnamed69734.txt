@@ -1,0 +1,1 @@
+uint32_t mask = create_bitmask(3, 7); // returns 0xF8 (binary 11111000)
