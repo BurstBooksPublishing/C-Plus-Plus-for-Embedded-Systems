@@ -1,0 +1,5 @@
+constexpr auto compileTimeFilter = [](int value) {
+    return value > 10 && value < 20;
+};
+
+constexpr int filteredValue = compileTimeFilter(15); // Evaluates to true at compile time
