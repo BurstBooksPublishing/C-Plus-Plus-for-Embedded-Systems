@@ -1,0 +1,42 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void scaleAndNormalizeData(Tensor& data) {
+    // Calculate mean and standard deviation of the dataset
+    auto mean = ReduceMean(data, {0}); // Mean along the feature axis
+    auto variance = ReduceMean(Square(data - mean), {0}); // Variance
+    auto std_dev = Sqrt(variance); // Standard deviation
+
+    // Scale and normalize the data
+    data = (data - mean) / std_dev;
+}
+
+int main() {
+    // Example dataset (2D tensor: samples x features)
+    Tensor data(DT_FLOAT, TensorShape({5, 3}));
+    auto data_mapped = data.tensor();
+    data_mapped.setValues({
+        {1.0, 2.0, 3.0},
+        {4.0, 5.0, 6.0},
+        {7.0, 8.0, 9.0},
+        {10.0, 11.0, 12.0},
+        {13.0, 14.0, 15.0}
+    });
+
+    // Scale and normalize the dataset
+    scaleAndNormalizeData(data);
+
+    // Print the normalized data
+    for (int i = 0; i < data.dim_size(0); ++i) {
+        for (int j = 0; j < data.dim_size(1); ++j) {
+            std::cout << data_mapped(i, j) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
+}
