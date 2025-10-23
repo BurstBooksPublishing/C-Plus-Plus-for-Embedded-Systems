@@ -1,0 +1,10 @@
+extern "C" void Reset_Handler();
+extern "C" void SysTick_Handler();
+
+__attribute__((section(".isr_vector")))
+void (*const g_pfnVectors[])(void) = {
+    Reset_Handler,  // Initial stack pointer
+    // Other handlers
+    SysTick_Handler,
+    // Additional interrupt handlers
+};
