@@ -1,0 +1,10 @@
+std::timed_mutex mtx;
+
+void task() {
+    if (mtx.try_lock_for(std::chrono::milliseconds(100))) {
+        // Critical section
+        mtx.unlock();
+    } else {
+        // Handle timeout
+    }
+}
