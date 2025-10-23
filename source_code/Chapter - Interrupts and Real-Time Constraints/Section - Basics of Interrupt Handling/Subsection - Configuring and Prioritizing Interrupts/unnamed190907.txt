@@ -1,0 +1,18 @@
+#include "stm32f4xx.h"
+
+void Configure_GPIO_Interrupt() {
+    // Enable GPIO clock
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+
+    // Configure GPIO pin as input
+    GPIOA->MODER &= ~(3 << (2 * 0)); // Clear mode bits for PA0
+    GPIOA->MODER |= (0 << (2 * 0));  // Set mode to input
+
+    // Configure interrupt on rising edge
+    EXTI->IMR |= EXTI_IMR_MR0;  // Enable interrupt on line 0
+    EXTI->RTSR |= EXTI_RTSR_TR0; // Rising trigger selection for line 0
+
+    // Enable and set EXTI interrupt in NVIC
+    NVIC_SetPriority(EXTI0_IRQn, 1); // Set priority
+    NVIC_EnableIRQ(EXTI0_IRQn);      // Enable interrupt
+}
