@@ -1,0 +1,20 @@
+void taskA() {
+    while (true) {
+        // Task A work
+        rtos::delay(10); // Delay for 10 ms
+    }
+}
+
+void taskB() {
+    while (true) {
+        // Task B work
+        rtos::delay(20); // Delay for 20 ms
+    }
+}
+
+int main() {
+    rtos::createTask(taskA);
+    rtos::createTask(taskB);
+    rtos::startScheduler();
+    return 0;
+}
