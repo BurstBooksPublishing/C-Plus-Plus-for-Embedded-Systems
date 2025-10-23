@@ -1,0 +1,7 @@
+template
+T add(T a, T b) {
+    return a + b;
+}
+
+int result = add(3, 4); // Works with integers
+float result2 = add(3.5f, 4.5f); // Works with floats
