@@ -1,0 +1,2 @@
+UartRegisters* uart = reinterpret_cast(0x40001000);
+uart->control |= 0x1; // Enable UART
