@@ -1,0 +1,17 @@
+#include 
+
+sem_t semaphore;
+
+void producer() {
+    while (true) {
+        // Produce item
+        sem_post(&semaphore); // Signal that an item is available
+    }
+}
+
+void consumer() {
+    while (true) {
+        sem_wait(&semaphore); // Wait for an item to be available
+        // Consume item
+    }
+}
