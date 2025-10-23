@@ -1,0 +1,44 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define the input data (features and labels)
+    Scope root = Scope::NewRootScope();
+    auto x_data = Const(root, {{1.0f}, {2.0f}, {3.0f}, {4.0f}});
+    auto y_data = Const(root, {{2.0f}, {4.0f}, {6.0f}, {8.0f}});
+
+    // Define the model parameters (weights and bias)
+    auto W = Variable(root, {1, 1}, DT_FLOAT);
+    auto b = Variable(root, {1}, DT_FLOAT);
+    auto assign_W = Assign(root, W, RandomNormal(root, {1, 1}, DT_FLOAT));
+    auto assign_b = Assign(root, b, RandomNormal(root, {1}, DT_FLOAT));
+
+    // Define the linear model: y = W * x + b
+    auto y_pred = Add(root, MatMul(root, x_data, W), b);
+
+    // Define the loss function (Mean Squared Error)
+    auto loss = ReduceMean(root, Square(root, Subtract(root, y_pred, y_data)), {0});
+
+    // Define the optimizer (Gradient Descent)
+    auto optimizer = GradientDescentOptimizer(root, 0.01f);
+    auto train_op = optimizer.minimize(loss);
+
+    // Initialize the session and run the training loop
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({assign_W, assign_b}, nullptr)); // Initialize W and b
+    for (int i = 0; i < 1000; ++i) {
+        TF_CHECK_OK(session.Run({train_op}, nullptr)); // Train the model
+    }
+
+    // Evaluate the trained model
+    Tensor W_result, b_result;
+    TF_CHECK_OK(session.Run({W}, &W_result)); // Get the final weight
+    TF_CHECK_OK(session.Run({b}, &b_result)); // Get the final bias
+    LOG(INFO) << "W: " << W_result.matrix() << ", b: " << b_result.vec();
+
+    return 0;
+}
