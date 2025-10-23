@@ -1,0 +1,62 @@
+#include 
+#include 
+#include 
+#include 
+
+// Load a pre-trained NLP model for question answering
+tensorflow::Status LoadModel(const std::string& model_path, 
+                             std::unique_ptr* session) {
+    tensorflow::GraphDef graph_def;
+    TF_RETURN_IF_ERROR(tensorflow::ReadBinaryProto(tensorflow::Env::Default(), 
+                                                   model_path, &graph_def));
+    session->reset(tensorflow::NewSession(tensorflow::SessionOptions()));
+    return (*session)->Create(graph_def);
+}
+
+// Run inference on the model to answer a question
+tensorflow::Status RunInference(tensorflow::Session* session, 
+                                const std::vector>& inputs, 
+                                const std::vector& output_tensor_names, 
+                                std::vector* outputs) {
+    return session->Run(inputs, output_tensor_names, {}, outputs);
+}
+
+int main() {
+    // Path to the pre-trained model
+    std::string model_path = "path/to/pretrained_model.pb";
+    std::unique_ptr session;
+
+    // Load the model
+    tensorflow::Status status = LoadModel(model_path, &session);
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Prepare input tensors (e.g., tokenized question and context)
+    tensorflow::Tensor question_tensor(tensorflow::DT_STRING, tensorflow::TensorShape({1}));
+    tensorflow::Tensor context_tensor(tensorflow::DT_STRING, tensorflow::TensorShape({1}));
+    question_tensor.flat()(0) = "What is TensorFlow?";
+    context_tensor.flat()(0) = "TensorFlow is an open-source machine learning framework.";
+
+    // Define input and output tensor names
+    std::vector> inputs = {
+        {"input_question", question_tensor},
+        {"input_context", context_tensor}
+    };
+    std::vector output_tensor_names = {"output_answer"};
+    std::vector outputs;
+
+    // Run inference
+    status = RunInference(session.get(), inputs, output_tensor_names, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running inference: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Extract and print the answer
+    std::string answer = output[0].flat()(0);
+    std::cout << "Answer: " << answer << std::endl;
+
+    return 0;
+}
