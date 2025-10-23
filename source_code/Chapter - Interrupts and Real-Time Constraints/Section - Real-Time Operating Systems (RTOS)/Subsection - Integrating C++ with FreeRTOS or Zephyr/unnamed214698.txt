@@ -1,0 +1,29 @@
+class MyTask {
+public:
+    MyTask() {
+        xTaskCreate(taskFunction, "MyTask", configMINIMAL_STACK_SIZE, this, 1, &taskHandle);
+    }
+
+    ~MyTask() {
+        if (taskHandle != nullptr) {
+            vTaskDelete(taskHandle);
+        }
+    }
+
+private:
+    static void taskFunction(void* pvParameters) {
+        MyTask* task = static_cast(pvParameters);
+        if (task) {
+            task->run();
+        }
+    }
+
+    void run() {
+        while (true) {
+            // Task logic here
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    }
+
+    TaskHandle_t taskHandle = nullptr;
+};
