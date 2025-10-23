@@ -1,0 +1,7 @@
+void realTimeTask() {
+    // Task must complete within 1ms
+    uint32_t start = getCurrentTime();
+    performTask();
+    uint32_t end = getCurrentTime();
+    assert(end - start <= 1); // Ensure deadline is met
+}
