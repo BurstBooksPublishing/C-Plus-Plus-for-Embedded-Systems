@@ -1,0 +1,2 @@
+volatile uint32_t* write_only_register = reinterpret_cast(0x40002000);
+*write_only_register = 0x1234; // Write to the register
