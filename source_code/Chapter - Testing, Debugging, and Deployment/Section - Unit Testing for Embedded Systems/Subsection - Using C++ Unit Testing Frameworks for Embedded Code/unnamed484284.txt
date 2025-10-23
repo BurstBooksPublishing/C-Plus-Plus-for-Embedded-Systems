@@ -1,0 +1,12 @@
+class SerialFixture : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Initialize serial communication
+        Serial::initialize();
+    }
+
+    void TearDown() override {
+        // Deinitialize serial communication
+        Serial::deinitialize();
+    }
+};
