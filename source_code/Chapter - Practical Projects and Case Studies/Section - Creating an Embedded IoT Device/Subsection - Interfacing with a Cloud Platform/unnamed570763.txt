@@ -1,0 +1,5 @@
+if (client->Publish("my/topic", "Hello from my device")) {
+    std::cout << "Message published successfully" << std::endl;
+} else {
+    std::cerr << "Failed to publish message" << std::endl;
+}
