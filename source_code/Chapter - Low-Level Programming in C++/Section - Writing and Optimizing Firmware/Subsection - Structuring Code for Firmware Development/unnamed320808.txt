@@ -1,0 +1,4 @@
+extern "C" void USART1_IRQHandler() {
+    // Clear interrupt flag
+    // Set a flag or post to a queue for main loop processing
+}
