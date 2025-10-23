@@ -1,0 +1,15 @@
+// Entering low-power mode
+void enterLowPowerMode() {
+    // Save CPU state
+    saveState();
+    // Enter deep sleep
+    deepSleep();
+}
+
+// Waking up from low-power mode
+void wakeUp() {
+    // Restore CPU state
+    restoreState();
+    // Resume normal operation
+    resumeExecution();
+}
