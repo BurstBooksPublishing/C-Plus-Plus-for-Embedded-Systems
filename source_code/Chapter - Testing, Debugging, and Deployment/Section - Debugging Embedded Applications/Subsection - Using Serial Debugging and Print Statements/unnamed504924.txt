@@ -1,0 +1,12 @@
+constexpr size_t BUFFER_SIZE = 1024;
+char buffer[BUFFER_SIZE];
+size_t bufferIndex = 0;
+
+void logMessage(const char* message) {
+    if (bufferIndex + strlen(message) < BUFFER_SIZE) {
+        strcpy(&buffer[bufferIndex], message);
+        bufferIndex += strlen(message);
+    } else {
+        // Handle buffer overflow
+    }
+}
