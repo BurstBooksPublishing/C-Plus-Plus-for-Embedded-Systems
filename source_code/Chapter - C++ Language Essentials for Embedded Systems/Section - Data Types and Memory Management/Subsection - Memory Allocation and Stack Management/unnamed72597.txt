@@ -1,0 +1,4 @@
+void functionExample() {
+    int localVar = 10; // Allocated on the stack
+    // ...
+} // localVar is automatically deallocated when the function returns
