@@ -1,0 +1,40 @@
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/public/session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/cc/ops/image_ops.h"
+#include "tensorflow/cc/ops/io_ops.h"
+#include "tensorflow/core/platform/env.h"
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void DataAugmentationExample() {
+    // Load an image from file
+    Scope root = Scope::NewRootScope();
+    auto image_file = ReadFile(root, "path/to/image.jpg");
+    auto image = DecodeJpeg(root, image_file, DecodeJpeg::Channels(3));
+
+    // Randomly flip the image horizontally
+    auto flipped_image = RandomFlipLeftRight(root, image);
+
+    // Randomly adjust brightness
+    auto brightness_adjusted = RandomBrightness(root, flipped_image, 0.2);
+
+    // Randomly crop the image
+    auto cropped_image = RandomCrop(root, brightness_adjusted, {224, 224, 3});
+
+    // Resize the image to a fixed size
+    auto resized_image = ResizeBilinear(root, cropped_image, {224, 224});
+
+    // Normalize the image to the range[0, 1]
+    auto normalized_image = Div(root, resized_image, {255.0f});
+
+    // Start a TensorFlow session
+    ClientSession session(root);
+    std::vector outputs;
+
+    // Run the session to get the augmented image
+    TF_CHECK_OK(session.Run({normalized_image}, &outputs));
+
+    // The augmented image is now in output[0]
+}
