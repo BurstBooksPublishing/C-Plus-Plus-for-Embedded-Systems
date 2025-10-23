@@ -1,0 +1,17 @@
+class BuddyAllocator {
+public:
+    BuddyAllocator(size_t size) : totalSize(size) {
+        // Initialize the allocator
+    }
+
+    void* allocate(size_t size) {
+        // Implementation of buddy allocation
+    }
+
+    void deallocate(void* ptr) {
+        // Implementation of buddy deallocation
+    }
+
+private:
+    size_t totalSize;
+};
