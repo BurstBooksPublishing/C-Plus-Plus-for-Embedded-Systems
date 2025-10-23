@@ -1,0 +1,24 @@
+template 
+class MemoryPool {
+public:
+    T* allocate() {
+        if (free_list) {
+            T* ptr = reinterpret_cast(free_list);
+            free_list = free_list->next;
+            return ptr;
+        }
+        return nullptr;
+    }
+    void deallocate(T* ptr) {
+        auto node = reinterpret_cast(ptr);
+        node->next = free_list;
+        free_list = node;
+    }
+private:
+    union Node {
+        T data;
+        Node* next;
+    };
+    Node* free_list = nullptr;
+    alignas(alignof(T)) std::byte memory[N * sizeof(T)];
+};
