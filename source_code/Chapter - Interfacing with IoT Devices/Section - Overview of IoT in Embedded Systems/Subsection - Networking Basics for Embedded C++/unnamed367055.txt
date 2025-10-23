@@ -1,0 +1,5 @@
+void send_data(int sock, const char* data, size_t len) {
+    if (send(sock, data, len, 0) < 0) {
+        // Handle error
+    }
+}
