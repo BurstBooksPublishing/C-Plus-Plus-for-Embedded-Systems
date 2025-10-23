@@ -1,0 +1,52 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+
+int main() {
+    // Initialize a TensorFlow session
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Define a dataset pipeline using TensorFlow's Data API
+    GraphDef graph_def;
+    status = ReadBinaryProto(Env::Default(), "dataset_pipeline.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Run the dataset pipeline
+    std::vector outputs;
+    status = session->Run({}, {}, {"dataset_iterator"}, &outputs);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Process the output tensors
+    for (const auto& output : outputs) {
+        std::cout << "Output tensor: " << output.DebugString() << "\n";
+    }
+
+    // Close the session
+    session->Close();
+    return 0;
+}
