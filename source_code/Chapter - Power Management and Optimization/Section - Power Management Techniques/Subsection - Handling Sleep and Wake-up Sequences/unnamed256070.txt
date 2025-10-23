@@ -1,0 +1,19 @@
+#include "stm32f4xx.h" // Include the appropriate HAL library
+
+void configureInterrupt() {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // Enable GPIOA clock
+    GPIOA->MODER &= ~(3U << (2 * 0));    // Configure PA0 as input
+    EXTI->IMR |= EXTI_IMR_MR0;           // Enable EXTI line 0
+    EXTI->RTSR |= EXTI_RTSR_TR0;         // Enable rising edge trigger
+    NVIC_EnableIRQ(EXTI0_IRQn);          // Enable EXTI0 interrupt
+}
+
+void enterSleepMode() {
+    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep on exit
+    __WFI();                             // Wait for interrupt
+}
+
+void EXTI0_IRQHandler() {
+    EXTI->PR |= EXTI_PR_PR0;             // Clear pending interrupt
+    // Handle wake-up event
+}
