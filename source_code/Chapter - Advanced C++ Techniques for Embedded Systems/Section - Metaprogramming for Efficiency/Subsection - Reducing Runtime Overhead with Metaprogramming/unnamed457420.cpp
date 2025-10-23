@@ -1,0 +1,1 @@
+static_assert(Factorial<5>::value == 120, "Test failed");
