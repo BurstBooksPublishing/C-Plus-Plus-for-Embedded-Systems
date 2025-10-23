@@ -1,0 +1,7 @@
+for (int i = 0; i < 100; i += 4) {
+    // Process elements in batches of 4
+    process(array[i]);
+    process(array[i+1]);
+    process(array[i+2]);
+    process(array[i+3]);
+}
