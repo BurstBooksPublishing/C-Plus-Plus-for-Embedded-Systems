@@ -1,0 +1,15 @@
+void configureInterrupt() {
+    // Configure PB0 for rising edge interrupt
+    EXTI->IMR |= (1 << 0);   // Enable interrupt on line 0
+    EXTI->RTSR |= (1 << 0);  // Enable rising edge trigger
+    NVIC_EnableIRQ(EXTI0_IRQn); // Enable EXTI0 interrupt
+}
+
+extern "C" void EXTI0_IRQHandler() {
+    // Handle interrupt
+    if (EXTI->PR & (1 << 0)) {
+        // Clear pending bit
+        EXTI->PR = (1 << 0);
+        // Perform action
+    }
+}
