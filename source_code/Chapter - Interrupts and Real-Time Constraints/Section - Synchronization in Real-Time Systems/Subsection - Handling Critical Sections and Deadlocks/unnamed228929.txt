@@ -1,0 +1,13 @@
+void task_a() {
+    std::unique_lock lock1(mtx1, std::defer_lock);
+    std::unique_lock lock2(mtx2, std::defer_lock);
+    std::lock(lock1, lock2);
+    // Critical section
+}
+
+void task_b() {
+    std::unique_lock lock1(mtx1, std::defer_lock);
+    std::unique_lock lock2(mtx2, std::defer_lock);
+    std::lock(lock1, lock2);
+    // Critical section
+}
