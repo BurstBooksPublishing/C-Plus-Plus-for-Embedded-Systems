@@ -1,0 +1,7 @@
+float CalculateAverage(const std::vector& readings) {
+    float sum = 0.0f;
+    for (auto reading : readings) {
+        sum += reading;
+    }
+    return sum / readings.size();
+}
