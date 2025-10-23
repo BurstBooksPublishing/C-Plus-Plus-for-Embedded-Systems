@@ -1,0 +1,10 @@
+void toggle_led() {
+    asm volatile (
+        "ldr r0, [%[port]]" 
+        "eor r0, r0, #1"    
+        "str r0, [%[port]]"
+        :
+        : [port] "r" (LED_PORT)
+        : "r0"
+    );
+}
