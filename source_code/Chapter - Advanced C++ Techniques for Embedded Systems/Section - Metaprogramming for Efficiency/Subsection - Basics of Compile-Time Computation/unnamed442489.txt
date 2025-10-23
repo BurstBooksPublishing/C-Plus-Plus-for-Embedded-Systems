@@ -1,0 +1,14 @@
+template
+struct Fibonacci {
+    static constexpr int value = Fibonacci::value + Fibonacci::value;
+};
+
+template<>
+struct Fibonacci<0> {
+    static constexpr int value = 0;
+};
+
+template<>
+struct Fibonacci<1> {
+    static constexpr int value = 1;
+};
