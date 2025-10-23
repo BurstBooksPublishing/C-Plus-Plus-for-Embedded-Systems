@@ -1,0 +1,28 @@
+#include 
+#include 
+
+const std::string SERVER_ADDRESS = "tcp://mqtt.cloudplatform.com:1883";
+const std::string CLIENT_ID = "sensor_device";
+const std::string TOPIC = "sensor/data";
+
+void publishData(const std::string& data) {
+    mqtt::client client(SERVER_ADDRESS, CLIENT_ID);
+    mqtt::connect_options connOpts;
+    connOpts.set_keep_alive_interval(20);
+    connOpts.set_clean_session(true);
+
+    try {
+        client.connect(connOpts);
+        mqtt::message_ptr pubmsg = mqtt::make_message(TOPIC, data);
+        client.publish(pubmsg);
+        client.disconnect();
+    } catch (const mqtt::exception& exc) {
+        std::cerr << "MQTT error: " << exc.what() << std::endl;
+    }
+}
+
+int main() {
+    std::string sensorData = "{\"temperature\": 23.5, \"humidity\": 60}";
+    publishData(sensorData);
+    return 0;
+}
