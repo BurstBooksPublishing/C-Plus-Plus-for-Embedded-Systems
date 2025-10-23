@@ -1,0 +1,4 @@
+// Example starter pseudocode
+bool validateFirmware(Partition p) {
+// Your implementation here
+}
