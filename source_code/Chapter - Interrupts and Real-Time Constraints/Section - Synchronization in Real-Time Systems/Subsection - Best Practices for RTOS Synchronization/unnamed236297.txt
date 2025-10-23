@@ -1,0 +1,13 @@
+#include 
+
+std::mutex myMutex;
+
+void highPriorityTask() {
+    std::lock_guard guard(myMutex);
+    // Access shared resource
+}
+
+void lowPriorityTask() {
+    std::lock_guard guard(myMutex);
+    // Access shared resource
+}
