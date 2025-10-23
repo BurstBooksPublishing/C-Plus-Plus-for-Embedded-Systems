@@ -1,0 +1,7 @@
+inline void criticalTask() {
+    // Perform critical task
+}
+
+void ISR() {
+    criticalTask(); // Execute the inline function
+}
