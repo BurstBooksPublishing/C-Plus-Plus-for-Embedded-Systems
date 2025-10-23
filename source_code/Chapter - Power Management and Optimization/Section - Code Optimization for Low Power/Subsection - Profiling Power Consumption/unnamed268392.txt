@@ -1,0 +1,15 @@
+#include 
+#include 
+
+void powerCriticalFunction() {
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    // Critical code section
+    for (int i = 0; i < 1000; ++i) {
+        // Perform some computation
+    }
+    
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration elapsed = end - start;
+    std::cout << "Execution time: " << elapsed.count() << " seconds\n";
+}
