@@ -1,0 +1,26 @@
+class State {
+public:
+    virtual void handle() = 0;
+};
+
+class IdleState : public State {
+public:
+    void handle() override { /* Handle idle state */ }
+};
+
+class ActiveState : public State {
+public:
+    void handle() override { /* Handle active state */ }
+};
+
+class Device {
+public:
+    Device() : state(new IdleState()) {}
+    void setState(State* newState) { 
+        delete state;
+        state = newState;
+    }
+    void performAction() { state->handle(); }
+private:
+    State* state;
+};
