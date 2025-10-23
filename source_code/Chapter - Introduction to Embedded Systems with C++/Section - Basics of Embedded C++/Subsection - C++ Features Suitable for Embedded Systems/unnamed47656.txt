@@ -1,0 +1,5 @@
+try {
+    // Critical code
+} catch (const std::exception& e) {
+    // Handle error
+}
