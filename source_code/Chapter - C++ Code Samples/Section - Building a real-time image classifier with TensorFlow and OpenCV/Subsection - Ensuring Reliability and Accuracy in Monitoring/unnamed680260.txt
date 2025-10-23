@@ -1,0 +1,100 @@
+#include 
+#include 
+#include 
+#include 
+
+// Load TensorFlow model
+TF_Graph* LoadGraph(const char* model_path) {
+    TF_Status* status = TF_NewStatus();
+    TF_Graph* graph = TF_NewGraph();
+    TF_SessionOptions* session_opts = TF_NewSessionOptions();
+    TF_Buffer* run_opts = nullptr;
+
+    TF_Session* session = TF_LoadSessionFromSavedModel(
+        session_opts, run_opts, model_path, nullptr, 0, graph, nullptr, status);
+
+    if (TF_GetCode(status) != TF_OK) {
+        std::cerr << "Error loading model: " << TF_Message(status) << std::endl;
+        TF_DeleteGraph(graph);
+        graph = nullptr;
+    }
+
+    TF_DeleteSessionOptions(session_opts);
+    TF_DeleteStatus(status);
+    return graph;
+}
+
+// Preprocess image for TensorFlow input
+cv::Mat PreprocessImage(const cv::Mat& image) {
+    cv::Mat resized_image;
+    cv::resize(image, resized_image, cv::Size(224, 224)); // Resize to model input size
+    resized_image.convertTo(resized_image, CV_32F, 1.0 / 255.0); // Normalize
+    return resized_image;
+}
+
+// Run inference on the image
+std::vector RunInference(TF_Graph* graph, const cv::Mat& image) {
+    TF_Status* status = TF_NewStatus();
+    TF_Session* session = TF_NewSession(graph, nullptr, status);
+
+    // Prepare input tensor
+    std::vector dims = {1, image.rows, image.cols, image.channels()};
+    TF_Tensor* input_tensor = TF_AllocateTensor(TF_FLOAT, dims.data(), dims.size(), image.total() * image.elemSize());
+
+    // Copy image data to tensor
+    std::memcpy(TF_TensorData(input_tensor), image.data, TF_TensorByteSize(input_tensor));
+
+    // Prepare output tensor
+    TF_Output input_op = {TF_GraphOperationByName(graph, "input_tensor"), 0};
+    TF_Output output_op = {TF_GraphOperationByName(graph, "output_tensor"), 0};
+
+    TF_Tensor* output_tensor = nullptr;
+    TF_SessionRun(session, nullptr, &input_op, &input_tensor, 1, &output_op, &output_tensor, 1, nullptr, 0, nullptr, status);
+
+    // Extract results
+    std::vector results(TF_TensorByteSize(output_tensor) / sizeof(float));
+    std::memcpy(results.data(), TF_TensorData(output_tensor), TF_TensorByteSize(output_tensor));
+
+    // Cleanup
+    TF_DeleteTensor(input_tensor);
+    TF_DeleteTensor(output_tensor);
+    TF_DeleteSession(session, status);
+    TF_DeleteStatus(status);
+
+    return results;
+}
+
+int main() {
+    // Load TensorFlow model
+    TF_Graph* graph = LoadGraph("path/to/saved_model");
+
+    // Initialize OpenCV video capture
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        std::cerr << "Error opening video stream" << std::endl;
+        return -1;
+    }
+
+    cv::Mat frame;
+    while (cap.read(frame)) {
+        // Preprocess frame
+        cv::Mat processed_frame = PreprocessImage(frame);
+
+        // Run inference
+        std::vector results = RunInference(graph, processed_frame);
+
+        // Display results (e.g., class with highest probability)
+        int predicted_class = std::distance(results.begin(), std::max_element(results.begin(), results.end()));
+        std::cout << "Predicted class: " << predicted_class << std::endl;
+
+        // Display frame
+        cv::imshow("Real-Time Image Classifier", frame);
+        if (cv::waitKey(1) == 27) break; // Exit on ESC key
+    }
+
+    // Cleanup
+    TF_DeleteGraph(graph);
+    cap.release();
+    cv::destroyAllWindows();
+    return 0;
+}
