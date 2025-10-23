@@ -1,0 +1,8 @@
+template
+void process(T value) {
+    if constexpr (std::is_integral_v) {
+        // Compile-time optimized path for integral types
+    } else {
+        // Generic path for non-integral types
+    }
+}
