@@ -1,0 +1,4 @@
+template
+T read_register(volatile T* reg) {
+    return *reg;
+}
