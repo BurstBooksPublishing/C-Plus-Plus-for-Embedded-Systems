@@ -1,0 +1,1 @@
+std::function func = [](int a, int b) { return a + b; }; int result = func(3, 4); // Slight runtime overhead
