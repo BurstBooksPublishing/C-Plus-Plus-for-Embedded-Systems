@@ -1,0 +1,48 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to clean and preprocess data
+std::vector cleanAndPreprocessData(const std::vector& rawData) {
+    std::vector processedData;
+    for (const auto& value : rawData) {
+        // Example: Remove outliers by clipping values to a range
+        float cleanedValue = std::max(-1.0f, std::min(1.0f, value));
+        processedData.push_back(cleanedValue);
+    }
+    return processedData;
+}
+
+// Function to normalize data
+std::vector normalizeData(const std::vector& data) {
+    std::vector normalizedData;
+    float sum = 0.0f;
+    for (const auto& value : data) {
+        sum += value;
+    }
+    float mean = sum / data.size();
+    for (const auto& value : data) {
+        normalizedData.push_back((value - mean) / mean);
+    }
+    return normalizedData;
+}
+
+int main() {
+    // Example raw data
+    std::vector rawData = {0.5f, 1.2f, -0.8f, 2.5f, -1.5f};
+
+    // Step 1: Clean and preprocess data
+    std::vector cleanedData = cleanAndPreprocessData(rawData);
+
+    // Step 2: Normalize data
+    std::vector normalizedData = normalizeData(cleanedData);
+
+    // Output the processed data
+    for (const auto& value : normalizedData) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
