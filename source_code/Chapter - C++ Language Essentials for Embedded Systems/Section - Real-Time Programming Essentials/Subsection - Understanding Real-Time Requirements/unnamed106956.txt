@@ -1,0 +1,12 @@
+volatile bool event_occurred = false;
+
+void ISR() {
+    event_occurred = true;
+}
+
+void event_handler() {
+    if (event_occurred) {
+        // Handle the event
+        event_occurred = false;
+    }
+}
