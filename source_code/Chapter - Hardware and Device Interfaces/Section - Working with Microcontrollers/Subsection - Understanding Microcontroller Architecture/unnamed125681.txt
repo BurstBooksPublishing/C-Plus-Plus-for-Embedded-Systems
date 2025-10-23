@@ -1,0 +1,5 @@
+void buttonPressed() {
+    // Handle button press
+}
+
+attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonPressed, RISING);
