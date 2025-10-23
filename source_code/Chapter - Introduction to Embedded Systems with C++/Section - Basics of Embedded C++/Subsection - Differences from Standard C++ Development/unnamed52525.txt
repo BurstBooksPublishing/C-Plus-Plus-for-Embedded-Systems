@@ -1,0 +1,6 @@
+// Standard C++: No direct hardware interaction
+int value = 42;
+
+// Embedded C++: Writing to a hardware register
+#define GPIO_OUTPUT (*(volatile unsigned int*)0x1000)
+GPIO_OUTPUT = 0x01;
