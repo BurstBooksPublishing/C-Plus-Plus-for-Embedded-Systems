@@ -1,0 +1,8 @@
+void ControlAlgorithmTest::testExecutionTime() {
+    auto start = std::chrono::high_resolution_clock::now();
+    controlAlgorithm.run();
+    auto end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast(end - start);
+    CPPUNIT_ASSERT(duration.count() <= 1000); // Assert execution time <= 1ms
+}
