@@ -1,0 +1,31 @@
+// Include TensorFlow C++ headers
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+
+int main() {
+    // Create a TensorFlow scope
+    tensorflow::Scope root = tensorflow::Scope::NewRootScope();
+
+    // Define two constant tensors
+    auto a = tensorflow::ops::Const(root, { {3.0f, 2.0f}, {1.0f, 4.0f} });
+    auto b = tensorflow::ops::Const(root, { {1.0f, 0.0f}, {0.0f, 1.0f} });
+
+    // Perform matrix multiplication
+    auto matmul = tensorflow::ops::MatMul(root, a, b);
+
+    // Create a session to run the computation
+    tensorflow::ClientSession session(root);
+
+    // Define a vector to hold the output tensor
+    std::vector outputs;
+
+    // Run the session and store the result in outputs
+    TF_CHECK_OK(session.Run({matmul}, &outputs));
+
+    // Print the result
+    std::cout << "Matrix multiplication result:\n"
+              << output[0].matrix() << std::endl;
+
+    return 0;
+}
