@@ -1,0 +1,10 @@
+#include 
+#include 
+
+void realTimeTask() {
+    auto start = std::chrono::high_resolution_clock::now();
+    // Perform time-critical task
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast(end - start);
+}
