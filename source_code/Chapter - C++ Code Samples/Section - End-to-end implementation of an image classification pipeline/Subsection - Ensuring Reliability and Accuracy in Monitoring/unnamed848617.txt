@@ -1,0 +1,34 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Load pre-trained model
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+
+    // Placeholder for input image
+    auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({1, 224, 224, 3}));
+
+    // Load model (e.g., MobileNet)
+    auto model = ImportGraphDef(root, "path_to_mobilenet.pb");
+
+    // Run inference
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{input, input_tensor}}, {model.output}, &outputs));
+
+    // Process output (e.g., softmax, argmax)
+    auto output = output[0].tensor();
+    int predicted_class = std::distance(output.data(), std::max_element(output.data(), output.data() + output.size()));
+
+    // Print predicted class
+    std::cout << "Predicted class: " << predicted_class << std::endl;
+
+    return 0;
+}
