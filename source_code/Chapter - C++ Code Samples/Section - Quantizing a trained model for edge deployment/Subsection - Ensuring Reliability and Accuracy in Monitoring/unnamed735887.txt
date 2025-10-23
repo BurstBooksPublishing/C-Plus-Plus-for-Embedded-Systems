@@ -1,0 +1,26 @@
+#include 
+#include 
+#include 
+#include 
+
+// Load the trained model
+std::unique_ptr model = 
+    tflite::FlatBufferModel::BuildFromFile("trained_model.tflite");
+
+// Create a TensorFlow Lite interpreter
+std::unique_ptr interpreter;
+tflite::ops::builtin::BuiltinOpResolver resolver;
+tflite::InterpreterBuilder(*model, resolver)(&interpreter);
+
+// Apply post-training quantization
+tflite::optimize::QuantizeModelAllOperators(
+    model->GetModel(), 
+    tflite::TensorType_FLOAT32, 
+    tflite::TensorType_UINT8, 
+    &interpreter->primary_subgraph());
+
+// Save the quantized model for edge deployment
+std::ofstream quantized_model("quantized_model.tflite", std::ios::binary);
+quantized_model.write(reinterpret_cast(model->GetModel()->data()), 
+                      model->GetModel()->size());
+quantized_model.close();
