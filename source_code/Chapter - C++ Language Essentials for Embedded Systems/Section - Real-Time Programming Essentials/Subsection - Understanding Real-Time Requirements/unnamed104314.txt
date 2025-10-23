@@ -1,0 +1,2 @@
+constexpr int max_size = 100;
+int buffer[max_size];
