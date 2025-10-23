@@ -1,0 +1,64 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to perform k-fold cross-validation
+double crossValidate(const std::vector>& data, 
+                     int k, 
+                     std::function>&, 
+                                          const std::vector>&)> model) {
+    int n = data.size();
+    int foldSize = n / k;
+    double totalError = 0.0;
+
+    for (int i = 0; i < k; ++i) {
+        // Split data into training and validation sets
+        std::vector> trainData, valData;
+        for (int j = 0; j < n; ++j) {
+            if (j >= i * foldSize && j < (i + 1) * foldSize) {
+                valData.push_back(dat[j]);
+            } else {
+                trainData.push_back(dat[j]);
+            }
+        }
+
+        // Train the model and calculate validation error
+        double error = model(trainData, valData);
+        totalError += error;
+    }
+
+    // Return the average error across all folds
+    return totalError / k;
+}
+
+// Example model function (e.g., linear regression)
+double exampleModel(const std::vector>& trainData, 
+                    const std::vector>& valData) {
+    // Placeholder for model training and validation
+    // This should be replaced with actual model implementation
+    double error = 0.0;
+    // Calculate error (e.g., mean squared error)
+    for (const auto& val : valData) {
+        double prediction = 0.0; // Placeholder for prediction
+        error += std::pow(val.back() - prediction, 2);
+    }
+    return error / valData.size();
+}
+
+int main() {
+    // Example dataset
+    std::vector> data = {
+        {1.0, 2.0, 3.0},
+        {4.0, 5.0, 6.0},
+        {7.0, 8.0, 9.0},
+        {10.0, 11.0, 12.0},
+        {13.0, 14.0, 15.0}
+    };
+
+    // Perform 3-fold cross-validation
+    double avgError = crossValidate(data, 3, exampleModel);
+    std::cout << "Average validation error: " << avgError << std::endl;
+
+    return 0;
+}
