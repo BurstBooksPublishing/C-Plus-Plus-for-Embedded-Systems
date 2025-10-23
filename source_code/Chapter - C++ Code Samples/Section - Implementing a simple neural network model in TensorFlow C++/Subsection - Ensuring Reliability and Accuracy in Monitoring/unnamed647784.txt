@@ -1,0 +1,52 @@
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define the scope for the operations
+    Scope root = Scope::NewRootScope();
+
+    // Input placeholder
+    auto x = Placeholder(root, DT_FLOAT, Placeholder::Shape({None, 2}));
+
+    // Weights and biases for the hidden layer
+    auto W1 = Variable(root, {2, 3}, DT_FLOAT);
+    auto b1 = Variable(root, {3}, DT_FLOAT);
+
+    // Weights and biases for the output layer
+    auto W2 = Variable(root, {3, 1}, DT_FLOAT);
+    auto b2 = Variable(root, {1}, DT_FLOAT);
+
+    // Hidden layer computation
+    auto hidden = Add(root, MatMul(root, x, W1), b1);
+    auto hidden_activation = Relu(root, hidden);
+
+    // Output layer computation
+    auto output = Add(root, MatMul(root, hidden_activation, W2), b2);
+
+    // Initialize variables
+    auto init = VariablesInitializer(root, {W1, b1, W2, b2});
+
+    // Create a session to run the graph
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({init}, nullptr));
+
+    // Example input tensor
+    Tensor input_data(DT_FLOAT, TensorShape({3, 2}));
+    auto input_matrix = input_data.matrix();
+    input_matrix(0, 0) = 1.0; input_matrix(0, 1) = 2.0;
+    input_matrix(1, 0) = 3.0; input_matrix(1, 1) = 4.0;
+    input_matrix(2, 0) = 5.0; input_matrix(2, 1) = 6.0;
+
+    // Run the model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{x, input_data}}, {output}, &outputs));
+
+    // Print the output
+    LOG(INFO) << "Output: " << output[0].matrix();
+
+    return 0;
+}
