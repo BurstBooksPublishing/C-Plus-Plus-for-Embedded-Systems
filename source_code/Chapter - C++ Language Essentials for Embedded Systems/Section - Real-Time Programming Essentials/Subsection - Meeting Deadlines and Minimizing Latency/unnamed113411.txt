@@ -1,0 +1,12 @@
+volatile bool interrupt_occurred = false;
+
+void ISR() {
+    interrupt_occurred = true;
+}
+
+void background_task() {
+    if (interrupt_occurred) {
+        // Handle the interrupt
+        interrupt_occurred = false;
+    }
+}
