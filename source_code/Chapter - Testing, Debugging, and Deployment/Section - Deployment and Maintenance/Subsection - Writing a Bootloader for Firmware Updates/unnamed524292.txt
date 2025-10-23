@@ -1,0 +1,16 @@
+#include 
+
+// Calculate a simple checksum
+uint32_t calculate_checksum(const uint8_t *data, uint32_t length) {
+  uint32_t checksum = 0;
+  for (uint32_t i = 0; i < length; ++i) {
+    checksum += data[i];
+  }
+  return checksum;
+}
+
+// Validate firmware using checksum
+bool validate_firmware(const uint8_t *firmware, uint32_t length, uint32_t expected_checksum) {
+  uint32_t checksum = calculate_checksum(firmware, length);
+  return checksum == expected_checksum;
+}
