@@ -1,0 +1,2 @@
+std::ofstream file("data.txt");
+file << "Hello, World!" << std::endl;
