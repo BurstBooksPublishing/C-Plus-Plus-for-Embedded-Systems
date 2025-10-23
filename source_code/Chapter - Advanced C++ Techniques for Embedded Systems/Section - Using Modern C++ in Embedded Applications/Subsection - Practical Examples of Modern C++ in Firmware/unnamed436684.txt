@@ -1,0 +1,5 @@
+std::tuple read_sensor_and_status() {
+    int status = check_status();
+    int value = read_sensor();
+    return std::make_tuple(status, value);
+}
