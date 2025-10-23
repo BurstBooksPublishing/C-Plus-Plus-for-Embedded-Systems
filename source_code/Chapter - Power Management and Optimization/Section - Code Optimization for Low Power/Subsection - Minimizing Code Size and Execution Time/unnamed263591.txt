@@ -1,0 +1,1 @@
+int scaled_value = (integer_value * 100) / 256; // Fixed-point approximation
