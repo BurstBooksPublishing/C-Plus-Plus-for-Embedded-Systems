@@ -1,0 +1,16 @@
+project_root/
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ main.cpp
+â”‚   â”œâ”€â”€ peripherals/
+â”‚   â”‚   â”œâ”€â”€ gpio.cpp
+â”‚   â”‚   â””â”€â”€ uart.cpp
+â”‚   â””â”€â”€ drivers/
+â”‚       â””â”€â”€ sensor.cpp
+â”œâ”€â”€ include/
+â”‚   â”œâ”€â”€ peripherals/
+â”‚   â”‚   â”œâ”€â”€ gpio.h
+â”‚   â”‚   â””â”€â”€ uart.h
+â”‚   â””â”€â”€ drivers/
+â”‚       â””â”€â”€ sensor.h
+â””â”€â”€ third_party/
+    â””â”€â”€ stm32cubemx/
