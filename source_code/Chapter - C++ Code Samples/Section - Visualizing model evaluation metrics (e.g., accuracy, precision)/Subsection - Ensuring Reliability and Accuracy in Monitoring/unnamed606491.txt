@@ -1,0 +1,49 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to calculate accuracy
+float calculateAccuracy(const std::vector& trueLabels, 
+                        const std::vector& predictedLabels) {
+    int correct = 0;
+    for (size_t i = 0; i < trueLabels.size(); ++i) {
+        if (trueLabel[i] == predictedLabel[i]) {
+            correct++;
+        }
+    }
+    return static_cast(correct) / trueLabels.size();
+}
+
+// Function to calculate precision
+float calculatePrecision(const std::vector& trueLabels, 
+                         const std::vector& predictedLabels, 
+                         int classLabel) {
+    int truePositives = 0, falsePositives = 0;
+    for (size_t i = 0; i < trueLabels.size(); ++i) {
+        if (predictedLabel[i] == classLabel) {
+            if (trueLabel[i] == classLabel) {
+                truePositives++;
+            } else {
+                falsePositives++;
+            }
+        }
+    }
+    return static_cast(truePositives) / (truePositives + falsePositives);
+}
+
+int main() {
+    // Example true and predicted labels
+    std::vector trueLabels = {0, 1, 1, 0, 1, 0, 1, 0, 1, 0};
+    std::vector predictedLabels = {0, 1, 0, 0, 1, 1, 1, 0, 1, 0};
+
+    // Calculate and display accuracy
+    float accuracy = calculateAccuracy(trueLabels, predictedLabels);
+    std::cout << "Accuracy: " << accuracy << std::endl;
+
+    // Calculate and display precision for class 1
+    float precision = calculatePrecision(trueLabels, predictedLabels, 1);
+    std::cout << "Precision for class 1: " << precision << std::endl;
+
+    return 0;
+}
