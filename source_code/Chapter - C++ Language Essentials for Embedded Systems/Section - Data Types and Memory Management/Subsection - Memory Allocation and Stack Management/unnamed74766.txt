@@ -1,0 +1,3 @@
+void processLargeObject(const LargeObject& obj) { // Pass by reference
+    // ...
+}
