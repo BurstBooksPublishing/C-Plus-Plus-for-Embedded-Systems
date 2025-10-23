@@ -1,0 +1,2 @@
+auto is_valid = [](int value) { return value > 0; };
+sensor_buffer.erase(std::remove_if(sensor_buffer.begin(), sensor_buffer.end(), is_valid), sensor_buffer.end());
