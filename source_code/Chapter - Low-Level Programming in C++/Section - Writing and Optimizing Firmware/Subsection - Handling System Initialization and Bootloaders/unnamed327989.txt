@@ -1,0 +1,3 @@
+uint32_t calculate_sysclk(uint32_t f_osc, uint32_t PLLM, uint32_t PLLN, uint32_t PLLP) {
+    return (f_osc * PLLN) / (PLLM * PLLP);
+}
