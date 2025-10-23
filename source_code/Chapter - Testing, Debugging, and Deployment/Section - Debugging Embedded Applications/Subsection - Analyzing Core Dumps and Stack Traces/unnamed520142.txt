@@ -1,0 +1,4 @@
+Thread 1 (Thread 0x7ffff7d8d740 (LWP 12345)):
+#0  0x00007ffff7e3a1f7 in pthread_join () from /lib/x86_64-linux-gnu/libpthread.so.0
+#1  0x00005555555552a1 in cleanup_threads () at src/worker.c:203
+#2  0x00005555555555d9 in main () at src/worker.c:315
