@@ -1,0 +1,4 @@
+volatile uint32_t* gpioConfigRegister = reinterpret_cast(0x40020000);
+
+// Set GPIO pin 5 as output
+*gpioConfigRegister |= (1 << (5 * 2)); // Position 10:11 set to 01
