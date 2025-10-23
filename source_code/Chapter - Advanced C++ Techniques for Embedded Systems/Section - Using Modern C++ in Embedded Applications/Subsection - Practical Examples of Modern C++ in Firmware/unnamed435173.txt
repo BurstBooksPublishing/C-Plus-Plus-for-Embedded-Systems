@@ -1,0 +1,3 @@
+for (auto& value : sensor_buffer) {
+    value = read_sensor();
+}
