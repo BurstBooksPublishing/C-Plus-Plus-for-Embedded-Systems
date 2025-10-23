@@ -1,0 +1,5 @@
+void enterLowPowerMode() {
+    // Configure peripherals for low power
+    // Enter sleep mode
+    __asm__ __volatile__("WFI"); // Wait for interrupt
+}
