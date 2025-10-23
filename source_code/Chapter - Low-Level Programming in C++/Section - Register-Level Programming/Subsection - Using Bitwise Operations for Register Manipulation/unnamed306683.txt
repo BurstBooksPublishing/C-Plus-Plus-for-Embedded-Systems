@@ -1,0 +1,2 @@
+uint8_t reg = 0b00001100; // Example register value
+reg |= (1 << 2);         // Set bit 2
