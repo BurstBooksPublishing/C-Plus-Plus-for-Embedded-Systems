@@ -1,0 +1,8 @@
+void background_task() {
+    while (true) {
+        perform_task();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+std::thread worker(background_task);
