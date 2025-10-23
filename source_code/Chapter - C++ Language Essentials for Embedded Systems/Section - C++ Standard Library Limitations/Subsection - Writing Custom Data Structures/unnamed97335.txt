@@ -1,0 +1,22 @@
+template 
+class StaticArray {
+public:
+    constexpr size_t size() const { return N; }
+
+    T& operator[](size_t index) {
+        if (index >= N) {
+            // Handle error: Index out of bounds
+        }
+        return data[index];
+    }
+
+    const T& operator[](size_t index) const {
+        if (index >= N) {
+            // Handle error: Index out of bounds
+        }
+        return data[index];
+    }
+
+private:
+    T data[N];
+};
