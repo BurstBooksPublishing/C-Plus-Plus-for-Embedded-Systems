@@ -1,0 +1,39 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void benchmarkCppML() {
+    // Start timing
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // Create a TensorFlow scope
+    Scope root = Scope::NewRootScope();
+
+    // Define a simple matrix multiplication operation
+    auto A = Const(root, {{1.0f, 2.0f}, {3.0f, 4.0f}});
+    auto B = Const(root, {{5.0f, 6.0f}, {7.0f, 8.0f}});
+    auto matmul = MatMul(root, A, B);
+
+    // Run the session
+    ClientSession session(root);
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({matmul}, &outputs));
+
+    // End timing
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration elapsed = end - start;
+
+    // Output the result and time taken
+    std::cout << "C++ ML Benchmark Result:\n" << output[0].matrix() << "\n";
+    std::cout << "Time taken: " << elapsed.count() << " seconds\n";
+}
+
+int main() {
+    benchmarkCppML();
+    return 0;
+}
