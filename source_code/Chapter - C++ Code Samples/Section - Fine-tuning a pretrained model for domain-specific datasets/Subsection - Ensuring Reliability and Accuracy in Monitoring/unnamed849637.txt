@@ -1,0 +1,42 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void fineTunePretrainedModel(const std::string& modelPath, 
+                             const std::string& datasetPath) {
+    // Load the pretrained model
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+    
+    // Load the dataset
+    Tensor dataset;
+    TF_CHECK_OK(ReadBinaryProto(root.env(), datasetPath, &dataset));
+
+    // Modify the last layer for domain-specific classification
+    auto input = Placeholder(root, DT_FLOAT);
+    auto weights = Variable(root, {1024, 10}, DT_FLOAT);
+    auto biases = Variable(root, {10}, DT_FLOAT);
+    auto logits = Add(root, MatMul(root, input, weights), biases);
+
+    // Define the loss function and optimizer
+    auto labels = Placeholder(root, DT_FLOAT);
+    auto cross_entropy = ReduceMean(root, 
+        Negate(root, Multiply(root, labels, Log(root, Softmax(root, logits)))));
+    auto optimizer = ApplyGradientDescent(root, weights, 0.01f, cross_entropy);
+
+    // Fine-tune the model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({optimizer}, &outputs));
+
+    // Save the fine-tuned model
+    TF_CHECK_OK(SaveModel(root, session, modelPath));
+}
+
+int main() {
+    fineTunePretrainedModel("pretrained_model.pb", "domain_dataset.pb");
+    return 0;
+}
