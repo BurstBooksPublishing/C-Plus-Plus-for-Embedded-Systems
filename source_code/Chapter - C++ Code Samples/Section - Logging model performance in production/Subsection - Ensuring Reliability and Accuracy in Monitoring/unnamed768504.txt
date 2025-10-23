@@ -1,0 +1,45 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Function to log model performance metrics
+void logPerformanceMetrics(const std::string& modelName, 
+                           double accuracy, 
+                           double latency, 
+                           const std::string& logFilePath) {
+    // Get current timestamp
+    auto now = std::chrono::system_clock::now();
+    std::time_t timestamp = std::chrono::system_clock::to_time_t(now);
+
+    // Open log file in append mode
+    std::ofstream logFile(logFilePath, std::ios::app);
+    if (!logFile.is_open()) {
+        std::cerr << "Error opening log file!" << std::endl;
+        return;
+    }
+
+    // Log performance metrics
+    logFile << "Timestamp: " << std::ctime(Ã—tamp)
+            << "Model: " << modelName << "\n"
+            << "Accuracy: " << accuracy << "\n"
+            << "Latency: " << latency << " ms\n"
+            << "-------------------------\n";
+
+    // Close the log file
+    logFile.close();
+}
+
+int main() {
+    // Example usage
+    std::string modelName = "MyModel";
+    double accuracy = 0.95; // Example accuracy
+    double latency = 120.5; // Example latency in milliseconds
+    std::string logFilePath = "model_performance_log.txt";
+
+    // Log the performance metrics
+    logPerformanceMetrics(modelName, accuracy, latency, logFilePath);
+
+    return 0;
+}
