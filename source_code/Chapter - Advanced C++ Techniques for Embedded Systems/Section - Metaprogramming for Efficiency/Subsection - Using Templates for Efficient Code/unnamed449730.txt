@@ -1,0 +1,9 @@
+template 
+struct Factorial {
+    static constexpr int value = N * Factorial::value;
+};
+
+template <>
+struct Factorial<0> {
+    static constexpr int value = 1;
+};
