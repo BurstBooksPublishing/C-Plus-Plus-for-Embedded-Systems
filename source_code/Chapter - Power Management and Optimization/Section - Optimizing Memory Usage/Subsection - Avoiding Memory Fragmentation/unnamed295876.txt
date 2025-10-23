@@ -1,0 +1,28 @@
+class CustomAllocator {
+public:
+    CustomAllocator(size_t size) {
+        memory = new uint8_t[size];
+        free_blocks.push_back({memory, size});
+    }
+
+    void* allocate(size_t size) {
+        for (auto& block : free_blocks) {
+            if (block.size >= size) {
+                void* ptr = block.ptr;
+                block.ptr += size;
+                block.size -= size;
+                return ptr;
+            }
+        }
+        return nullptr;
+    }
+
+private:
+    struct Block {
+        uint8_t* ptr;
+        size_t size;
+    };
+
+    std::list free_blocks;
+    uint8_t* memory;
+};
