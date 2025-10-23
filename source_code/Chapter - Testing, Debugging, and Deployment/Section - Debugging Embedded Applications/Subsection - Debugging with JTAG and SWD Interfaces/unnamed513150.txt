@@ -1,0 +1,10 @@
+Pin 1: VREF
+Pin 2: SWDIO
+Pin 3: GND
+Pin 4: SWCLK
+Pin 5: TDI
+Pin 6: TDO
+Pin 7: TCK
+Pin 8: TMS
+Pin 9: nTRST
+Pin 10: RESET
