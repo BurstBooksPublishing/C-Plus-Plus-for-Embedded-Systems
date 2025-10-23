@@ -1,0 +1,13 @@
+class IADC {
+public:
+    virtual uint16_t read() const = 0;
+    virtual ~IADC() = default;
+};
+
+class MockADC : public IADC {
+public:
+    MockADC(uint16_t value) : value_(value) {}
+    uint16_t read() const override { return value_; }
+private:
+    uint16_t value_;
+};
