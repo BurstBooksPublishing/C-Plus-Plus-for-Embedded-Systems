@@ -1,0 +1,1 @@
+std::unique_ptr buffer(new int[256]);
