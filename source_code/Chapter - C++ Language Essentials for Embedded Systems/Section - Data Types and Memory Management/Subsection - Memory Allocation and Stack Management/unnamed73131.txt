@@ -1,0 +1,4 @@
+void processData() {
+    int data[100]; // Fixed-size array allocated on the stack
+    // ...
+}
