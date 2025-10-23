@@ -1,0 +1,20 @@
+class UARTMock {
+public:
+    void write(char data) {
+        // Simulate writing to UART register
+        transmittedData.push_back(data);
+    }
+
+    char read() {
+        // Simulate reading from UART register
+        if (receivedData.empty()) {
+            return '\0';
+        }
+        char data = receivedData.front();
+        receivedData.pop_front();
+        return data;
+    }
+
+    std::vector transmittedData;
+    std::deque receivedData;
+};
