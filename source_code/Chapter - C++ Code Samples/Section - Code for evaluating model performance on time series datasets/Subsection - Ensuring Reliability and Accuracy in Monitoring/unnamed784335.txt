@@ -1,0 +1,47 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void evaluateTimeSeriesModel(const Tensor& predictions, const Tensor& labels) {
+    // Calculate Mean Absolute Error (MAE)
+    auto diff = Subtract(root(), predictions, labels);
+    auto abs_diff = Abs(root(), diff);
+    auto mae = Mean(root(), abs_diff, 0); // Mean along the batch dimension
+
+    // Calculate Root Mean Squared Error (RMSE)
+    auto squared_diff = Square(root(), diff);
+    auto mse = Mean(root(), squared_diff, 0);
+    auto rmse = Sqrt(root(), mse);
+
+    ClientSession session(root());
+    std::vector outputs;
+
+    // Run the session to compute MAE and RMSE
+    TF_CHECK_OK(session.Run({mae, rmse}, &outputs));
+
+    std::cout << "Mean Absolute Error (MAE): " << output[0].scalar()() << std::endl;
+    std::cout << "Root Mean Squared Error (RMSE): " << output[1].scalar()() << std::endl;
+}
+
+int main() {
+    // Example predictions and labels (replace with actual data)
+    Tensor predictions(DT_FLOAT, TensorShape({10}));
+    Tensor labels(DT_FLOAT, TensorShape({10}));
+
+    // Fill tensors with example data
+    auto pred_map = predictions.tensor();
+    auto label_map = labels.tensor();
+    for (int i = 0; i < 10; ++i) {
+        pred_map(i) = static_cast(i) * 0.1f;
+        label_map(i) = static_cast(i) * 0.1f + 0.05f;
+    }
+
+    evaluateTimeSeriesModel(predictions, labels);
+
+    return 0;
+}
