@@ -1,0 +1,5 @@
+constexpr int computeChecksum(const std::array& data) {
+    int sum = 0;
+    for (auto byte : data) sum += byte;
+    return sum;
+}
