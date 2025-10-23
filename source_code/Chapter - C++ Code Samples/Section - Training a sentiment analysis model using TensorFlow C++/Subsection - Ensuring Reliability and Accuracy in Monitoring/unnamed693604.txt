@@ -1,0 +1,95 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define the model parameters
+    const int input_size = 100; // Input feature size
+    const int num_classes = 2;  // Positive or negative sentiment
+    const int hidden_units = 128; // Hidden layer size
+
+    // Placeholder for input data
+    auto input = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                             Placeholder::Shape({-1, input_size}));
+
+    // Define the weights and biases for the hidden layer
+    auto weights_hidden = Variable(Scope::NewRootScope(), 
+                                   {input_size, hidden_units}, DT_FLOAT);
+    auto biases_hidden = Variable(Scope::NewRootScope(), 
+                                  {hidden_units}, DT_FLOAT);
+
+    // Define the hidden layer
+    auto hidden_layer = Add(Scope::NewRootScope(), 
+                            MatMul(Scope::NewRootScope(), input, weights_hidden), 
+                            biases_hidden);
+    auto hidden_activation = Relu(Scope::NewRootScope(), hidden_layer);
+
+    // Define the weights and biases for the output layer
+    auto weights_output = Variable(Scope::NewRootScope(), 
+                                   {hidden_units, num_classes}, DT_FLOAT);
+    auto biases_output = Variable(Scope::NewRootScope(), 
+                                  {num_classes}, DT_FLOAT);
+
+    // Define the output layer
+    auto output_layer = Add(Scope::NewRootScope(), 
+                            MatMul(Scope::NewRootScope(), hidden_activation, 
+                                   weights_output), biases_output);
+
+    // Define the loss function (cross-entropy)
+    auto labels = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                              Placeholder::Shape({-1, num_classes}));
+    auto loss = ReduceMean(Scope::NewRootScope(), 
+                           SoftmaxCrossEntropyWithLogits(Scope::NewRootScope(), 
+                                                         output_layer, labels), 
+                           {0});
+
+    // Define the optimizer (Adam)
+    auto optimizer = ApplyAdam(Scope::NewRootScope(), 
+                               {weights_hidden, biases_hidden, weights_output, 
+                                biases_output}, 0.001f, 0.9f, 0.999f, 1e-8f);
+
+    // Initialize variables and start a session
+    ClientSession session(Scope::NewRootScope());
+    TF_CHECK_OK(session.Run({Assign(Scope::NewRootScope(), weights_hidden, 
+                                    RandomNormal(Scope::NewRootScope(), 
+                                                 {input_size, hidden_units}, 
+                                                 DT_FLOAT)),
+                            Assign(Scope::NewRootScope(), biases_hidden, 
+                                   RandomNormal(Scope::NewRootScope(), 
+                                                {hidden_units}, DT_FLOAT)),
+                            Assign(Scope::NewRootScope(), weights_output, 
+                                   RandomNormal(Scope::NewRootScope(), 
+                                                {hidden_units, num_classes}, 
+                                                DT_FLOAT)),
+                            Assign(Scope::NewRootScope(), biases_output, 
+                                   RandomNormal(Scope::NewRootScope(), 
+                                                {num_classes}, DT_FLOAT))}, 
+                            nullptr));
+
+    // Training loop
+    for (int epoch = 0; epoch < 10; ++epoch) {
+        // Generate dummy input and labels for training
+        Tensor input_tensor(DT_FLOAT, TensorShape({32, input_size}));
+        Tensor labels_tensor(DT_FLOAT, TensorShape({32, num_classes}));
+        // Fill tensors with random data (for demonstration)
+        input_tensor.matrix().setRandom();
+        labels_tensor.matrix().setRandom();
+
+        // Run the training step
+        std::vector outputs;
+        TF_CHECK_OK(session.Run({{input, input_tensor}, {labels, labels_tensor}}, 
+                                {loss, optimizer}, &outputs));
+
+        // Print the loss
+        std::cout << "Epoch " << epoch << ", Loss: " 
+                  << output[0].scalar()() << std::endl;
+    }
+
+    return 0;
+}
