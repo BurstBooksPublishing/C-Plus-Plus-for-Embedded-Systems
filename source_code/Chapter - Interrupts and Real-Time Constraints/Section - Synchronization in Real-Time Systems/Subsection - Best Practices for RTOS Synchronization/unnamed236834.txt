@@ -1,0 +1,8 @@
+#include 
+
+std::atomic sharedData{0};
+
+void realTimeTask() {
+    int localData = sharedData.load(std::memory_order_relaxed);
+    // Process data
+}
