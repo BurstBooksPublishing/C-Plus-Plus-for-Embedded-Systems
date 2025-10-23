@@ -1,0 +1,11 @@
+CC = arm-none-eabi-gcc
+CFLAGS = -mcpu=cortex-m4 -O2 -g
+LDFLAGS = -T linker_script.ld
+
+all: firmware.elf
+
+firmware.elf: main.o gpio.o uart.o
+    $(CC) $(LDFLAGS) -o $@ $^
+
+%.o: %.c
+    $(CC) $(CFLAGS) -c -o $@ $<
