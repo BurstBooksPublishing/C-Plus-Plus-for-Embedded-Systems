@@ -1,0 +1,7 @@
+#include 
+
+void sendData(const std::string& topic, const std::string& payload) {
+    mqtt::client client("tcp://localhost:1883", "client_id");
+    mqtt::message msg = mqtt::make_message(topic, payload);
+    client.publish(msg);
+}
