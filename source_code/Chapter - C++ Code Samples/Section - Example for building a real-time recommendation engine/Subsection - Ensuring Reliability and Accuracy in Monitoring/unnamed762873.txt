@@ -1,0 +1,62 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Load a pre-trained recommendation model
+tensorflow::SavedModelBundle bundle;
+tensorflow::SessionOptions session_options;
+tensorflow::RunOptions run_options;
+std::string export_dir = "path/to/saved_model";
+
+// Load the model from the specified directory
+TF_CHECK_OK(tensorflow::LoadSavedModel(session_options, run_options, 
+                                       export_dir, {"serve"}, &bundle));
+
+// Function to generate real-time recommendations
+std::vector generate_recommendations(const std::vector& user_input) {
+    tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, 
+                                    tensorflow::TensorShape({1, user_input.size()}));
+    auto input_tensor_mapped = input_tensor.tensor();
+
+    // Populate the input tensor with user data
+    for (size_t i = 0; i < user_input.size(); ++i) {
+        input_tensor_mapped(0, i) = user_inpu[i];
+    }
+
+    // Define the input and output tensor names
+    std::vector> inputs = {
+        {"input_tensor", input_tensor}
+    };
+    std::vector outputs;
+    std::vector output_names = {"output_tensor"};
+
+    // Run the model to get recommendations
+    TF_CHECK_OK(bundle.session->Run(inputs, output_names, {}, &outputs));
+
+    // Extract and return the recommendations
+    auto output_tensor_mapped = output[0].tensor();
+    std::vector recommendations(output_tensor_mapped.size());
+    for (size_t i = 0; i < recommendations.size(); ++i) {
+        recommendation[i] = output_tensor_mapped(0, i);
+    }
+    return recommendations;
+}
+
+int main() {
+    // Example user input (e.g., user preferences or history)
+    std::vector user_input = {0.5, 0.3, 0.8, 0.1};
+
+    // Generate recommendations
+    std::vector recommendations = generate_recommendations(user_input);
+
+    // Output the recommendations
+    std::cout << "Recommendations: ";
+    for (float rec : recommendations) {
+        std::cout << rec << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
