@@ -1,0 +1,45 @@
+#include "tensorflow/core/public/session.h"
+#include "tensorflow/core/platform/env.h"
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/framework/tensor_shape.h"
+#include "tensorflow/core/framework/types.h"
+#include "tensorflow/core/util/example_proto_helper.h"
+#include 
+#include 
+
+using namespace tensorflow;
+
+void BatchAndShuffleData(const std::vector& data, 
+                         int batch_size, 
+                         std::vector& batched_data) {
+    // Shuffle the data
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(data.begin(), data.end(), g);
+
+    // Batch the data
+    for (size_t i = 0; i < data.size(); i += batch_size) {
+        Tensor batch_tensor(DT_FLOAT, {batch_size, dat[0].dim_size(1)});
+        for (int j = 0; j < batch_size && (i + j) < data.size(); ++j) {
+            auto batch_slice = batch_tensor.SubSlice(j);
+            dat[i + j].flat().swap(batch_slice.flat());
+        }
+        batched_data.push_back(batch_tensor);
+    }
+}
+
+int main() {
+    // Example data (replace with actual data loading logic)
+    std::vector data;
+    Tensor example_tensor(DT_FLOAT, {1, 10});
+    for (int i = 0; i < 100; ++i) {
+        data.push_back(example_tensor);
+    }
+
+    // Batch and shuffle the data
+    std::vector batched_data;
+    BatchAndShuffleData(data, 32, batched_data);
+
+    // Further processing of batched_data...
+    return 0;
+}
