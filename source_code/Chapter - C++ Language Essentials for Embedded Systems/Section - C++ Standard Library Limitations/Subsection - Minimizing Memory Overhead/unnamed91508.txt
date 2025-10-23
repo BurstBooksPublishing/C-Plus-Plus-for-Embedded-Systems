@@ -1,0 +1,2 @@
+constexpr int buffer_size = 100;
+uint8_t static_buffer[buffer_size];
