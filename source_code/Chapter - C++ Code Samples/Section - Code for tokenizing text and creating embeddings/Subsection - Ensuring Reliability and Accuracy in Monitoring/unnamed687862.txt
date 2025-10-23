@@ -1,0 +1,65 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Function to tokenize text into words
+std::vector tokenizeText(const std::string& text) {
+    std::vector tokens;
+    std::string token;
+    for (char ch : text) {
+        if (isalpha(ch) || ch == '\'') {
+            token += tolower(ch); // Convert to lowercase and build token
+        } else if (!token.empty()) {
+            tokens.push_back(token); // Add token to vector
+            token.clear();
+        }
+    }
+    if (!token.empty()) {
+        tokens.push_back(token); // Add last token if any
+    }
+    return tokens;
+}
+
+// Function to create embeddings from tokens
+Tensor createEmbeddings(const std::vector& tokens, Session* session) {
+    // Placeholder for input tokens
+    auto input = Placeholder(session->graph(), DT_STRING, Placeholder::Shape({static_cast(tokens.size())}));
+
+    // Load pre-trained embedding model (e.g., Word2Vec)
+    auto embeddings = Variable(session->graph(), {10000, 300}, DT_FLOAT); // Example: 10k words, 300-dim embeddings
+    auto embedding_lookup = Gather(session->graph(), embeddings, input);
+
+    // Run session to get embeddings
+    std::vector outputs;
+    TF_CHECK_OK(session->Run({{input, Tensor(tokens)}}, {embedding_lookup}, &outputs));
+
+    return output[0]; // Return the embeddings tensor
+}
+
+int main() {
+    // Initialize TensorFlow session
+    Session* session;
+    TF_CHECK_OK(NewSession(SessionOptions(), &session));
+
+    // Example text
+    std::string text = "Natural Language Processing with C++ and TensorFlow";
+
+    // Tokenize text
+    auto tokens = tokenizeText(text);
+
+    // Create embeddings
+    Tensor embeddings = createEmbeddings(tokens, session);
+
+    // Output embeddings (for demonstration)
+    std::cout << "Embeddings shape: " << embeddings.shape().DebugString() << std::endl;
+
+    // Close session
+    session->Close();
+    return 0;
+}
