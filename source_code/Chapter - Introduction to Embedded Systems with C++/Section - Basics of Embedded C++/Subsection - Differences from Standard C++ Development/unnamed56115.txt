@@ -1,0 +1,11 @@
+// Standard C++: Using exceptions
+try {
+    riskyOperation();
+} catch (const std::exception& e) {
+    handleError();
+}
+
+// Embedded C++: Using return codes
+if (riskyOperation() != SUCCESS) {
+    handleError();
+}
