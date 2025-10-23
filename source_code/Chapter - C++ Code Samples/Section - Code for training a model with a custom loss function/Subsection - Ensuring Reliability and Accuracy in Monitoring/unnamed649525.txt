@@ -1,0 +1,56 @@
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Custom loss function
+Output CustomLoss(const Scope& scope, const Output& predictions, 
+                  const Output& labels) {
+  auto diff = Subtract(scope, predictions, labels);
+  return ReduceSum(scope, Multiply(scope, diff, diff), {0});
+}
+
+int main() {
+  Scope root = Scope::NewRootScope();
+
+  // Placeholder for input data and labels
+  auto x = Placeholder(root, DT_FLOAT);
+  auto y = Placeholder(root, DT_FLOAT);
+
+  // Model parameters
+  auto W = Variable(root, {1}, DT_FLOAT);
+  auto b = Variable(root, {1}, DT_FLOAT);
+
+  // Model: y_pred = W * x + b
+  auto y_pred = Add(root, Multiply(root, x, W), b);
+
+  // Compute custom loss
+  auto loss = CustomLoss(root, y_pred, y);
+
+  // Optimizer
+  auto optimizer = GradientDescentOptimizer(root, 0.01);
+  auto train_op = optimizer.Minimize(root, loss);
+
+  // Initialize variables
+  ClientSession session(root);
+  TF_CHECK_OK(session.Run({Assign(root, W, {1.0f}), 
+                           Assign(root, b, {0.0f})}, nullptr));
+
+  // Training data
+  Tensor x_data(DT_FLOAT, {3});
+  x_data.vec() << 1.0f, 2.0f, 3.0f;
+  Tensor y_data(DT_FLOAT, {3});
+  y_data.vec() << 2.0f, 4.0f, 6.0f;
+
+  // Training loop
+  for (int i = 0; i < 100; ++i) {
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{x, x_data}, {y, y_data}}, {loss}, &outputs));
+    std::cout << "Loss: " << output[0].scalar() << std::endl;
+    TF_CHECK_OK(session.Run({{x, x_data}, {y, y_data}}, {train_op}, nullptr));
+  }
+
+  return 0;
+}
