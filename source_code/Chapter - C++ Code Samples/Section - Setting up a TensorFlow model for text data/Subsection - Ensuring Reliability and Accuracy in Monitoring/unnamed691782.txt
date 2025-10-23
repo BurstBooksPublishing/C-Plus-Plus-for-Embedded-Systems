@@ -1,0 +1,47 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define a simple TensorFlow model for text classification
+void setupTextModel() {
+    Scope root = Scope::NewRootScope();
+
+    // Placeholder for input text data (batch_size x sequence_length)
+    auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 100}));
+
+    // Embedding layer to convert text indices to dense vectors
+    auto embedding = Variable(root, {10000, 128}, DT_FLOAT);
+    auto embed = Gather(root, embedding, input);
+
+    // LSTM layer for sequence modeling
+    auto lstm_cell = LSTMCell(root, 128);
+    auto lstm_output = RNN(root, embed, lstm_cell);
+
+    // Fully connected layer for classification
+    auto weights = Variable(root, {128, 10}, DT_FLOAT);
+    auto biases = Variable(root, {10}, DT_FLOAT);
+    auto logits = Add(root, MatMul(root, lstm_output, weights), biases);
+
+    // Softmax layer for output probabilities
+    auto output = Softmax(root, logits);
+
+    // Initialize variables and session
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({Assign(root, embedding, RandomNormal(root, {10000, 128}, DT_FLOAT)),
+                             Assign(root, weights, RandomNormal(root, {128, 10}, DT_FLOAT)),
+                             Assign(root, biases, RandomNormal(root, {10}, DT_FLOAT))}, nullptr));
+
+    // Example input tensor (batch_size=2, sequence_length=100)
+    Tensor input_tensor(DT_FLOAT, TensorShape({2, 100}));
+    std::vector outputs;
+
+    // Run the model
+    TF_CHECK_OK(session.Run({{input, input_tensor}}, {output}, &outputs));
+
+    // Output the results
+    std::cout << "Model output: " << output[0].DebugString() << std::endl;
+}
