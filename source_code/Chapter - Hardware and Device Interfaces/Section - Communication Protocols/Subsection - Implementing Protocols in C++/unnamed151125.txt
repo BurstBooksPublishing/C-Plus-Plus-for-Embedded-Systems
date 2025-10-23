@@ -1,0 +1,31 @@
+#include 
+#include 
+
+void i2c_init() {
+    // Set SCL to 100kHz
+    TWSR = 0x00;
+    TWBR = 0x48;
+    // Enable TWI
+    TWCR = (1 << TWEN);
+}
+
+void i2c_start() {
+    // Send START condition
+    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+    // Wait for TWINT flag set
+    while (!(TWCR & (1 << TWINT)));
+}
+
+void i2c_write(uint8_t data) {
+    // Load data into TWDR
+    TWDR = data;
+    // Start transmission
+    TWCR = (1 << TWINT) | (1 << TWEN);
+    // Wait for TWINT flag set
+    while (!(TWCR & (1 << TWINT)));
+}
+
+void i2c_stop() {
+    // Send STOP condition
+    TWCR = (1 << TWINT) | (1 << TWSTO) | (1 << TWEN);
+}
