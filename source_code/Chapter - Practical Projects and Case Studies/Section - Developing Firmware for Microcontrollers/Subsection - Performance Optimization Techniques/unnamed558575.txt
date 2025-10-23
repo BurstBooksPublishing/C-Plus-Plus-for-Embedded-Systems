@@ -1,0 +1,5 @@
+// Example of timing a function
+auto start = std::chrono::high_resolution_clock::now();
+function_to_profile();
+auto end = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast(end - start);
