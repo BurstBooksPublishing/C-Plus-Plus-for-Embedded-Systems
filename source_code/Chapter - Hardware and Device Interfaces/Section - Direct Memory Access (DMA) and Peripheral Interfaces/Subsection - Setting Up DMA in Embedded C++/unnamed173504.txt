@@ -1,0 +1,3 @@
+// Configure USART for DMA reception
+USART1->CR3 |= USART_CR3_DMAR;  // Enable DMA reception
+USART1->CR1 |= USART_CR1_RE | USART_CR1_UE;  // Enable receiver and USART
