@@ -1,0 +1,10 @@
+class Register {
+public:
+    Register& operator=(int value) {
+        // Write value to hardware register
+        return *this;
+    }
+};
+
+Register reg;
+reg = 0xFF; // Overloaded assignment operator
