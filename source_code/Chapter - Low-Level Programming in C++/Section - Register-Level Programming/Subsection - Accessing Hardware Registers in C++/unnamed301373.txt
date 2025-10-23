@@ -1,0 +1,1 @@
+*status_register = (*status_register & ~(0x7 << 28)) | (mode_value << 28);
