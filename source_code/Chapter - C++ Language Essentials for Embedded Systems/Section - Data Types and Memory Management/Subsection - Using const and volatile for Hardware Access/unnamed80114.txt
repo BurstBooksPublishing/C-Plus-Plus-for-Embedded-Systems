@@ -1,0 +1,1 @@
+volatile uint32_t* const STATUS_REGISTER = reinterpret_cast(0x40000004);
