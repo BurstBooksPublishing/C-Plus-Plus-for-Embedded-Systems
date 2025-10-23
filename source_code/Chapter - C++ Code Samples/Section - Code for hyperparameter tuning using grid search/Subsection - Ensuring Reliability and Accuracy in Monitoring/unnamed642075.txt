@@ -1,0 +1,47 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void gridSearchHyperparameterTuning() {
+    // Define hyperparameters to tune
+    std::vector learningRates = {0.001, 0.01, 0.1};
+    std::vector batchSizes = {32, 64, 128};
+    std::vector numEpochs = {10, 20, 30};
+
+    // Iterate over all combinations of hyperparameters
+    for (float lr : learningRates) {
+        for (int bs : batchSizes) {
+            for (int epochs : numEpochs) {
+                // Initialize model with current hyperparameters
+                Scope root = Scope::NewRootScope();
+                auto model = // Define your model here
+                             // Example: Linear regression, neural network, etc.
+
+                // Train the model
+                ClientSession session(root);
+                std::vector outputs;
+                TF_CHECK_OK(session.Run({/* Input tensors */}, &outputs));
+
+                // Evaluate the model
+                float accuracy = // Calculate accuracy or loss
+                                 // Example: output[0].scalar() for loss
+
+                // Log the results
+                std::cout << "Learning Rate: " << lr << ", Batch Size: " << bs
+                          << ", Epochs: " << epochs << ", Accuracy: " << accuracy
+                          << std::endl;
+            }
+        }
+    }
+}
+
+int main() {
+    gridSearchHyperparameterTuning();
+    return 0;
+}
