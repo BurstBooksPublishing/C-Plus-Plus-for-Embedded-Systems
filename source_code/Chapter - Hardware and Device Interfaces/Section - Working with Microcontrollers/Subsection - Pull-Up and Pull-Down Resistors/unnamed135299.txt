@@ -1,0 +1,5 @@
+void configurePullUp() {
+    // Enable pull-up resistor on PB1
+    GPIOB->PUPDR &= ~(0b11 << (1 * 2)); // Clear pull-up/pull-down bits
+    GPIOB->PUPDR |= (0b01 << (1 * 2));  // Set pull-up resistor for PB1
+}
