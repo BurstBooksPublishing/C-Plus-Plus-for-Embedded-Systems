@@ -1,0 +1,8 @@
+#include 
+#include 
+
+void generate_rsa_key_pair() {
+    Botan::AutoSeeded_RNG rng;
+    Botan::RSA_PrivateKey key(rng, 2048);
+    // Store or use the key as needed
+}
