@@ -1,0 +1,53 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to process data in chunks to manage memory overhead
+void processDataInChunks(const std::vector& data, 
+                         tensorflow::Session* session, 
+                         int chunkSize) {
+    for (size_t i = 0; i < data.size(); i += chunkSize) {
+        // Define the end of the current chunk
+        size_t end = std::min(i + chunkSize, data.size());
+        
+        // Create a tensor for the current chunk
+        tensorflow::Tensor inputTensor(tensorflow::DT_FLOAT, 
+                                       tensorflow::TensorShape({end - i}));
+        auto inputTensorMap = inputTensor.tensor();
+        
+        // Copy data into the tensor
+        for (size_t j = i; j < end; ++j) {
+            inputTensorMap(j - i) = dat[j];
+        }
+        
+        // Run the session with the current chunk
+        std::vector outputs;
+        TF_CHECK_OK(session->Run({{"input", inputTensor}}, 
+                                 {"output"}, {}, &outputs));
+        
+        // Process the output (e.g., store or further analyze)
+        auto outputTensorMap = output[0].tensor();
+        for (int k = 0; k < outputTensorMap.size(); ++k) {
+            std::cout << "Processed output: " << outputTensorMap(k) << std::endl;
+        }
+    }
+}
+
+int main() {
+    // Example usage
+    std::vector largeDataset(1000000, 1.0f); // Simulate a large dataset
+    tensorflow::Session* session;
+    TF_CHECK_OK(tensorflow::NewSession(tensorflow::SessionOptions(), &session));
+    
+    // Load the model (not shown here)
+    
+    // Process data in chunks to avoid memory overhead
+    processDataInChunks(largeDataset, session, 10000);
+    
+    // Clean up
+    session->Close();
+    delete session;
+    
+    return 0;
+}
