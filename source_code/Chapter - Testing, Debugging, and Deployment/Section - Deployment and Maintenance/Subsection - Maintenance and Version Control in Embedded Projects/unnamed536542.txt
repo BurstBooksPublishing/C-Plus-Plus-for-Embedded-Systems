@@ -1,0 +1,1 @@
+git tag -a v1.0.0 -m "Stable release for STM32F4 series"
