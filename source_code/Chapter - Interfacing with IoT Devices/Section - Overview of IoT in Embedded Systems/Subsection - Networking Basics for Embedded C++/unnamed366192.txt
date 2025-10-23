@@ -1,0 +1,5 @@
+void start_listening(int sock) {
+    if (listen(sock, 5) < 0) {
+        // Handle error
+    }
+}
