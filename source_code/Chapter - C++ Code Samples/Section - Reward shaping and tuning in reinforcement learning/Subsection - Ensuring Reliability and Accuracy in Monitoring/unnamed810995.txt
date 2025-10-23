@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <tensorflow/core/public/session.h>
+
+using namespace std;
+using namespace tensorflow;
+
+// Define a simple reward shaping function
+float rewardShaping(float state, float nextState) {
+    // Encourage the agent to move towards the goal
+    float reward = -abs(nextState - 10.0f); // Goal is at state 10
+    return reward;
+}
+
+int main() {
+    // Initialize TensorFlow session
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        cerr << "Error creating session: " << status.ToString() << endl;
+        return 1;
+    }
+
+    // Define the state and action spaces
+    vector<float> states = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    vector<float> actions = {-1.0f, 1.0f}; // Left or right movement
+
+    // Initialize Q-values
+    vector<vector<float>> Q(states.size(), vector<float>(actions.size(), 0.0f));
+
+    // Hyperparameters
+    float alpha = 0.1f;   // Learning rate
+    float gamma = 0.9f;   // Discount factor
+    float epsilon = 0.1f; // Exploration rate
+
+    // Training loop
+    for (int episode = 0; episode < 1000; ++episode) {
+        float state = states[0]; // Start at initial state
+        while (state != states.back()) { // Continue until goal is reached
+            // Epsilon-greedy action selection
+            int stateIndex = distance(states.begin(), find(states.begin(), states.end(), state));
+            int actionIndex;
+            if (rand() / static_cast<float>(RAND_MAX) < epsilon) {
+                actionIndex = rand() % actions.size(); // Explore
+            } else {
+                actionIndex = distance(Q[stateIndex].begin(),
+                                       max_element(Q[stateIndex].begin(), Q[stateIndex].end())); // Exploit
+            }
+
+            float action = actions[actionIndex];
+            float nextState = state + action;
+
+            // Ensure nextState is within bounds
+            nextState = max(states.front(), min(nextState, states.back()));
+            int nextStateIndex = distance(states.begin(), find(states.begin(), states.end(), nextState));
+
+            // Reward shaping
+            float reward = rewardShaping(state, nextState);
+
+            // Q-learning update
+            float maxNextQ = *max_element(Q[nextStateIndex].begin(), Q[nextStateIndex].end());
+            Q[stateIndex][actionIndex] += alpha * (reward + gamma * maxNextQ - Q[stateIndex][actionIndex]);
+
+            state = nextState;
+        }
+    }
+
+    // Clean up TensorFlow session
+    session->Close();
+    delete session;
+
+    return 0;
+}
