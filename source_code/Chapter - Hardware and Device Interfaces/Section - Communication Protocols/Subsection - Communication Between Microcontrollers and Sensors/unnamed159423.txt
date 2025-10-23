@@ -1,0 +1,10 @@
+void setup() {
+  TCCR1A = 0; // Clear Timer1 control register A
+  TCCR1B = (1 << ICES1) | (1 << CS11); // Set input capture edge select and prescaler
+  TIMSK1 = (1 << ICIE1); // Enable input capture interrupt
+}
+
+ISR(TIMER1_CAPT_vect) {
+  uint16_t capture_value = ICR1; // Read the capture value
+  // Process the capture value to determine the duty cycle
+}
