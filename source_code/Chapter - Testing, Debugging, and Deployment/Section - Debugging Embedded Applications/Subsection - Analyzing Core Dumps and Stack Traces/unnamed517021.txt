@@ -1,0 +1,1 @@
+gcc -g -o my_embedded_app main.c util.c
