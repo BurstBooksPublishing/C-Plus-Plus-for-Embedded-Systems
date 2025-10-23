@@ -1,0 +1,5 @@
+Matrix A(2, 3, 1.5);
+Matrix B = A.transpose();
+Matrix C = A + A;  // Should compile
+Matrix D(3, 2);
+// A + D;  // Should fail at compile time
