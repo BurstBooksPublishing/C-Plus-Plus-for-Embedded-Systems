@@ -1,0 +1,8 @@
+volatile int shared_data = 0;
+
+extern "C" void EXTI0_IRQHandler() {
+    __disable_irq(); // Disable interrupts
+    shared_data++;
+    __enable_irq();  // Re-enable interrupts
+    EXTI->PR |= EXTI_PR_PR0; // Clear pending interrupt
+}
