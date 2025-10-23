@@ -1,0 +1,30 @@
+#include 
+
+XBee xbee = XBee();
+
+void setup() {
+  Serial.begin(9600);
+  xbee.begin(Serial);
+}
+
+void loop() {
+  // Sending data
+  uint8_t payload[] = { 'H', 'e', 'l', 'l', 'o', ' ', 'Z', 'i', 'g', 'b', 'e', 'e' };
+  XBeeAddress64 addr64 = XBeeAddress64(0x0013A200, 0x40B0E0E3);
+  ZBTxRequest zbTx = ZBTxRequest(addr64, payload, sizeof(payload));
+  xbee.send(zbTx);
+
+  // Receiving data
+  xbee.readPacket();
+  if (xbee.getResponse().isAvailable()) {
+    ZBRxResponse zbRx = ZBRxResponse();
+    xbee.getResponse().getZBRxResponse(zbRx);
+    Serial.print("Received: ");
+    for (int i = 0; i < zbRx.getDataLength(); i++) {
+      Serial.print((char)zbRx.getData()[i]);
+    }
+    Serial.println();
+  }
+
+  delay(5000);
+}
