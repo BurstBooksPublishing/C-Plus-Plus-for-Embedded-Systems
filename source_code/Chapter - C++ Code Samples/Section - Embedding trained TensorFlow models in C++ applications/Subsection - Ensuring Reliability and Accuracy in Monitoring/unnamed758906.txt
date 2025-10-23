@@ -1,0 +1,46 @@
+#include 
+#include 
+#include 
+#include 
+
+int main() {
+    // Load the saved TensorFlow model
+    tensorflow::SavedModelBundle bundle;
+    tensorflow::SessionOptions session_options;
+    tensorflow::RunOptions run_options;
+    const std::string export_dir = "path/to/saved_model";
+
+    // Load the model from the specified directory
+    tensorflow::Status status = tensorflow::LoadSavedModel(
+        session_options, run_options, export_dir,
+        {tensorflow::kSavedModelTagServe}, &bundle);
+
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Prepare input tensor (example: a single float value)
+    tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1}));
+    auto input_tensor_mapped = input_tensor.tensor();
+    input_tensor_mapped(0) = 42.0f;  // Example input value
+
+    // Define input and output tensor names
+    std::vector> inputs = {
+        {"input_tensor_name", input_tensor}};
+    std::vector output_tensor_names = {"output_tensor_name"};
+    std::vector outputs;
+
+    // Run the model
+    status = bundle.session->Run(inputs, output_tensor_names, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Extract and print the output
+    auto output_tensor_mapped = output[0].tensor();
+    std::cout << "Model output: " << output_tensor_mapped(0) << std::endl;
+
+    return 0;
+}
