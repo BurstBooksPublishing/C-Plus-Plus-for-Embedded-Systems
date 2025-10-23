@@ -1,0 +1,10 @@
+class UartDriver {
+public:
+    UartDriver() = default;
+    void initialize();
+    void send(const std::vector& data);
+    std::vector receive();
+private:
+    void configureBaudRate(unsigned int baudRate);
+    void enableInterrupts();
+};
