@@ -1,0 +1,5 @@
+void configureGPIO() {
+    // Set GPIO pin 5 as output
+    volatile uint32_t* gpioDir = reinterpret_cast(0x400FF014);
+    *gpioDir |= (1 << 5);
+}
