@@ -1,0 +1,4 @@
+void debug_led_on() {
+    // Turn on an LED for debugging purposes
+    *gpio_data |= (1 << debug_led_pin);
+}
