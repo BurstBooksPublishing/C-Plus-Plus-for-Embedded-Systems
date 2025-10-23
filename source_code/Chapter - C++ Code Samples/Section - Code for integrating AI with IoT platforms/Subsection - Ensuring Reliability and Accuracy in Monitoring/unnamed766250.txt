@@ -1,0 +1,48 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Load TensorFlow Lite model and prepare interpreter
+std::unique_ptr model = 
+    tflite::FlatBufferModel::BuildFromFile("model.tflite");
+if (!model) {
+    std::cerr << "Failed to load model\n";
+    return -1;
+}
+
+tflite::ops::builtin::BuiltinOpResolver resolver;
+std::unique_ptr interpreter;
+tflite::InterpreterBuilder(*model, resolver)(&interpreter);
+if (!interpreter) {
+    std::cerr << "Failed to construct interpreter\n";
+    return -1;
+}
+
+// Allocate tensors
+if (interpreter->AllocateTensors() != kTfLiteOk) {
+    std::cerr << "Failed to allocate tensors\n";
+    return -1;
+}
+
+// Get input tensor and prepare input data
+float* input = interpreter->typed_input_tensor(0);
+std::vector input_data = { /* IoT sensor data */ };
+std::copy(input_data.begin(), input_data.end(), input);
+
+// Run inference
+if (interpreter->Invoke() != kTfLiteOk) {
+    std::cerr << "Failed to invoke interpreter\n";
+    return -1;
+}
+
+// Get output tensor and process results
+float* output = interpreter->typed_output_tensor(0);
+std::cout << "Inference result: " << *output << std::endl;
+
+// Send result to IoT platform (e.g., MQTT, HTTP)
+// Example: sendResultToIoTPlatform(*output);
+
+return 0;
