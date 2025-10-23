@@ -1,0 +1,31 @@
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Create a root scope for the TensorFlow graph
+    Scope root = Scope::NewRootScope();
+
+    // Define two constant tensors
+    auto a = Const(root, {{1.0f, 2.0f}, {3.0f, 4.0f}});
+    auto b = Const(root, {{5.0f, 6.0f}, {7.0f, 8.0f}});
+
+    // Perform matrix multiplication using TensorFlow operations
+    auto matmul = MatMul(root, a, b);
+
+    // Create a client session to run the graph
+    ClientSession session(root);
+
+    // Run the session and fetch the result
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({matmul}, &outputs));
+
+    // Print the result of the matrix multiplication
+    std::cout << "Matrix multiplication result:\n"
+              << output[0].matrix() << std::endl;
+
+    return 0;
+}
