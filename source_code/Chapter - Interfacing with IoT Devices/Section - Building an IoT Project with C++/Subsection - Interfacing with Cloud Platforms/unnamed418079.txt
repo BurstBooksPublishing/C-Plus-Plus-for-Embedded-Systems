@@ -1,0 +1,30 @@
+#include 
+#include 
+#include 
+
+void publishToAWS(const std::string& topic, const std::string& payload) {
+    Aws::SDKOptions options;
+    Aws::InitAPI(options);
+
+    Aws::Client::ClientConfiguration clientConfig;
+    clientConfig.region = "us-west-2";
+
+    Aws::IoTDataPlane::IoTDataPlaneClient iotClient(clientConfig);
+    Aws::IoTDataPlane::Model::PublishRequest request;
+    request.SetTopic(topic);
+    request.SetPayload(payload);
+
+    auto outcome = iotClient.Publish(request);
+    if (!outcome.IsSuccess()) {
+        std::cerr << "AWS error: " << outcome.GetError().GetMessage() << std::endl;
+    }
+
+    Aws::ShutdownAPI(options);
+}
+
+int main() {
+    std::string topic = "sensor/data";
+    std::string payload = "{\"temperature\": 23.5, \"humidity\": 60}";
+    publishToAWS(topic, payload);
+    return 0;
+}
