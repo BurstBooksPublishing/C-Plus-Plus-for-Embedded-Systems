@@ -1,0 +1,25 @@
+#include "tensorflow/core/framework/tensor.h"
+#include "tensorflow/core/platform/types.h"
+
+int main() {
+    // Create a 2x2 tensor of type float
+    tensorflow::Tensor tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({2, 2}));
+
+    // Access the tensor's data
+    auto tensor_data = tensor.tensor();
+
+    // Initialize the tensor with values
+    tensor_data(0, 0) = 1.0f;
+    tensor_data(0, 1) = 2.0f;
+    tensor_data(1, 0) = 3.0f;
+    tensor_data(1, 1) = 4.0f;
+
+    // Print the tensor values
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            printf("tensor(%d, %d) = %f\n", i, j, tensor_data(i, j));
+        }
+    }
+
+    return 0;
+}
