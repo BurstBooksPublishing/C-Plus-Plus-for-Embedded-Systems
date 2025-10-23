@@ -1,0 +1,10 @@
+#include 
+#include 
+
+void sampleSensor(TemperatureSensor& sensor) {
+    while (true) {
+        float temperature = sensor.readTemperature();
+        // Process temperature data
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sample every 100ms
+    }
+}
