@@ -1,0 +1,31 @@
+#include 
+#include 
+#include 
+#include 
+
+// Load the TensorFlow Lite model from a file
+std::unique_ptr model = 
+    tflite::FlatBufferModel::BuildFromFile("model.tflite");
+
+// Create the interpreter
+tflite::ops::builtin::BuiltinOpResolver resolver;
+std::unique_ptr interpreter;
+tflite::InterpreterBuilder(*model, resolver)(&interpreter);
+
+// Allocate tensors
+interpreter->AllocateTensors();
+
+// Optimize the model for inference on embedded systems
+tflite::optimize::QuantizeModelAllOperators(
+    interpreter->subgraph(0)->GetModel(), 
+    tflite::TensorType_UINT8, 
+    interpreter->subgraph(0)->tensors());
+
+// Perform inference
+interpreter->Invoke();
+
+// Access the output tensor
+TfLiteTensor* output_tensor = interpreter->output_tensor(0);
+float* output_data = output_tensor->data.f;
+
+// Process the output data as needed
