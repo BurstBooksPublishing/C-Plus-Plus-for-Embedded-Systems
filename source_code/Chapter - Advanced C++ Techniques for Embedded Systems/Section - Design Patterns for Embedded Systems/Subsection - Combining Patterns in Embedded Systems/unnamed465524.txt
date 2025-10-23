@@ -1,0 +1,15 @@
+class DeviceManager : public Singleton {
+private:
+    Context* deviceState;
+    Subject* eventNotifier;
+public:
+    DeviceManager() : deviceState(new Context()), eventNotifier(new Subject()) {}
+    void changeState(State* newState) {
+        deviceState->setState(newState);
+        eventNotifier->notify();
+    }
+    ~DeviceManager() {
+        delete deviceState;
+        delete eventNotifier;
+    }
+};
