@@ -1,0 +1,6 @@
+#include 
+#include 
+
+void enter_sleep_mode() {
+    std::this_thread::sleep_for(std::chrono::seconds(10)); // Sleep for 10 seconds
+}
