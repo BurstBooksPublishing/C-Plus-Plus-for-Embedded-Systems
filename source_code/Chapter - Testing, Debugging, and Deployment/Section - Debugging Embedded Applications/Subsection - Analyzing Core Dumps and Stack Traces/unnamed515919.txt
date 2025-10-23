@@ -1,0 +1,3 @@
+#0  0x00005555 in my_function () at main.c:42
+#1  0x00006666 in another_function () at util.c:15
+#2  0x00007777 in main () at app.c:10
