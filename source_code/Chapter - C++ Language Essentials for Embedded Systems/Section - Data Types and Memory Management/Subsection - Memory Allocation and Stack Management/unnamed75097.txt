@@ -1,0 +1,6 @@
+struct Node {
+    int data;
+    int next;
+};
+
+Node nodes[100]; // Fixed-size array for nodes
