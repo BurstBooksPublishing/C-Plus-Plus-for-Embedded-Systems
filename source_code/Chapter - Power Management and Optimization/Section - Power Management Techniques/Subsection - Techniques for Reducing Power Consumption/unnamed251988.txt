@@ -1,0 +1,4 @@
+void disable_unused_peripherals() {
+    // Hypothetical register to disable GPIO pins
+    *reinterpret_cast(0x40023000) = 0x00; // Disable GPIO
+}
