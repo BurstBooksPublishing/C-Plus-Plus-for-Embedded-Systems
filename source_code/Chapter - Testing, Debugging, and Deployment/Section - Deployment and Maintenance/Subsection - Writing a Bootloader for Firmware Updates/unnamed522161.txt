@@ -1,0 +1,31 @@
+#include 
+#include 
+
+// Define memory addresses for bootloader and application
+constexpr uint32_t BOOTLOADER_START = 0x08000000;
+constexpr uint32_t APPLICATION_START = 0x08004000;
+constexpr uint32_t UPDATE_FLAG_ADDR = 0x20000000;
+
+// Function to jump to the application
+void jump_to_application(uint32_t address) {
+  typedef void (*application_entry_t)(void);
+  application_entry_t application_entry = (application_entry_t)(*(uint32_t *)(address + 4));
+  __disable_irq();
+  __set_MSP(*(uint32_t *)address);
+  application_entry();
+}
+
+// Main bootloader function
+int main() {
+  // Check if an update is requested
+  if (*((volatile uint32_t *)UPDATE_FLAG_ADDR) == 0xDEADBEEF) {
+    // Handle firmware update process
+    // ...
+    // Clear the update flag
+    *((volatile uint32_t *)UPDATE_FLAG_ADDR) = 0;
+  }
+
+  // Jump to the main application
+  jump_to_application(APPLICATION_START);
+  return 0;
+}
