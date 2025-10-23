@@ -1,0 +1,59 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void evaluateModel(const Tensor& predictions, const Tensor& labels) {
+    // Calculate accuracy
+    int correct = 0;
+    auto pred_values = predictions.flat();
+    auto label_values = labels.flat();
+    for (int i = 0; i < pred_values.size(); ++i) {
+        if (round(pred_values(i)) == label_values(i)) {
+            correct++;
+        }
+    }
+    float accuracy = static_cast(correct) / pred_values.size();
+    std::cout << "Accuracy: " << accuracy * 100 << "%" << std::endl;
+}
+
+void improveModel(Graph& graph, ClientSession& session, const Tensor& input_data, 
+                  const Tensor& labels, float learning_rate = 0.01) {
+    // Define placeholders
+    Scope scope = Scope::NewRootScope();
+    auto x = Placeholder(scope, DT_FLOAT);
+    auto y = Placeholder(scope, DT_INT32);
+
+    // Define model (e.g., a simple linear classifier)
+    auto W = Variable(scope, {input_data.dim_size(1), 1}, DT_FLOAT);
+    auto b = Variable(scope, {1}, DT_FLOAT);
+    auto logits = Add(scope, MatMul(scope, x, W), b);
+    auto loss = ReduceMean(scope, Square(scope, Subtract(scope, logits, Cast(scope, y, DT_FLOAT))));
+
+    // Optimizer
+    auto optimizer = ApplyGradientDescent(scope, W, learning_rate, 
+                                          Gradients(scope, loss, {W}[0]);
+
+    // Run training session
+    TF_CHECK_OK(session.Run({{x, input_data}, {y, labels}}, {optimizer}, nullptr));
+}
+
+int main() {
+    // Example usage
+    Tensor input_data(DT_FLOAT, {100, 10});  // 100 samples, 10 features
+    Tensor labels(DT_INT32, {100});          // 100 labels
+
+    // Initialize and train model
+    Graph graph;
+    ClientSession session(graph);
+    improveModel(graph, session, input_data, labels);
+
+    // Evaluate model
+    Tensor predictions(DT_FLOAT, {100, 1});
+    evaluateModel(predictions, labels);
+
+    return 0;
+}
