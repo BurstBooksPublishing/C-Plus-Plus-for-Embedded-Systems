@@ -1,0 +1,1 @@
+volatile uint32_t* status_register = reinterpret_cast(0x40000000);
