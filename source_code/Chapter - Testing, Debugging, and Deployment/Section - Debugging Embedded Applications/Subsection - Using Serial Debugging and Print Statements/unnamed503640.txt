@@ -1,0 +1,5 @@
+void sendString(const char* str) {
+    while (*str) {
+        UART0->DR = *str++; // Assuming UART0 is the peripheral register
+    }
+}
