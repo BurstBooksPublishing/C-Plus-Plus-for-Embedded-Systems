@@ -1,0 +1,57 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Load a pre-trained TensorFlow model
+tensorflow::Status LoadModel(const std::string& export_dir, 
+                             tensorflow::SavedModelBundle& bundle) {
+    return tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
+                                      tensorflow::RunOptions(), export_dir,
+                                      {tensorflow::kSavedModelTagServe}, &bundle);
+}
+
+// Run inference using the loaded model
+tensorflow::Status RunInference(tensorflow::SavedModelBundle& bundle, 
+                                const std::vector>& inputs, 
+                                std::vector& outputs) {
+    return bundle.session->Run(inputs, {"output_node_name"}, {}, &outputs);
+}
+
+int main() {
+    // Path to the saved model
+    std::string model_path = "path/to/saved_model";
+
+    // Load the model
+    tensorflow::SavedModelBundle bundle;
+    auto status = LoadModel(model_path, bundle);
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Prepare input tensor (example: a single float value)
+    tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, {1});
+    auto input_tensor_mapped = input_tensor.tensor();
+    input_tensor_mapped(0) = 1.0f;
+
+    // Define input tensor map
+    std::vector> inputs = {
+        {"input_node_name", input_tensor}
+    };
+
+    // Run inference
+    std::vector outputs;
+    status = RunInference(bundle, inputs, outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running inference: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Output the result
+    auto output_tensor_mapped = output[0].tensor();
+    std::cout << "Prediction: " << output_tensor_mapped(0) << std::endl;
+
+    return 0;
+}
