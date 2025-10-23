@@ -1,0 +1,11 @@
+const char* getErrorMessage(ErrorCode code) {
+    static const char* messages[] = {
+        "Success",
+        "Out of memory",
+        "Invalid input",
+        "Device busy"
+    };
+    return static_cast(code) < sizeof(messages) / sizeof(messages[0]) 
+           ? messages[static_cast(code)] 
+           : "Unknown error";
+}
