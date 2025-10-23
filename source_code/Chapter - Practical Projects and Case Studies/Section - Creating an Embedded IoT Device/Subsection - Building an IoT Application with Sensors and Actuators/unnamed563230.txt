@@ -1,0 +1,16 @@
+#include 
+
+const int ledPin = 1; // GPIO pin for the LED
+
+void setup() {
+    wiringPiSetup(); // Initialize WiringPi
+    pinMode(ledPin, OUTPUT); // Set pin as output
+}
+
+void turnOnLED() {
+    digitalWrite(ledPin, HIGH); // Turn on LED
+}
+
+void turnOffLED() {
+    digitalWrite(ledPin, LOW); // Turn off LED
+}
