@@ -1,0 +1,4 @@
+auto start = std::chrono::high_resolution_clock::now();
+critical_function();
+auto end = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast(end - start);
