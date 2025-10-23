@@ -1,0 +1,9 @@
+// Define DMA controller base address
+volatile uint32_t* const dmaBase = reinterpret_cast(0x40020000);
+
+// Configure DMA channel 1
+dmaBase[0x08] = 0x00000001; // Enable DMA channel 1
+dmaBase[0x0C] = reinterpret_cast(sourceAddress); // Source address
+dmaBase[0x10] = reinterpret_cast(destinationAddress); // Destination address
+dmaBase[0x14] = transferSize; // Number of data items to transfer
+dmaBase[0x18] = 0x00000003; // Set transfer mode (e.g., memory-to-memory)
