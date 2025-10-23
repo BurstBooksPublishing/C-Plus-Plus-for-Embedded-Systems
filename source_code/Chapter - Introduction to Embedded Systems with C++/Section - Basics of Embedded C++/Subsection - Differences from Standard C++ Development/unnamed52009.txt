@@ -1,0 +1,7 @@
+// Standard C++: Using std::vector
+std::vector vec;
+vec.push_back(10);
+
+// Embedded C++: Using a fixed-size array
+int vec[10];
+vec[0] = 10;
