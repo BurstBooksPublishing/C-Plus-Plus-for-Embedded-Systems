@@ -1,0 +1,5 @@
+// [timestamp_us] [event_type] [message]
+[100234] INFO System initialized
+[100540] WARN Sensor value out of range
+[101200] ERROR Failed to write to EEPROM
+[102000] INFO Retry successful
