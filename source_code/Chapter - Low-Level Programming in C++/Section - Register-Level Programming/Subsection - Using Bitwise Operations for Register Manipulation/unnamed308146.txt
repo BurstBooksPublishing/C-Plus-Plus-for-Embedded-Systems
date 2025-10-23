@@ -1,0 +1,2 @@
+CTRL_REG |= PERIPH_ENABLE;   // Enable peripheral
+CTRL_REG &= ~PERIPH_DISABLE; // Disable peripheral
