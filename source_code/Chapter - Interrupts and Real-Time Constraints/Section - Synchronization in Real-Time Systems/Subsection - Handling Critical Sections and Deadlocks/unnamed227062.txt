@@ -1,0 +1,11 @@
+#include 
+#include 
+
+std::mutex mtx;
+std::vector buffer;
+
+void add_to_buffer(int value) {
+    mtx.lock();
+    buffer.push_back(value);
+    mtx.unlock();
+}
