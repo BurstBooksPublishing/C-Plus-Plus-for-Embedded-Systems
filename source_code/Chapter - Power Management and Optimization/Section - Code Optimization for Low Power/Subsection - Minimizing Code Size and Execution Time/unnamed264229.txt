@@ -1,0 +1,3 @@
+#ifdef DEBUG
+    log_debug("Debug mode enabled");
+#endif
