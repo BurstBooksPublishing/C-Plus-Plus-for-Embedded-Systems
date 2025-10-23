@@ -1,0 +1,5 @@
+// Standard C++: Debugging with GDB
+gdb ./program
+
+// Embedded C++: Debugging with JTAG
+openocd -f interface/jtag.cfg -f target/stm32f4x.cfg
