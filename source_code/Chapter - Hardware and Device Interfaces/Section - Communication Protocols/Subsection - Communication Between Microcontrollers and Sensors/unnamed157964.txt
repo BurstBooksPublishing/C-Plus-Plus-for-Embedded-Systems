@@ -1,0 +1,12 @@
+#include 
+
+void setup() {
+  SPI.begin(); // Initialize SPI communication
+  pinMode(SS, OUTPUT); // Set chip select pin as output
+}
+
+void loop() {
+  digitalWrite(SS, LOW); // Select the sensor
+  uint8_t data = SPI.transfer(0x55); // Send and receive data
+  digitalWrite(SS, HIGH); // Deselect the sensor
+}
