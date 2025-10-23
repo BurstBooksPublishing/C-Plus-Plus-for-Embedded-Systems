@@ -1,0 +1,50 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void trainNetwork() {
+    // Define placeholders for input and target
+    auto x = Placeholder(Scope::NewRootScope(), DT_FLOAT, Placeholder::Shape({-1, 784}));
+    auto y = Placeholder(Scope::NewRootScope(), DT_FLOAT, Placeholder::Shape({-1, 10}));
+
+    // Define weights and biases
+    auto W1 = Variable(Scope::NewRootScope(), {784, 256}, DT_FLOAT);
+    auto b1 = Variable(Scope::NewRootScope(), {256}, DT_FLOAT);
+    auto W2 = Variable(Scope::NewRootScope(), {256, 10}, DT_FLOAT);
+    auto b2 = Variable(Scope::NewRootScope(), {10}, DT_FLOAT);
+
+    // Initialize variables
+    auto init = InitializeVariables(Scope::NewRootScope(), {W1, b1, W2, b2});
+
+    // Define the forward pass
+    auto layer1 = Add(Scope::NewRootScope(), MatMul(Scope::NewRootScope(), x, W1), b1);
+    auto activation1 = Relu(Scope::NewRootScope(), layer1);
+    auto layer2 = Add(Scope::NewRootScope(), MatMul(Scope::NewRootScope(), activation1, W2), b2);
+    auto output = Softmax(Scope::NewRootScope(), layer2);
+
+    // Define the loss function (cross-entropy)
+    auto loss = ReduceMean(Scope::NewRootScope(), 
+        Negate(Scope::NewRootScope(), 
+            ReduceSum(Scope::NewRootScope(), 
+                Multiply(Scope::NewRootScope(), y, Log(Scope::NewRootScope(), output)), {1})));
+
+    // Define the optimizer (gradient descent)
+    auto optimizer = GradientDescentOptimizer(Scope::NewRootScope(), 0.01f);
+    auto train_op = optimizer.Minimize(Scope::NewRootScope(), loss);
+
+    // Create a session and run the training
+    ClientSession session(Scope::NewRootScope());
+    TF_CHECK_OK(session.Run({init}, nullptr)); // Initialize variables
+
+    // Training loop
+    for (int i = 0; i < 1000; ++i) {
+        Tensor input_tensor(DT_FLOAT, TensorShape({batch_size, 784}));
+        Tensor target_tensor(DT_FLOAT, TensorShape({batch_size, 10}));
+        // Fill input_tensor and target_tensor with data
+
+        TF_CHECK_OK(session.Run({{x, input_tensor}, {y, target_tensor}}, {train_op}, nullptr));
+    }
+}
