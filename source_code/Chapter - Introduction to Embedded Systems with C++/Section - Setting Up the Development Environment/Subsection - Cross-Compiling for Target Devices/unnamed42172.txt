@@ -1,0 +1,1 @@
+arm-none-eabi-g++ --sysroot=/path/to/sysroot -o hello_embedded hello.cpp
