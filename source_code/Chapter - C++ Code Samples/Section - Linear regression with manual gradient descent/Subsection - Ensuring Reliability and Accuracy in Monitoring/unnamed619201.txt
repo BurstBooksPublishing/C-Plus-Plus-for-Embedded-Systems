@@ -1,0 +1,58 @@
+#include 
+#include 
+
+// Linear regression using manual gradient descent
+class LinearRegression {
+private:
+    double slope;  // Weight (slope)
+    double intercept;  // Bias (intercept)
+    double learning_rate;  // Learning rate for gradient descent
+
+public:
+    LinearRegression(double lr = 0.01) : slope(0), intercept(0), learning_rate(lr) {}
+
+    // Predict function
+    double predict(double x) {
+        return slope * x + intercept;
+    }
+
+    // Gradient descent update
+    void fit(const std::vector& X, const std::vector& y, int epochs) {
+        int n = X.size();
+        for (int epoch = 0; epoch < epochs; ++epoch) {
+            double slope_grad = 0;
+            double intercept_grad = 0;
+
+            // Compute gradients
+            for (int i = 0; i < n; ++i) {
+                double prediction = predict([i]);
+                slope_grad += -2 * [i] * ([i] - prediction);
+                intercept_grad += -2 * ([i] - prediction);
+            }
+
+            // Update parameters
+            slope -= learning_rate * (slope_grad / n);
+            intercept -= learning_rate * (intercept_grad / n);
+        }
+    }
+
+    // Getter for slope and intercept
+    double getSlope() const { return slope; }
+    double getIntercept() const { return intercept; }
+};
+
+int main() {
+    // Sample dataset
+    std::vector X = {1, 2, 3, 4, 5};
+    std::vector y = {2, 4, 5, 4, 5};
+
+    // Create and train the model
+    LinearRegression model(0.01);
+    model.fit(X, y, 1000);
+
+    // Output the learned parameters
+    std::cout << "Slope: " << model.getSlope() << "\n";
+    std::cout << "Intercept: " << model.getIntercept() << "\n";
+
+    return 0;
+}
