@@ -1,0 +1,25 @@
+class MemoryPool {
+public:
+    MemoryPool(size_t size) : poolSize(size), isAllocated(false) {
+        pool = new char[size];
+    }
+
+    ~MemoryPool() {
+        delete[] pool;
+    }
+
+    void* allocate(size_t size) {
+        if (isAllocated || size > poolSize) return nullptr;
+        isAllocated = true;
+        return static_cast(pool);
+    }
+
+    void deallocate() {
+        isAllocated = false;
+    }
+
+private:
+    char* pool;
+    size_t poolSize;
+    bool isAllocated;
+};
