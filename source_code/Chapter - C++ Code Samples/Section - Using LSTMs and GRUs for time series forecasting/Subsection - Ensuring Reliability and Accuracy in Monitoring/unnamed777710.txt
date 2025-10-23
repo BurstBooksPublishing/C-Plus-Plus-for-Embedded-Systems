@@ -1,0 +1,54 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void TimeSeriesForecasting() {
+    // Define the input sequence length and feature dimensions
+    const int sequence_length = 10;
+    const int feature_dim = 1;
+
+    // Placeholder for input data
+    auto input = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                             Placeholder::Shape({sequence_length, feature_dim}));
+
+    // Define LSTM cell
+    auto lstm_cell = LSTMCell(Scope::NewRootScope(), 64); // 64 hidden units
+    auto lstm_output = RNN(Scope::NewRootScope(), lstm_cell, input);
+
+    // Define GRU cell
+    auto gru_cell = GRUCell(Scope::NewRootScope(), 64); // 64 hidden units
+    auto gru_output = RNN(Scope::NewRootScope(), gru_cell, input);
+
+    // Define the output layer
+    auto lstm_final_output = FullyConnected(Scope::NewRootScope(), 
+                                            lstm_output, 1);
+    auto gru_final_output = FullyConnected(Scope::NewRootScope(), 
+                                           gru_output, 1);
+
+    // Create a session to run the graph
+    ClientSession session(Scope::NewRootScope());
+
+    // Example input tensor
+    Tensor input_tensor(DT_FLOAT, TensorShape({sequence_length, feature_dim}));
+    std::vector input_data(sequence_length * feature_dim, 0.5f);
+    std::copy_n(input_data.begin(), input_data.size(), 
+                input_tensor.flat().data());
+
+    // Run the LSTM model
+    std::vector lstm_outputs;
+    TF_CHECK_OK(session.Run({{input, input_tensor}}, {lstm_final_output}, 
+                            &lstm_outputs));
+
+    // Run the GRU model
+    std::vector gru_outputs;
+    TF_CHECK_OK(session.Run({{input, input_tensor}}, {gru_final_output}, 
+                            &gru_outputs));
+
+    // Output the results
+    std::cout << "LSTM Output: " << lstm_output[0].DebugString() << std::endl;
+    std::cout << "GRU Output: " << gru_output[0].DebugString() << std::endl;
+}
