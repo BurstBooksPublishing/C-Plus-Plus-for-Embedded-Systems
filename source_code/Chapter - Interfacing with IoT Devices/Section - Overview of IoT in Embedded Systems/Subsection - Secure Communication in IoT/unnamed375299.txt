@@ -1,0 +1,8 @@
+#include 
+#include 
+#include 
+
+bool verify_firmware_signature(const std::string& firmware, const std::string& signature, const CryptoPP::RSA::PublicKey& public_key) {
+    CryptoPP::RSASSA_PKCS1v15_SHA_Verifier verifier(public_key);
+    return verifier.VerifyMessage((const CryptoPP::byte*)firmware.data(), firmware.size(), (const CryptoPP::byte*)signature.data(), signature.size());
+}
