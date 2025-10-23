@@ -1,0 +1,42 @@
+#include 
+#include  // Include SHAP library for interpretability
+#include 
+#include 
+
+// Function to compute SHAP values for a given model and input
+std::vector computeSHAP(TF_Graph* graph, TF_Session* session, 
+                               const std::vector& input) {
+    // Initialize SHAP explainer
+    SHAPExplainer explainer(graph, session);
+
+    // Compute SHAP values for the input
+    std::vector shap_values = explainer.explain(input);
+
+    return shap_values;
+}
+
+int main() {
+    // Load the pre-trained TensorFlow model
+    TF_Graph* graph = TF_NewGraph();
+    TF_Session* session = TF_NewSession(graph, nullptr);
+
+    // Example input data
+    std::vector input = {0.1, 0.2, 0.3, 0.4};
+
+    // Compute SHAP values for the input
+    std::vector shap_values = computeSHAP(graph, session, input);
+
+    // Output SHAP values
+    std::cout << "SHAP Values: ";
+    for (float value : shap_values) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    // Clean up
+    TF_CloseSession(session, nullptr);
+    TF_DeleteSession(session, nullptr);
+    TF_DeleteGraph(graph);
+
+    return 0;
+}
