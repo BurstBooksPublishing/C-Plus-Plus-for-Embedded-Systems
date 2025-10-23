@@ -1,0 +1,21 @@
+class GPIOPin {
+private:
+    int pinNumber;
+
+public:
+    GPIOPin(int pin) : pinNumber(pin) {
+        // Initialize GPIO pin
+    }
+
+    ~GPIOPin() {
+        // Release GPIO pin
+    }
+
+    void setHigh() {
+        // Set pin high
+    }
+
+    void setLow() {
+        // Set pin low
+    }
+};
