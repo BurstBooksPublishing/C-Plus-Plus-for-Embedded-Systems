@@ -1,0 +1,10 @@
+// Define the ISR for DMA transfer complete
+extern "C" void DMA1_Channel1_IRQHandler() {
+    if (DMA1->ISR & DMA_ISR_TCIF1) {
+        // Handle transfer complete
+        DMA1->IFCR |= DMA_IFCR_CTCIF1;  // Clear the transfer complete flag
+    }
+}
+
+// Enable DMA interrupt in NVIC
+NVIC_EnableIRQ(DMA1_Channel1_IRQn);
