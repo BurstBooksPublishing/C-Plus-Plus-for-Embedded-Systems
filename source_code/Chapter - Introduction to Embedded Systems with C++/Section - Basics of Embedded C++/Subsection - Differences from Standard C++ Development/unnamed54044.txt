@@ -1,0 +1,11 @@
+// Standard C++: Polling loop
+while (true) {
+    if (isDataAvailable()) {
+        processData();
+    }
+}
+
+// Embedded C++: Interrupt-driven design
+void onDataAvailable() {
+    processData();
+}
