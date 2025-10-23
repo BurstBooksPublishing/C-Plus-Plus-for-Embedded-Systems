@@ -1,0 +1,13 @@
+struct PIDController {
+    double Kp, Ki, Kd;
+    double prev_error = 0.0;
+    double integral = 0.0;
+
+    double compute(double setpoint, double measured_value, double dt) {
+        double error = setpoint - measured_value;
+        integral += error * dt;
+        double derivative = (error - prev_error) / dt;
+        prev_error = error;
+        return Kp * error + Ki * integral + Kd * derivative;
+    }
+};
