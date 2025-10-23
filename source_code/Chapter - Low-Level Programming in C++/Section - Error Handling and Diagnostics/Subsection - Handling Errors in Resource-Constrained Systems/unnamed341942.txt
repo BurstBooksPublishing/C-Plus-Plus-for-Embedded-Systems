@@ -1,0 +1,2 @@
+#define WDT_CTRL (*(volatile uint32_t*)0x40001000)
+#define WDT_FEED 0x55AA55AA
