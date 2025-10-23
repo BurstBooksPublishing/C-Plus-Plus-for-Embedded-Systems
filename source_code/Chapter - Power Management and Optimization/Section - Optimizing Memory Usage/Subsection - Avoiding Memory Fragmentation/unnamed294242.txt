@@ -1,0 +1,2 @@
+constexpr int buffer_size = 1024;
+uint8_t buffer[buffer_size];
