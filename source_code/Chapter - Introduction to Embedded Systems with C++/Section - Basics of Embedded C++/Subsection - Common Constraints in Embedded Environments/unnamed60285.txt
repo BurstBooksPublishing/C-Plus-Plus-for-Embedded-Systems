@@ -1,0 +1,3 @@
+void enterLowPowerMode() {
+    __WFI(); // Wait for interrupt
+}
