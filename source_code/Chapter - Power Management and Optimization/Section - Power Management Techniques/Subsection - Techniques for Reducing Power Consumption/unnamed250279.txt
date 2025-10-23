@@ -1,0 +1,8 @@
+#include 
+
+void process_data() {
+    std::vector data = {1, 2, 3, 4, 5};
+    for (auto& value : data) {
+        value *= 2; // Simple processing example
+    }
+}
