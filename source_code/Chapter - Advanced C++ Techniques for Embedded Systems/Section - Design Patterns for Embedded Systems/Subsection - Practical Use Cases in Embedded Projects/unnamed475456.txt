@@ -1,0 +1,22 @@
+class TemperatureSensor {
+private:
+    std::vector observers;
+
+public:
+    void attach(Observer* observer) {
+        observers.push_back(observer);
+    }
+
+    void notify(float temperature) {
+        for (auto observer : observers) {
+            observer->update(temperature);
+        }
+    }
+};
+
+class Display : public Observer {
+public:
+    void update(float temperature) override {
+        // Update display with new temperature
+    }
+};
