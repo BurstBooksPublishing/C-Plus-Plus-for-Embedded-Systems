@@ -1,0 +1,5 @@
+void vTaskFunction(void *pvParameters) {
+    while (1) {
+        // Task code
+    }
+}
