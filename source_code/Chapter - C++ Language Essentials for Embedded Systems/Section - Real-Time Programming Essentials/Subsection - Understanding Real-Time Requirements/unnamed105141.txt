@@ -1,0 +1,21 @@
+struct Task {
+    int deadline;
+    int period;
+    void (*execute)();
+};
+
+Task tasks[] = {
+    {10, 100, task1},
+    {20, 200, task2},
+    {30, 300, task3}
+};
+
+void scheduler() {
+    while (true) {
+        for (auto& task : tasks) {
+            if (current_time % task.period == 0) {
+                task.execute();
+            }
+        }
+    }
+}
