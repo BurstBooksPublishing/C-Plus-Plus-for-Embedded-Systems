@@ -1,0 +1,12 @@
+constexpr uint8_t i2c_address = 0x27;
+
+void initializeI2C() {
+    // Set prescaler to 1
+    TWSR = 0x00;
+    
+    // Set bit rate
+    TWBR = (F_CPU / 100000UL - 16) / 2;
+    
+    // Enable I2C
+    TWCR = (1 << TWEN);
+}
