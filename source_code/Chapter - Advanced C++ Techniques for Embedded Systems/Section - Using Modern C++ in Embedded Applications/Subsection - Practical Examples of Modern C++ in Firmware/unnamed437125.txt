@@ -1,0 +1,7 @@
+std::optional get_sensor_reading() {
+    if (sensor_available()) {
+        return read_sensor();
+    } else {
+        return std::nullopt;
+    }
+}
