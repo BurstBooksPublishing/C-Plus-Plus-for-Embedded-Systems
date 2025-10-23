@@ -1,0 +1,18 @@
+template 
+class StaticPoolAllocator {
+public:
+    using value_type = T;
+    StaticPoolAllocator() : ptr_(pool_) {}
+    T* allocate(std::size_t n) {
+        if (ptr_ + n > pool_ + N) throw std::bad_alloc();
+        T* result = ptr_;
+        ptr_ += n;
+        return result;
+    }
+    void deallocate(T*, std::size_t) {}
+private:
+    static T pool_[N];
+    T* ptr_;
+};
+
+std::vector> vec;
