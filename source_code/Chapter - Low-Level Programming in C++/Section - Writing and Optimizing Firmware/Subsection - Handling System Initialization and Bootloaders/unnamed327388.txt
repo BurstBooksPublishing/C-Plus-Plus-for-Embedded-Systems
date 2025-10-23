@@ -1,0 +1,5 @@
+inline void configure_clock() {
+    volatile uint32_t* RCC_CR = reinterpret_cast(0x40023800);
+    *RCC_CR |= (1 << 16); // Enable HSE
+    while (!(*RCC_CR & (1 << 17))) {} // Wait for HSE ready
+}
