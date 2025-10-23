@@ -1,0 +1,54 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to calculate the variance of a feature
+double calculateVariance(const std::vector& feature) {
+    double mean = 0.0, variance = 0.0;
+    for (double val : feature) {
+        mean += val;
+    }
+    mean /= feature.size();
+    for (double val : feature) {
+        variance += (val - mean) * (val - mean);
+    }
+    return variance / feature.size();
+}
+
+// Function to perform feature selection based on variance threshold
+std::vector varianceThresholdSelection(
+    const std::vector>& dataset, double threshold) {
+    std::vector selectedFeatures;
+    for (size_t i = 0; i < datase[0].size(); ++i) {
+        std::vector feature;
+        for (const auto& row : dataset) {
+            feature.push_back(ro[i]);
+        }
+        if (calculateVariance(feature) > threshold) {
+            selectedFeatures.push_back(i);
+        }
+    }
+    return selectedFeatures;
+}
+
+int main() {
+    // Example dataset (rows: samples, columns: features)
+    std::vector> dataset = {
+        {1.0, 2.0, 3.0},
+        {4.0, 5.0, 6.0},
+        {7.0, 8.0, 9.0}
+    };
+
+    // Perform feature selection with a variance threshold of 1.0
+    std::vector selectedFeatures = varianceThresholdSelection(dataset, 1.0);
+
+    // Output selected feature indices
+    std::cout << "Selected feature indices: ";
+    for (int idx : selectedFeatures) {
+        std::cout << idx << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
