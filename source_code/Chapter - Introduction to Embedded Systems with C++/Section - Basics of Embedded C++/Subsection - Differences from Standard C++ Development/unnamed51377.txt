@@ -1,0 +1,6 @@
+// Standard C++: Dynamic memory allocation
+int* arr = new int[100];
+delete[] arr;
+
+// Embedded C++: Static memory allocation
+int arr[100];
