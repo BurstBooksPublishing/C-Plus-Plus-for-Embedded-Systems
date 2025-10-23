@@ -1,0 +1,7 @@
+namespace HW {
+    void init() {
+        // Initialize hardware
+    }
+}
+
+HW::init(); // Call function from HW namespace
