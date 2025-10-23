@@ -1,0 +1,6 @@
+template 
+constexpr T power(T base) {
+    return (N == 0) ? 1 : base * power(base);
+}
+
+constexpr int result = power(2); // result = 8
