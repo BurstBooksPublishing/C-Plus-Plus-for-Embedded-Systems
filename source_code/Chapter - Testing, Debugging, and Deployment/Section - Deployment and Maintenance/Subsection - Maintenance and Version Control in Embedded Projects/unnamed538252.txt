@@ -1,0 +1,4 @@
+void processData(const std::vector& data) {
+    std::vector copy = data; // Inefficient copying
+    // Process data
+}
