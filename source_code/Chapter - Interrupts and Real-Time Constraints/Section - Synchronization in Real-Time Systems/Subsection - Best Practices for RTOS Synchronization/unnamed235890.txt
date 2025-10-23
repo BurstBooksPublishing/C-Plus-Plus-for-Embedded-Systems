@@ -1,0 +1,4 @@
+extern "C" void ISR() {
+    // Minimal processing
+    taskFlag.store(true);
+}
