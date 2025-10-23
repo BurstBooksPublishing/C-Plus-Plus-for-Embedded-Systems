@@ -1,0 +1,48 @@
+#include 
+#include 
+#include 
+
+int main() {
+    // Create a new TensorFlow session
+    tensorflow::Session* session;
+    tensorflow::Status status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Define a simple computational graph: y = x * 2
+    tensorflow::Scope root = tensorflow::Scope::NewRootScope();
+    auto x = tensorflow::ops::Placeholder(root, tensorflow::DT_FLOAT);
+    auto y = tensorflow::ops::Multiply(root, x, 2.0f);
+
+    // Create the graph and add it to the session
+    tensorflow::GraphDef graph;
+    status = root.ToGraphDef(&graph);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph: " << status.ToString() << std::endl;
+        return 1;
+    }
+    status = session->Create(graph);
+    if (!status.ok()) {
+        std::cerr << "Error adding graph to session: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Run the graph with an input value for x
+    tensorflow::Tensor x_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1}));
+    x_tensor.flat()(0) = 3.0f; // Set x = 3.0
+    std::vector outputs;
+    status = session->Run({{"Placeholder", x_tensor}}, {"Mul"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running session: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Print the result
+    std::cout << "Output: " << output[0].flat()(0) << std::endl;
+
+    // Clean up
+    session->Close();
+    return 0;
+}
