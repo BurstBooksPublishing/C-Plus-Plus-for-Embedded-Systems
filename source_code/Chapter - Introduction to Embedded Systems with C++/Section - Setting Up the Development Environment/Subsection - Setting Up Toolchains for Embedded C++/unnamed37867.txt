@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(EmbeddedProject CXX)
+
+set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+set(CMAKE_CXX_FLAGS "-mcpu=cortex-m4 -mthumb -Wall")
+
+add_executable(main.elf main.cpp)
+
+target_link_options(main.elf PRIVATE -T linker_script.ld)
