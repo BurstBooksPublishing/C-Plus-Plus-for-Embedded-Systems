@@ -1,0 +1,53 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void TrainCNN() {
+    // Define the input placeholder for the images
+    Scope root = Scope::NewRootScope();
+    auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 28, 28, 1}));
+
+    // Define the labels placeholder
+    auto labels = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 10}));
+
+    // Define the CNN layers
+    auto conv1 = Conv2D(root, input, 32, {5, 5}, "SAME");
+    auto relu1 = Relu(root, conv1);
+    auto pool1 = MaxPool(root, relu1, {2, 2}, {2, 2}, "SAME");
+
+    auto conv2 = Conv2D(root, pool1, 64, {5, 5}, "SAME");
+    auto relu2 = Relu(root, conv2);
+    auto pool2 = MaxPool(root, relu2, {2, 2}, {2, 2}, "SAME");
+
+    auto reshape = Reshape(root, pool2, {-1, 7 * 7 * 64});
+    auto dense1 = MatMul(root, reshape, Variable(root, {7 * 7 * 64, 1024}, DT_FLOAT));
+    auto relu3 = Relu(root, dense1);
+
+    auto logits = MatMul(root, relu3, Variable(root, {1024, 10}, DT_FLOAT));
+
+    // Define the loss function (cross-entropy)
+    auto cross_entropy = SoftmaxCrossEntropyWithLogits(root, logits, labels);
+    auto loss = ReduceMean(root, cross_entropy.loss, {0});
+
+    // Define the optimizer (Adam)
+    auto optimizer = ApplyAdam(root, Variable(root, {}, DT_FLOAT), Variable(root, {}, DT_FLOAT),
+                               Variable(root, {}, DT_FLOAT), Variable(root, {}, DT_FLOAT),
+                               loss, 0.001f, 0.9f, 0.999f, 1e-8f);
+
+    // Create a session and initialize variables
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({}, {optimizer.operation}, nullptr));
+
+    // Training loop (simplified for brevity)
+    Tensor input_data(DT_FLOAT, TensorShape({batch_size, 28, 28, 1}));
+    Tensor label_data(DT_FLOAT, TensorShape({batch_size, 10}));
+
+    for (int i = 0; i < num_epochs; ++i) {
+        // Fill input_data and label_data with training data
+        TF_CHECK_OK(session.Run({{input, input_data}, {labels, label_data}}, {loss}, nullptr));
+    }
+}
