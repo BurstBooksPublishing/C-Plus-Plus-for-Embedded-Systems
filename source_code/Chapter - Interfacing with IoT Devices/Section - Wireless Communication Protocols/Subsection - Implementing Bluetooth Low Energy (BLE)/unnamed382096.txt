@@ -1,0 +1,3 @@
+void setConnectionInterval(BLEServer *pServer, uint16_t minInterval, uint16_t maxInterval) {
+    pServer->setConnectionParams(minInterval, maxInterval, 0, 600);
+}
