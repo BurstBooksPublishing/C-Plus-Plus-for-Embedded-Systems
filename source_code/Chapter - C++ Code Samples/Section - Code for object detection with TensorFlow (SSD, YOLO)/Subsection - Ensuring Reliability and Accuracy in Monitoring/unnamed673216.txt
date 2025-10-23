@@ -1,0 +1,99 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+using namespace cv;
+
+int main() {
+    // Load the pre-trained SSD or YOLO model
+    std::string model_path = "path/to/your/model.pb";
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Load the model from the file
+    GraphDef graph_def;
+    status = ReadBinaryProto(Env::Default(), model_path, &graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error reading model file: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Load an image for object detection
+    Mat image = imread("path/to/your/image.jpg");
+    if (image.empty()) {
+        std::cerr << "Error loading image" << std::endl;
+        return -1;
+    }
+
+    // Preprocess the image (resize, normalize, etc.)
+    Mat resized_image;
+    resize(image, resized_image, Size(300, 300)); // Adjust size as per model input
+    Tensor input_tensor(DT_FLOAT, TensorShape({1, 300, 300, 3}));
+    float* p = input_tensor.flat().data();
+    for (int i = 0; i < resized_image.rows; ++i) {
+        for (int j = 0; j < resized_image.cols; ++j) {
+            Vec3b pixel = resized_image.at(i, j);
+            *p++ = pixe[2] / 255.0; // R
+            *p++ = pixe[1] / 255.0; // G
+            *p++ = pixe[0] / 255.0; // B
+        }
+    }
+
+    // Run the model
+    std::vector> inputs = {{"input_tensor", input_tensor}};
+    std::vector outputs;
+    status = session->Run(inputs, {"detection_boxes", "detection_scores", "detection_classes"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Process the output (bounding boxes, scores, classes)
+    Tensor boxes = output[0];
+    Tensor scores = output[1];
+    Tensor classes = output[2];
+
+    // Visualize the results
+    auto boxes_flat = boxes.flat();
+    auto scores_flat = scores.flat();
+    auto classes_flat = classes.flat();
+
+    for (int i = 0; i < boxes_flat.size() / 4; ++i) {
+        if (scores_flat(i) > 0.5) { // Confidence threshold
+            float ymin = boxes_flat(i * 4);
+            float xmin = boxes_flat(i * 4 + 1);
+            float ymax = boxes_flat(i * 4 + 2);
+            float xmax = boxes_flat(i * 4 + 3);
+
+            // Draw bounding box on the image
+            rectangle(image, Point(xmin * image.cols, ymin * image.rows),
+                      Point(xmax * image.cols, ymax * image.rows), Scalar(0, 255, 0), 2);
+        }
+    }
+
+    // Display the image with detected objects
+    imshow("Object Detection", image);
+    waitKey(0);
+
+    // Clean up
+    session->Close();
+    delete session;
+
+    return 0;
+}
