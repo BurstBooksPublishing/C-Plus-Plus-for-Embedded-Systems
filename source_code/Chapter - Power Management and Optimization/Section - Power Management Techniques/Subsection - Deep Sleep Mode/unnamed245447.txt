@@ -1,0 +1,7 @@
+void enterDeepSleepMode() {
+    disableAllPeripherals();
+    enableRTCTimer();
+    while (!rtcAlarm()) {
+        // Deep sleep until the RTC timer wakes the system
+    }
+}
