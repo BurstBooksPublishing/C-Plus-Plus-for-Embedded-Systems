@@ -1,0 +1,14 @@
+template 
+class Base {
+public:
+    void execute() {
+        static_cast(this)->implementation();
+    }
+};
+
+class Derived : public Base {
+public:
+    void implementation() {
+        /* Specific implementation */
+    }
+};
