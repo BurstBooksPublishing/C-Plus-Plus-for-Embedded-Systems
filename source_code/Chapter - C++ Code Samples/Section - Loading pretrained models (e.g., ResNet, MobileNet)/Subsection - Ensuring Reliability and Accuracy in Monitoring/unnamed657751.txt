@@ -1,0 +1,37 @@
+#include 
+#include 
+#include 
+#include 
+
+int main() {
+    // Define the path to the pretrained model
+    std::string model_path = "path/to/pretrained_model";
+
+    // Create a SavedModelBundle to load the model
+    tensorflow::SavedModelBundle bundle;
+
+    // Load the pretrained model
+    tensorflow::Status status = tensorflow::LoadSavedModel(
+        tensorflow::SessionOptions(), 
+        tensorflow::RunOptions(), 
+        model_path, 
+        {tensorflow::kSavedModelTagServe}, 
+        &bundle);
+
+    // Check if the model was loaded successfully
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    std::cout << "Model loaded successfully!" << std::endl;
+
+    // Use the loaded model for inference or further processing
+    // Example: Run a session with input tensors
+    // tensorflow::Tensor input_tensor(...);
+    // std::vector outputs;
+    // status = bundle.session->Run({{"input_tensor_name", input_tensor}}, 
+    //                              {"output_tensor_name"}, {}, &outputs);
+
+    return 0;
+}
