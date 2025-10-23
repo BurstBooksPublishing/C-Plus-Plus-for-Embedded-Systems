@@ -1,0 +1,1 @@
+int popcount_256bit(const uint64_t data[4]);
