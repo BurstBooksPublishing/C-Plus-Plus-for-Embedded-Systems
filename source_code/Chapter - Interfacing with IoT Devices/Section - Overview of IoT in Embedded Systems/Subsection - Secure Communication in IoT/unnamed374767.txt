@@ -1,0 +1,7 @@
+#include 
+
+void configure_mqtt_tls(mqtt::client& client, const std::string& ca_cert) {
+    mqtt::ssl_options ssl_opts;
+    ssl_opts.set_trust_store(ca_cert);
+    client.set_ssl_options(ssl_opts);
+}
