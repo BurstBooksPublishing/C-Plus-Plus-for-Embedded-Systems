@@ -1,0 +1,9 @@
+#include 
+
+std::mutex myMutex;
+
+void criticalSection() {
+    myMutex.lock();
+    // Access shared resource
+    myMutex.unlock();
+}
