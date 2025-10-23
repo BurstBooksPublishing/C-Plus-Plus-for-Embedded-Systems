@@ -1,0 +1,3 @@
+volatile int* const hwRegister = reinterpret_cast(0x1000);
+*hwRegister = 0x01; // Write to hardware register
+int value = *hwRegister; // Read from hardware register
