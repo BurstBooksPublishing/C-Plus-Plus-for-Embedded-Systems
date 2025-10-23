@@ -1,0 +1,45 @@
+#include 
+#include  // Eigen library for linear algebra
+#include  // Matplot++ for visualization
+
+using namespace Eigen;
+using namespace matplot;
+
+void performPCA(const MatrixXd& data, int num_components) {
+    // Center the data by subtracting the mean
+    VectorXd mean = data.colwise().mean();
+    MatrixXd centered = data.rowwise() - mean.transpose();
+
+    // Compute the covariance matrix
+    MatrixXd cov = (centered.adjoint() * centered) / double(data.rows() - 1);
+
+    // Perform Eigen decomposition
+    SelfAdjointEigenSolver eig(cov);
+    MatrixXd eigen_vectors = eig.eigenvectors().rightCols(num_components);
+
+    // Project data onto the principal components
+    MatrixXd reduced_data = centered * eigen_vectors;
+
+    // Visualize the reduced data
+    std::vector x, y;
+    for (int i = 0; i < reduced_data.rows(); ++i) {
+        x.push_back(reduced_data(i, 0));
+        y.push_back(reduced_data(i, 1));
+    }
+    scatter(x, y);
+    show();
+}
+
+int main() {
+    // Example data matrix (rows: samples, columns: features)
+    MatrixXd data(100, 3);
+    data << 1.2, 2.3, 3.4,
+            4.5, 5.6, 6.7,
+            // ... (more data rows)
+            7.8, 8.9, 9.0;
+
+    // Perform PCA and reduce to 2 components
+    performPCA(data, 2);
+
+    return 0;
+}
