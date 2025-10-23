@@ -1,0 +1,59 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void logisticRegressionClassifier() {
+    // Define placeholders for input features (X) and labels (Y)
+    Scope root = Scope::NewRootScope();
+    auto X = Placeholder(root, DT_FLOAT);
+    auto Y = Placeholder(root, DT_FLOAT);
+
+    // Define model parameters (weights and bias)
+    auto W = Variable(root, {1, 1}, DT_FLOAT);
+    auto b = Variable(root, {1}, DT_FLOAT);
+    auto assign_W = Assign(root, W, RandomNormal(root, {1, 1}, DT_FLOAT));
+    auto assign_b = Assign(root, b, RandomNormal(root, {1}, DT_FLOAT));
+
+    // Define the logistic regression model
+    auto logits = Add(root, MatMul(root, X, W), b);
+    auto prediction = Sigmoid(root, logits);
+
+    // Define the loss function (cross-entropy)
+    auto epsilon = Const(root, 1e-7f);
+    auto clipped_prediction = ClipByValue(root, prediction, epsilon, 1.0f - epsilon);
+    auto loss = Negate(root, ReduceMean(root, Add(root, Multiply(root, Y, Log(root, clipped_prediction)),
+        Multiply(root, Subtract(root, Const(root, 1.0f), Y), Log(root, Subtract(root, Const(root, 1.0f), clipped_prediction))))));
+
+    // Define the optimizer (Gradient Descent)
+    auto optimizer = GradientDescentOptimizer(root, 0.01f);
+    auto train_op = optimizer.minimize(loss);
+
+    // Initialize variables and start a session
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({assign_W, assign_b}, nullptr));
+
+    // Training data (example)
+    Tensor x_data(DT_FLOAT, TensorShape({4, 1}));
+    Tensor y_data(DT_FLOAT, TensorShape({4, 1}));
+    auto x_map = x_data.tensor();
+    auto y_map = y_data.tensor();
+    x_map(0, 0) = 1.0f; y_map(0, 0) = 0.0f;
+    x_map(1, 0) = 2.0f; y_map(1, 0) = 0.0f;
+    x_map(2, 0) = 3.0f; y_map(2, 0) = 1.0f;
+    x_map(3, 0) = 4.0f; y_map(3, 0) = 1.0f;
+
+    // Training loop
+    for (int i = 0; i < 1000; ++i) {
+        TF_CHECK_OK(session.Run({{X, x_data}, {Y, y_data}}, {loss}, nullptr));
+    }
+
+    // Test the model
+    Tensor test_data(DT_FLOAT, TensorShape({1, 1}));
+    test_data.tensor()(0, 0) = 2.5f;
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{X, test_data}}, {prediction}, &outputs));
+    std::cout << "Prediction: " << output[0].tensor()(0, 0) << std::endl;
+}
