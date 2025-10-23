@@ -1,0 +1,6 @@
+struct Task {
+    int priority;
+    std::function function;
+};
+
+std::priority_queue, std::greater<>> task_queue;
