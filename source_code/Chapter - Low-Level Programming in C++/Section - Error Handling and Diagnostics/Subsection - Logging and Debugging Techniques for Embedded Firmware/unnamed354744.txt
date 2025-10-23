@@ -1,0 +1,9 @@
+#include 
+
+void measure_performance() {
+    auto start = std::chrono::high_resolution_clock::now();
+    // Code to measure
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast(end - start);
+    LOG_DEBUG("Execution time: " + std::to_string(duration.count()) + " microseconds");
+}
