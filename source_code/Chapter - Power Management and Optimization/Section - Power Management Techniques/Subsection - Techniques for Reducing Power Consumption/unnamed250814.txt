@@ -1,0 +1,4 @@
+void configure_interrupts() {
+    // Hypothetical register to configure interrupt controller
+    *reinterpret_cast(0x40022000) = 0x01; // Enable low-power mode
+}
