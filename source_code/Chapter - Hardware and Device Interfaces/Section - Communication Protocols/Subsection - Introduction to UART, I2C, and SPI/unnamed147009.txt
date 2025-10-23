@@ -1,0 +1,9 @@
+constexpr uint8_t spi_mode = 0x03; // Mode 3
+
+void configureSPI() {
+    // Set MOSI, SCK, and SS as output
+    DDRB = (1 << DDB5) | (1 << DDB7) | (1 << DDB4);
+    
+    // Enable SPI, set to master mode, and set clock rate
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1) | (1 << SPR0) | (1 << CPHA) | (1 << CPOL);
+}
