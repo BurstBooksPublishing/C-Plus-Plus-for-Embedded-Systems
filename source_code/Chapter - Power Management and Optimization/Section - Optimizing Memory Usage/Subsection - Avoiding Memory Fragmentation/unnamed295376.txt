@@ -1,0 +1,2 @@
+std::vector vec;
+vec.reserve(100); // Preallocate memory to avoid fragmentation
