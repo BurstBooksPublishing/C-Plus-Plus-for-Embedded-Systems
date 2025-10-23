@@ -1,0 +1,11 @@
+#include 
+
+std::counting_semaphore<10> semaphore(10);
+
+void producer() {
+    semaphore.release(); // Signal availability
+}
+
+void consumer() {
+    semaphore.acquire(); // Wait for signal
+}
