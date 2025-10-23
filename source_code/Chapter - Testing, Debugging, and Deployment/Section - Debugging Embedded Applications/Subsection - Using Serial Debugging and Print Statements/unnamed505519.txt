@@ -1,0 +1,2 @@
+DEBUG_PRINT("{\"timestamp\": %lu, \"state\": %d, \"error\": %d}\n",
+            getTimestamp(), state, errorCode);
