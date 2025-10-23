@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+#include <tensorflow/core/framework/tensor.h>
+#include <tensorflow/core/framework/types.h>
+#include <tensorflow/core/public/session.h>
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void evaluateAndVisualizeResults(const Tensor& predictions, const Tensor& labels) {
+    // Assuming predictions and labels are 1D tensors of the same size
+    int numClasses = 10; // Example for 10 classes
+    int numSamples = predictions.dim_size(0);
+
+    // Initialize confusion matrix
+    std::vector<std::vector<int>> confusionMatrix(numClasses, std::vector<int>(numClasses, 0));
+
+    // Populate confusion matrix
+    for (int i = 0; i < numSamples; ++i) {
+        int predictedClass = predictions.flat<int>()(i);
+        int trueClass = labels.flat<int>()(i);
+        confusionMatrix[trueClass][predictedClass]++;
+    }
+
+    // Print confusion matrix
+    std::cout << "Confusion Matrix:\n";
+    for (int i = 0; i < numClasses; ++i) {
+        for (int j = 0; j < numClasses; ++j) {
+            std::cout << confusionMatrix[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+}
+
+int main() {
+    // Example usage
+    Tensor predictions(DT_INT32, TensorShape({100})); // 100 predictions
+    Tensor labels(DT_INT32, TensorShape({100}));      // 100 true labels
+
+    // Fill tensors with example data (e.g., from model inference)
+    // ...
+
+    evaluateAndVisualizeResults(predictions, labels);
+
+    return 0;
+}
