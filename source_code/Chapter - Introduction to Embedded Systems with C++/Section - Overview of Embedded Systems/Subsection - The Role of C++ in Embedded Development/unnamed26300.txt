@@ -1,0 +1,6 @@
+template
+class Buffer {
+public:
+    T data[N];
+    void clear() { memset(data, 0, N * sizeof(T)); }
+};
