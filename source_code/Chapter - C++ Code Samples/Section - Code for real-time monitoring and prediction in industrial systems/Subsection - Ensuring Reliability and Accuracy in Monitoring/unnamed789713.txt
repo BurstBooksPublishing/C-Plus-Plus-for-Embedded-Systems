@@ -1,0 +1,49 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Function to simulate real-time sensor data
+std::vector generateSensorData() {
+    std::vector data = { /* Simulated sensor readings */ };
+    return data;
+}
+
+int main() {
+    // Load the pre-trained TensorFlow model
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+
+    // Placeholder for input data
+    auto input = Placeholder(root, DT_FLOAT);
+
+    // Load the model (assuming it's saved as "model.pb")
+    GraphDef graph_def;
+    TF_CHECK_OK(ReadBinaryProto(Env::Default(), "model.pb", &graph_def));
+    TF_CHECK_OK(session.Create(graph_def));
+
+    // Real-time monitoring loop
+    while (true) {
+        // Simulate real-time data acquisition
+        std::vector sensorData = generateSensorData();
+        Tensor input_tensor(DT_FLOAT, TensorShape({1, sensorData.size()}));
+        std::copy_n(sensorData.begin(), sensorData.size(), input_tensor.flat().data());
+
+        // Run the model to make predictions
+        std::vector outputs;
+        TF_CHECK_OK(session.Run({{input, input_tensor}}, {"output_node"}, &outputs));
+
+        // Extract and display the prediction
+        auto prediction = output[0].flat();
+        std::cout << "Predicted Anomaly Score: " << prediction(0) << std::endl;
+
+        // Sleep to simulate real-time interval (e.g., 1 second)
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    return 0;
+}
