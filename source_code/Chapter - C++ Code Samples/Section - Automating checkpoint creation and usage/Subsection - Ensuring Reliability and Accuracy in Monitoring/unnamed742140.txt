@@ -1,0 +1,43 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Function to create a checkpoint
+void createCheckpoint(tensorflow::Session* session, 
+                      const std::string& checkpointPath) {
+    tensorflow::Tensor checkpointTensor(tensorflow::DT_STRING, 
+                                        tensorflow::TensorShape());
+    checkpointTensor.scalar()() = checkpointPath;
+    TF_CHECK_OK(session->Run({}, {}, {"SaveV2"}, {}, nullptr));
+}
+
+// Function to restore a checkpoint
+void restoreCheckpoint(tensorflow::Session* session, 
+                       const std::string& checkpointPath) {
+    tensorflow::Tensor checkpointTensor(tensorflow::DT_STRING, 
+                                        tensorflow::TensorShape());
+    checkpointTensor.scalar()() = checkpointPath;
+    TF_CHECK_OK(session->Run({}, {}, {"RestoreV2"}, {}, nullptr));
+}
+
+int main() {
+    // Initialize a TensorFlow session
+    tensorflow::Session* session;
+    TF_CHECK_OK(tensorflow::NewSession(tensorflow::SessionOptions(), 
+                                       &session));
+
+    // Define the checkpoint path
+    std::string checkpointPath = "/path/to/checkpoint";
+
+    // Automate checkpoint creation
+    createCheckpoint(session, checkpointPath);
+
+    // Automate checkpoint restoration
+    restoreCheckpoint(session, checkpointPath);
+
+    // Close the session
+    session->Close();
+    return 0;
+}
