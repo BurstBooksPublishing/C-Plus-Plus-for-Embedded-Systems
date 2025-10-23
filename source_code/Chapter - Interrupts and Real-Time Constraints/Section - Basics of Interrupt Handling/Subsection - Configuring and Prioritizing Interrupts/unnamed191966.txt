@@ -1,0 +1,2 @@
+NVIC_SetPriority(TIM2_IRQn, 0); // High priority
+NVIC_SetPriority(USART1_IRQn, 2); // Lower priority
