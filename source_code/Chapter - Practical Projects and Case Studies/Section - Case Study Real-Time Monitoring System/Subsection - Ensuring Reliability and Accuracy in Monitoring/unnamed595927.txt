@@ -1,0 +1,3 @@
+bool validateSensorData(float value, float minThreshold, float maxThreshold) {
+    return (value >= minThreshold && value <= maxThreshold);
+}
