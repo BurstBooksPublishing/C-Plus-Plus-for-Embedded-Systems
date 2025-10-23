@@ -1,0 +1,50 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    Scope root = Scope::NewRootScope();
+
+    // Define input placeholder
+    auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 784}));
+
+    // Define weights and biases for the first hidden layer
+    auto W1 = Variable(root, {784, 256}, DT_FLOAT);
+    auto b1 = Variable(root, {256}, DT_FLOAT);
+    auto layer1 = Add(root, MatMul(root, input, W1), b1);
+    auto layer1_activation = Relu(root, layer1);
+
+    // Define weights and biases for the second hidden layer
+    auto W2 = Variable(root, {256, 128}, DT_FLOAT);
+    auto b2 = Variable(root, {128}, DT_FLOAT);
+    auto layer2 = Add(root, MatMul(root, layer1_activation, W2), b2);
+    auto layer2_activation = Relu(root, layer2);
+
+    // Define weights and biases for the output layer
+    auto W3 = Variable(root, {128, 10}, DT_FLOAT);
+    auto b3 = Variable(root, {10}, DT_FLOAT);
+    auto output_layer = Add(root, MatMul(root, layer2_activation, W3), b3);
+
+    // Initialize variables
+    auto init = VariablesInitializer(root, {W1, b1, W2, b2, W3, b3});
+
+    // Create a session and run the initialization
+    ClientSession session(root);
+    TF_CHECK_OK(session.Run({}, {}, {init}, nullptr));
+
+    // Example input tensor (batch size of 1, 784 features)
+    Tensor input_tensor(DT_FLOAT, TensorShape({1, 784}));
+    input_tensor.flat().setZero(); // Replace with actual data
+
+    // Run the model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{input, input_tensor}}, {output_layer}, &outputs));
+
+    // Output the result
+    std::cout << "Output: " << output[0].matrix() << std::endl;
+
+    return 0;
+}
