@@ -1,0 +1,83 @@
+#include 
+#include 
+#include 
+
+// Define the Environment class
+class Environment {
+public:
+    Environment() : state(0), reward(0) {}
+
+    // Reset the environment to initial state
+    void reset() {
+        state = 0;
+        reward = 0;
+    }
+
+    // Execute an action and return the new state and reward
+    std::pair step(int action) {
+        // Simulate environment dynamics
+        if (action == 0) {
+            state += 1;
+            reward = 1.0;
+        } else {
+            state -= 1;
+            reward = -1.0;
+        }
+
+        // Check if the episode is done
+        bool done = (state >= 10 || state <= -10);
+
+        return {state, reward};
+    }
+
+private:
+    int state;
+    double reward;
+};
+
+// Define the Agent class
+class Agent {
+public:
+    Agent() : total_reward(0) {}
+
+    // Agent selects an action based on the current state
+    int choose_action() {
+        // Random action selection for simplicity
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 1);
+        return dis(gen);
+    }
+
+    // Update the agent's knowledge based on the reward
+    void update(double reward) {
+        total_reward += reward;
+    }
+
+    double get_total_reward() const {
+        return total_reward;
+    }
+
+private:
+    double total_reward;
+};
+
+int main() {
+    Environment env;
+    Agent agent;
+
+    // Run a single episode
+    env.reset();
+    for (int i = 0; i < 100; ++i) {
+        int action = agent.choose_action();
+        auto[new_state, reward] = env.step(action);
+        agent.update(reward);
+
+        std::cout << "Step: " << i << ", State: " << new_state 
+                  << ", Reward: " << reward << std::endl;
+    }
+
+    std::cout << "Total Reward: " << agent.get_total_reward() << std::endl;
+
+    return 0;
+}
