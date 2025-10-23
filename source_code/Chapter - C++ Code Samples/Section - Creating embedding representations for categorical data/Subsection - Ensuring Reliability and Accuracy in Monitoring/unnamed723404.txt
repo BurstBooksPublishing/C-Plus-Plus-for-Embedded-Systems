@@ -1,0 +1,39 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define the scope for the operations
+    Scope root = Scope::NewRootScope();
+
+    // Example categorical data (indices of categories)
+    Tensor categorical_data(DT_INT32, TensorShape({5}));
+    auto data_map = categorical_data.flat();
+    data_map(0) = 0; data_map(1) = 1; data_map(2) = 2; data_map(3) = 1; data_map(4) = 0;
+
+    // Define embedding parameters
+    const int embedding_dim = 3; // Dimension of the embedding vectors
+    const int vocab_size = 3;    // Number of unique categories
+
+    // Create embedding variable
+    auto embedding_var = Variable(root.WithOpName("embedding_var"),
+                                  {vocab_size, embedding_dim}, DT_FLOAT);
+    auto assign_embedding = Assign(root.WithOpName("assign_embedding"),
+                                   embedding_var, RandomNormal(root, {vocab_size, embedding_dim}, DT_FLOAT));
+
+    // Gather embeddings for the categorical data
+    auto embeddings = Gather(root.WithOpName("embeddings"), embedding_var, categorical_data);
+
+    // Initialize and run the session
+    ClientSession session(root);
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({assign_embedding, embeddings}, &outputs));
+
+    // Output the embeddings
+    std::cout << "Embeddings: " << output[1].DebugString() << std::endl;
+
+    return 0;
+}
