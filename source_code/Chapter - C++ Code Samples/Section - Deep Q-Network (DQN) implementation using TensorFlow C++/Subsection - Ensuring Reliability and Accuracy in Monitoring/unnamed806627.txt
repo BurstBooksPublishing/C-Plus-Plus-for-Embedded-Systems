@@ -1,0 +1,87 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the DQN class
+class DQN {
+public:
+    DQN(int state_size, int action_size, float learning_rate) 
+        : state_size_(state_size), action_size_(action_size), 
+          learning_rate_(learning_rate) {
+        // Build the neural network
+        BuildNetwork();
+    }
+
+    void BuildNetwork() {
+        // Input placeholder for state
+        auto state = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                                 Placeholder::Shape({-1, state_size_}));
+
+        // Hidden layers
+        auto hidden1 = FullyConnected(Scope::NewRootScope(), state, 64, 
+                                      FullyConnected::Attrs().Activation("relu"));
+        auto hidden2 = FullyConnected(Scope::NewRootScope(), hidden1, 64, 
+                                      FullyConnected::Attrs().Activation("relu"));
+
+        // Output layer
+        auto output = FullyConnected(Scope::NewRootScope(), hidden2, action_size_, 
+                                     FullyConnected::Attrs().Activation("linear"));
+
+        // Define the loss function (Mean Squared Error)
+        auto target = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                                  Placeholder::Shape({-1, action_size_}));
+        auto loss = ReduceMean(Scope::NewRootScope(), 
+                               Square(Scope::NewRootScope(), 
+                                     Subtract(Scope::NewRootScope(), target, output)));
+
+        // Define the optimizer
+        auto optimizer = ApplyGradientDescent(Scope::NewRootScope(), 
+                                              learning_rate_, loss);
+
+        // Initialize the session
+        session_ = std::unique_ptr(new ClientSession(Scope::NewRootScope()));
+    }
+
+    void Train(const std::vector& state, const std::vector& target) {
+        // Convert input to TensorFlow tensors
+        Tensor state_tensor(DT_FLOAT, TensorShape({1, state_size_}));
+        std::copy_n(state.begin(), state.size(), state_tensor.flat().data());
+
+        Tensor target_tensor(DT_FLOAT, TensorShape({1, action_size_}));
+        std::copy_n(target.begin(), target.size(), target_tensor.flat().data());
+
+        // Run the training step
+        std::vector outputs;
+        session_->Run({{state_, state_tensor}, {target_, target_tensor}}, 
+                      {optimizer_}, &outputs);
+    }
+
+private:
+    int state_size_;
+    int action_size_;
+    float learning_rate_;
+    std::unique_ptr session_;
+    Output state_;
+    Output target_;
+    Output optimizer_;
+};
+
+int main() {
+    // Example usage of the DQN class
+    DQN dqn(4, 2, 0.001);  // State size: 4, Action size: 2, Learning rate: 0.001
+
+    // Example training data
+    std::vector state = {1.0, 0.0, 0.0, 1.0};
+    std::vector target = {0.5, 0.5};
+
+    // Train the network
+    dqn.Train(state, target);
+
+    return 0;
+}
