@@ -1,0 +1,5 @@
+void criticalSection() {
+    __disable_irq(); // Disable interrupts
+    // Critical code
+    __enable_irq(); // Re-enable interrupts
+}
