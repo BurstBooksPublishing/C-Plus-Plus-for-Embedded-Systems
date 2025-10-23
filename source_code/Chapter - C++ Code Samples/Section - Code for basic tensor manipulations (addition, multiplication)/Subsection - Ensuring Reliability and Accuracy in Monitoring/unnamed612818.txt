@@ -1,0 +1,51 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+
+int main() {
+    // Initialize a TensorFlow session
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Define two tensors with shape[2, 2]
+    Tensor a(DT_FLOAT, TensorShape({2, 2}));
+    Tensor b(DT_FLOAT, TensorShape({2, 2}));
+
+    // Fill tensors with values
+    auto a_map = a.tensor();
+    auto b_map = b.tensor();
+    a_map(0, 0) = 1.0; a_map(0, 1) = 2.0;
+    a_map(1, 0) = 3.0; a_map(1, 1) = 4.0;
+    b_map(0, 0) = 5.0; b_map(0, 1) = 6.0;
+    b_map(1, 0) = 7.0; b_map(1, 1) = 8.0;
+
+    // Add tensors
+    Tensor c(DT_FLOAT, TensorShape({2, 2}));
+    status = session->Run({{"a", a}, {"b", b}}, {"Add"}, {}, {&c});
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Multiply tensors
+    Tensor d(DT_FLOAT, TensorShape({2, 2}));
+    status = session->Run({{"a", a}, {"b", b}}, {"Mul"}, {}, {&d});
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Print results
+    std::cout << "Addition result:\n" << c.tensor() << "\n";
+    std::cout << "Multiplication result:\n" << d.tensor() << "\n";
+
+    // Close the session
+    session->Close();
+    return 0;
+}
