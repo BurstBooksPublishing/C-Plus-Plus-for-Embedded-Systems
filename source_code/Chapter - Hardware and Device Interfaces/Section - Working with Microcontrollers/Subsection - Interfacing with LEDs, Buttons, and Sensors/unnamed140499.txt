@@ -1,0 +1,22 @@
+#include 
+#include 
+
+void adc_init() {
+    ADMUX |= (1 << REFS0); // Set reference voltage to AVCC
+    ADCSRA |= (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Enable ADC and set prescaler to 128
+}
+
+uint16_t adc_read(uint8_t ch) {
+    ADMUX = (ADMUX & 0xF8) | (ch & 0x07); // Select ADC channel
+    ADCSRA |= (1 << ADSC); // Start conversion
+    while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
+    return ADC; // Return converted value
+}
+
+int main() {
+    adc_init();
+    while (1) {
+        uint16_t temp = adc_read(0); // Read temperature from ADC channel 0
+        _delay_ms(100); // Delay for 100ms
+    }
+}
