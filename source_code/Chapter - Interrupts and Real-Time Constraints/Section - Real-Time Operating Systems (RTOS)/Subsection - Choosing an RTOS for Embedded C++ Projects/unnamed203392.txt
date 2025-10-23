@@ -1,0 +1,2 @@
+K_MEM_POOL_DEFINE(my_pool, 256, 1024, 4, 4);
+void* mem_block = k_mem_pool_alloc(&my_pool, 256);
