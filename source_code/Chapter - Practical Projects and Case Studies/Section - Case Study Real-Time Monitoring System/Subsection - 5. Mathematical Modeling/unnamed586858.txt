@@ -1,0 +1,4 @@
+float first_order_filter(float input, float prev_output, float K, float tau, float dt) {
+    float alpha = dt / (tau + dt);
+    return alpha * K * input + (1 - alpha) * prev_output;
+}
