@@ -1,0 +1,9 @@
+void Timer_Test() {
+    Timer_Init();
+    while (1) {
+        if (TIM2->SR & TIM_SR_UIF) {
+            TIM2->SR &= ~TIM_SR_UIF; // Clear update interrupt flag
+            GPIOA->ODR ^= (1U << 5); // Toggle PA5
+        }
+    }
+}
