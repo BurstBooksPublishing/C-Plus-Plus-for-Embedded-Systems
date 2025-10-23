@@ -1,0 +1,23 @@
+#include 
+
+std::vector temperatureReadings;
+
+void collectTemperatureData() {
+  float temperature = readTemperature(); // Assume this function reads the temperature
+  temperatureReadings.push_back(temperature);
+}
+
+void sendBatchData() {
+  if (temperatureReadings.empty()) return;
+
+  String payload = "{\"temperatures\":[";
+  for (size_t i = 0; i < temperatureReadings.size(); ++i) {
+    payload += String(temperatureReadings[i]);
+    if (i < temperatureReadings.size() - 1) {
+      payload += ",";
+    }
+  }
+  payload += "]}";
+  client.publish("sensor/temperature_batch", payload.c_str());
+  temperatureReadings.clear();
+}
