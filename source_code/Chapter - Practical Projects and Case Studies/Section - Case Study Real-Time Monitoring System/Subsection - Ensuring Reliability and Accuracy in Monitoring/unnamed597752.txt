@@ -1,0 +1,10 @@
+float getAccurateReading(float sensor1, float sensor2, float sensor3) {
+    if (sensor1 == sensor2 || sensor1 == sensor3) {
+        return sensor1;
+    } else if (sensor2 == sensor3) {
+        return sensor2;
+    } else {
+        // If no majority, return the average
+        return (sensor1 + sensor2 + sensor3) / 3.0f;
+    }
+}
