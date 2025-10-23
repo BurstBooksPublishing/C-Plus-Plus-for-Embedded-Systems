@@ -1,0 +1,7 @@
+#include 
+
+uint16_t readCurrent() {
+    ADCSRA |= (1 << ADSC); // Start ADC conversion
+    while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
+    return ADC; // Return the ADC value
+}
