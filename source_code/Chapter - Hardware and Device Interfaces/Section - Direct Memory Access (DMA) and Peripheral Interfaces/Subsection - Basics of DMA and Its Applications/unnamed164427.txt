@@ -1,0 +1,22 @@
+constexpr uint32_t DMA_BASE_ADDRESS = 0x40020000;
+constexpr uint32_t DMA_SOURCE_ADDRESS = 0x20000000;
+constexpr uint32_t DMA_DESTINATION_ADDRESS = 0x20001000;
+constexpr uint32_t DMA_DATA_SIZE = 1024; // 1 KB of data
+
+volatile auto* const dmaControlReg = reinterpret_cast(DMA_BASE_ADDRESS);
+volatile auto* const dmaSourceReg = reinterpret_cast(DMA_BASE_ADDRESS + 0x04);
+volatile auto* const dmaDestReg = reinterpret_cast(DMA_BASE_ADDRESS + 0x08);
+volatile auto* const dmaSizeReg = reinterpret_cast(DMA_BASE_ADDRESS + 0x0C);
+
+// Configure DMA controller
+*dmaSourceReg = DMA_SOURCE_ADDRESS;
+*dmaDestReg = DMA_DESTINATION_ADDRESS;
+*dmaSizeReg = DMA_DATA_SIZE;
+*dmaControlReg = 0x01; // Start DMA transfer
+
+// Wait for DMA transfer to complete
+while ((*dmaControlReg & 0x02) == 0) {
+    // Busy-wait loop
+}
+
+// Handle completion (e.g., process the transferred data)
