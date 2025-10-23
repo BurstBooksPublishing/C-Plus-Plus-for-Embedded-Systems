@@ -1,0 +1,14 @@
+#include 
+
+constexpr int max_iterations = 1000;
+
+uint32_t factorial(uint32_t n) {
+    uint32_t result = 1;
+    for (uint32_t i = 1; i <= n; ++i) {
+        result *= i;
+        if (i > max_iterations) {
+            break; // Prevent infinite loops
+        }
+    }
+    return result;
+}
