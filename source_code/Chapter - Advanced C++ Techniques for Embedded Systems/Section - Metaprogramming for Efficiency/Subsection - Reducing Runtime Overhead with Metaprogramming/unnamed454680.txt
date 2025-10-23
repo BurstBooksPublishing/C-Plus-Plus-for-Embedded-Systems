@@ -1,0 +1,12 @@
+template
+struct LookupTable {
+    constexpr static int value = N * N;
+};
+
+constexpr int table[5] = {
+    LookupTable<0>::value,
+    LookupTable<1>::value,
+    LookupTable<2>::value,
+    LookupTable<3>::value,
+    LookupTable<4>::value
+};
