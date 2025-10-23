@@ -1,0 +1,21 @@
+struct Task {
+    void (*function)();
+    uint32_t interval;
+    uint32_t next_run;
+};
+
+Task tasks[] = {
+    {read_sensors, 100, 0},
+    {process_data, 200, 0},
+    {send_data, 500, 0}
+};
+
+void scheduler() {
+    uint32_t current_time = millis();
+    for (auto& task : tasks) {
+        if (current_time >= task.next_run) {
+            task.function();
+            task.next_run = current_time + task.interval;
+        }
+    }
+}
