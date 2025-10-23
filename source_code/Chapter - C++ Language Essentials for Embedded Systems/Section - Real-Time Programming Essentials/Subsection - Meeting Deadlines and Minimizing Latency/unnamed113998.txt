@@ -1,0 +1,7 @@
+void profile_function() {
+    auto start = std::chrono::high_resolution_clock::now();
+    // Function to profile
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast(end - start);
+    std::cout << "Function took " << duration.count() << " microseconds\n";
+}
