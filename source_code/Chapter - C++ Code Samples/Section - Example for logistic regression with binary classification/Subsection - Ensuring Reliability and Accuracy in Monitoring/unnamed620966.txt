@@ -1,0 +1,57 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define the input data (features and labels)
+    Tensor x_data(DT_FLOAT, TensorShape({4, 2}));
+    Tensor y_data(DT_FLOAT, TensorShape({4, 1}));
+
+    // Initialize the input data
+    auto x_map = x_data.tensor();
+    auto y_map = y_data.tensor();
+    x_map(0, 0) = 1.0; x_map(0, 1) = 2.0;
+    x_map(1, 0) = 2.0; x_map(1, 1) = 3.0;
+    x_map(2, 0) = 3.0; x_map(2, 1) = 4.0;
+    x_map(3, 0) = 4.0; x_map(3, 1) = 5.0;
+
+    y_map(0, 0) = 0.0; y_map(1, 0) = 0.0;
+    y_map(2, 0) = 1.0; y_map(3, 0) = 1.0;
+
+    // Define the model parameters (weights and bias)
+    Scope scope = Scope::NewRootScope();
+    auto W = Variable(scope, {2, 1}, DT_FLOAT);
+    auto b = Variable(scope, {1}, DT_FLOAT);
+    auto assign_W = Assign(scope, W, RandomNormal(scope, {2, 1}, DT_FLOAT));
+    auto assign_b = Assign(scope, b, RandomNormal(scope, {1}, DT_FLOAT));
+
+    // Define the logistic regression model
+    auto logits = Add(scope, MatMul(scope, x_data, W), b);
+    auto pred = Sigmoid(scope, logits);
+
+    // Define the loss function (binary cross-entropy)
+    auto loss = ReduceMean(scope, Negate(scope, Add(scope, Multiply(scope, y_data, Log(scope, pred)),
+        Multiply(scope, Subtract(scope, Const(scope, 1.0f), y_data),
+        Log(scope, Subtract(scope, Const(scope, 1.0f), pred))))));
+
+    // Define the optimizer (Gradient Descent)
+    auto optimizer = GradientDescentOptimizer(scope, 0.01f);
+    auto train_op = optimizer.Minimize(scope, loss);
+
+    // Run the training session
+    ClientSession session(scope);
+    TF_CHECK_OK(session.Run({assign_W, assign_b}, nullptr));
+    for (int i = 0; i < 1000; ++i) {
+        TF_CHECK_OK(session.Run({train_op}, nullptr));
+    }
+
+    // Evaluate the trained model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({pred}, &outputs));
+    std::cout << "Predictions: " << output[0].matrix() << std::endl;
+
+    return 0;
+}
