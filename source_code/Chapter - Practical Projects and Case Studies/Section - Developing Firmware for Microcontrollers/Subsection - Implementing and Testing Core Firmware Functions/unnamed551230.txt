@@ -1,0 +1,8 @@
+void UART_Test() {
+    UART_Init();
+    char data[] = "Hello, World!\r\n";
+    for (char c : data) {
+        while (!(USART2->SR & USART_SR_TXE)); // Wait for TX buffer empty
+        USART2->DR = c; // Send character
+    }
+}
