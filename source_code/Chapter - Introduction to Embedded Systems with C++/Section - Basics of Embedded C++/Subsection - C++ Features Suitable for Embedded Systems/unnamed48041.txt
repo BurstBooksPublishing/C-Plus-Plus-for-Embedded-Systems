@@ -1,0 +1,7 @@
+struct BitField {
+    unsigned int flag1 : 1;
+    unsigned int flag2 : 1;
+};
+
+BitField bf;
+bf.flag1 = 1; // Set first bit
