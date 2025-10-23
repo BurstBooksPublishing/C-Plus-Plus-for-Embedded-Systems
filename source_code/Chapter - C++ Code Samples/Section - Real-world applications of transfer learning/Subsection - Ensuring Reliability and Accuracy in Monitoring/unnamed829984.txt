@@ -1,0 +1,48 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Load a pre-trained model for medical imaging
+Status LoadModel(const string& model_path, std::unique_ptr* session) {
+    SessionOptions options;
+    TF_RETURN_IF_ERROR(NewSession(options, session));
+    TF_RETURN_IF_ERROR((*session)->Create(model_path));
+    return Status::OK();
+}
+
+// Fine-tune the pre-trained model on a new dataset
+Status FineTuneModel(Session* session, const Tensor& input_data, 
+                     const Tensor& labels, int num_epochs) {
+    std::vector outputs;
+    for (int i = 0; i < num_epochs; ++i) {
+        TF_RETURN_IF_ERROR(session->Run({{"input", input_data}, {"labels", labels}}, 
+                                        {"loss"}, {}, &outputs));
+        float loss = output[0].scalar()();
+        std::cout << "Epoch " << i + 1 << ", Loss: " << loss << std::endl;
+    }
+    return Status::OK();
+}
+
+int main() {
+    // Path to the pre-trained model
+    std::string model_path = "path/to/pretrained/model.pb";
+
+    // Initialize TensorFlow session
+    std::unique_ptr session;
+    TF_CHECK_OK(LoadModel(model_path, &session));
+
+    // Example input data and labels for fine-tuning
+    Tensor input_data(DT_FLOAT, TensorShape({1, 224, 224, 3})); // Example medical image
+    Tensor labels(DT_FLOAT, TensorShape({1, 10})); // Example labels (e.g., 10 classes)
+
+    // Fine-tune the model
+    TF_CHECK_OK(FineTuneModel(session.get(), input_data, labels, 10));
+
+    // Close the session
+    session->Close();
+    return 0;
+}
