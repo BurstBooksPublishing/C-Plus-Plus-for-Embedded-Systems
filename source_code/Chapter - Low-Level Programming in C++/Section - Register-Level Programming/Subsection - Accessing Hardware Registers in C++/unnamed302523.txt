@@ -1,0 +1,6 @@
+struct UartRegisters {
+    volatile uint32_t status;
+    volatile uint32_t control;
+    volatile uint32_t data;
+    volatile uint32_t baud_rate;
+};
