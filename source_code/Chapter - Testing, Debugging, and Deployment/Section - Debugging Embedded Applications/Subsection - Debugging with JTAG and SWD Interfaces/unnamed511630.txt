@@ -1,0 +1,10 @@
+#include 
+#include 
+
+std::vector generate_sequence(uint32_t n) {
+    std::vector sequence;
+    for (uint32_t i = 0; i < n; ++i) {
+        sequence.push_back(i * i);
+    }
+    return sequence;
+}
