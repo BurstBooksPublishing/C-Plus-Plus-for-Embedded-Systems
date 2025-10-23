@@ -1,0 +1,38 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Load a pre-trained model (e.g., MobileNet)
+    Scope root = Scope::NewRootScope();
+    ClientSession session(root);
+
+    // Load custom dataset (e.g., images and labels)
+    Tensor images(DT_FLOAT, TensorShape({batch_size, image_height, image_width, num_channels}));
+    Tensor labels(DT_INT32, TensorShape({batch_size}));
+
+    // Modify the last layer of the pre-trained model for custom classes
+    auto input = Placeholder(root, DT_FLOAT);
+    auto logits = FullyConnected(root, input, num_custom_classes);
+    auto softmax = Softmax(root, logits);
+
+    // Define loss function and optimizer
+    auto labels_placeholder = Placeholder(root, DT_INT32);
+    auto cross_entropy = ReduceMean(root, Negate(root, ReduceSum(root, Multiply(root, OneHot(root, labels_placeholder, num_custom_classes, Const(root, 1.0), Const(root, 0.0)), Log(root, softmax)), {1})));
+    auto optimizer = ApplyGradientDescent(root, Variable(root, {}, DT_FLOAT), Const(root, 0.01), cross_entropy);
+
+    // Train the model on the custom dataset
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{input, images}, {labels_placeholder, labels}}, {optimizer}, &outputs));
+
+    // Save the fine-tuned model
+    TF_CHECK_OK(SaveModel(root, session, "path/to/save/model"));
+
+    std::cout << "Transfer learning completed and model saved." << std::endl;
+    return 0;
+}
