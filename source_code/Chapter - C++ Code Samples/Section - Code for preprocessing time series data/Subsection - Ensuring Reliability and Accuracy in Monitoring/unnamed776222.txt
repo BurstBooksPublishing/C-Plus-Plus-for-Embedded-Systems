@@ -1,0 +1,39 @@
+#include 
+#include 
+#include 
+
+// Function to normalize time series data using Min-Max scaling
+std::vector normalizeTimeSeries(const std::vector& data) {
+    std::vector normalizedData;
+    double minVal = *std::min_element(data.begin(), data.end());
+    double maxVal = *std::max_element(data.begin(), data.end());
+
+    for (double value : data) {
+        normalizedData.push_back((value - minVal) / (maxVal - minVal));
+    }
+    return normalizedData;
+}
+
+// Function to split time series data into training and testing sets
+std::pair, std::vector> splitTimeSeries(
+    const std::vector& data, double trainRatio) {
+    size_t trainSize = static_cast(data.size() * trainRatio);
+    std::vector trainData(data.begin(), data.begin() + trainSize);
+    std::vector testData(data.begin() + trainSize, data.end());
+    return {trainData, testData};
+}
+
+int main() {
+    // Example time series data
+    std::vector timeSeries = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0};
+
+    // Normalize the time series data
+    std::vector normalizedData = normalizeTimeSeries(timeSeries);
+
+    // Split the time series data into training and testing sets
+    auto[trainData, testData] = splitTimeSeries(normalizedData, 0.8);
+
+    // Output the results (for demonstration purposes)
+    // In practice, you would use trainData and testData for model training and evaluation
+    return 0;
+}
