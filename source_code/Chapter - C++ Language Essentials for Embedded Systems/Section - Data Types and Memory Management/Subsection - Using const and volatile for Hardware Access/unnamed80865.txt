@@ -1,0 +1,1 @@
+volatile const uint32_t* const TIMER_REGISTER = reinterpret_cast(0x40000008);
