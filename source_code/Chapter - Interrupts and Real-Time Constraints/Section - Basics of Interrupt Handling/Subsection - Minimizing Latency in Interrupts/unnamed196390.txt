@@ -1,0 +1,15 @@
+volatile bool flag = false;
+
+void ISR() {
+    flag = true; // Set a flag to indicate the interrupt occurred
+}
+
+int main() {
+    while (true) {
+        if (flag) {
+            // Handle the interrupt-related tasks
+            flag = false;
+        }
+        // Other main loop tasks
+    }
+}
