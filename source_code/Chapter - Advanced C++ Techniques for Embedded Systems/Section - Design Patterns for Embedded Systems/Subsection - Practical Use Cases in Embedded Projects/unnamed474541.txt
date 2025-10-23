@@ -1,0 +1,19 @@
+class UARTDriver {
+private:
+    static UARTDriver* instance;
+    UARTDriver() {} // Private constructor
+
+public:
+    static UARTDriver* getInstance() {
+        if (!instance) {
+            instance = new UARTDriver();
+        }
+        return instance;
+    }
+
+    void sendData(const std::string& data) {
+        // Implementation for sending data
+    }
+};
+
+UARTDriver* UARTDriver::instance = nullptr;
