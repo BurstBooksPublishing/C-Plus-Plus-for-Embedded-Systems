@@ -1,0 +1,14 @@
+#include 
+
+const std::string SERVER_ADDRESS = "tcp://mqtt.eclipse.org:1883";
+const std::string CLIENT_ID = "sensor_client";
+const std::string TOPIC = "sensor/data";
+
+void sendSensorData(const std::string& data) {
+    mqtt::async_client client(SERVER_ADDRESS, CLIENT_ID);
+    mqtt::connect_options connOpts;
+    client.connect(connOpts);
+
+    auto msg = mqtt::make_message(TOPIC, data);
+    client.publish(msg)->wait_for(2000); // Publish message with timeout
+}
