@@ -1,0 +1,6 @@
+void GPIO_Test() {
+    while (1) {
+        GPIOA->ODR ^= (1U << 5); // Toggle PA5
+        Delay(500); // Delay for 500 ms
+    }
+}
