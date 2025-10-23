@@ -1,0 +1,51 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Define the RNN model for the chatbot
+Status BuildChatbotModel(const Scope& scope, Output* output) {
+    // Placeholder for input sequence (batch_size, sequence_length)
+    auto input = Placeholder(scope, DT_FLOAT, Placeholder::Shape({-1, -1}));
+
+    // Define RNN cell (e.g., LSTM)
+    auto cell = LSTMBlockCell(scope, 128, 128); // 128 hidden units
+
+    // RNN layer
+    auto rnn_output = RNN(scope, cell, input, SequenceLength(scope, input));
+
+    // Dense layer for output prediction
+    auto weights = Variable(scope, {128, 100}, DT_FLOAT); // 100 output classes
+    auto bias = Variable(scope, {100}, DT_FLOAT);
+    *output = Add(scope, MatMul(scope, rnn_output, weights), bias);
+
+    return scope.status();
+}
+
+int main() {
+    Scope scope = Scope::NewRootScope();
+
+    // Build the chatbot model
+    Output output;
+    TF_CHECK_OK(BuildChatbotModel(scope, &output));
+
+    // Initialize variables
+    ClientSession session(scope);
+    TF_CHECK_OK(session.Run({}, nullptr));
+
+    // Example input tensor (batch_size=1, sequence_length=10)
+    Tensor input_tensor(DT_FLOAT, TensorShape({1, 10}));
+    std::fill_n(input_tensor.flat().data(), 10, 1.0f);
+
+    // Run the model
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{input_tensor}}, {output}, &outputs));
+
+    // Output the result
+    std::cout << "Chatbot output: " << output[0].DebugString() << std::endl;
+
+    return 0;
+}
