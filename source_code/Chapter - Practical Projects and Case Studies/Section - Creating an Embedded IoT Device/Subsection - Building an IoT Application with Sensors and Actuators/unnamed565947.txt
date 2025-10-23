@@ -1,0 +1,4 @@
+float convertToTemperature(int rawValue, float refVoltage, float referenceResistor, float alpha) {
+    float sensorVoltage = (rawValue / 1023.0) * refVoltage;
+    return (sensorVoltage * referenceResistor) / (refVoltage * alpha);
+}
