@@ -1,0 +1,46 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+int main() {
+    // Load the compressed TFLite model
+    std::unique_ptr model =
+        tflite::FlatBufferModel::BuildFromFile("compressed_model.tflite");
+    if (!model) {
+        std::cerr << "Failed to load model\n";
+        return -1;
+    }
+
+    // Build the interpreter
+    tflite::ops::builtin::BuiltinOpResolver resolver;
+    std::unique_ptr interpreter;
+    tflite::InterpreterBuilder(*model, resolver)(&interpreter);
+    if (!interpreter) {
+        std::cerr << "Failed to construct interpreter\n";
+        return -1;
+    }
+
+    // Allocate tensors
+    if (interpreter->AllocateTensors() != kTfLiteOk) {
+        std::cerr << "Failed to allocate tensors\n";
+        return -1;
+    }
+
+    // Get input tensor and prepare input data
+    float* input = interpreter->typed_input_tensor(0);
+    *input = 1.0f; // Example input data
+
+    // Run inference
+    if (interpreter->Invoke() != kTfLiteOk) {
+        std::cerr << "Failed to invoke interpreter\n";
+        return -1;
+    }
+
+    // Get output tensor and process results
+    float* output = interpreter->typed_output_tensor(0);
+    std::cout << "Output: " << *output << std::endl;
+
+    return 0;
+}
