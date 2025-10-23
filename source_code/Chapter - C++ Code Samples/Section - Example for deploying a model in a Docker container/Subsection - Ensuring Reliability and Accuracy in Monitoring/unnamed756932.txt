@@ -1,0 +1,62 @@
+// Include necessary headers
+#include 
+#include 
+#include 
+#include 
+
+// Function to load and run a TensorFlow model
+void run_model(const std::string& model_path) {
+    // Initialize a TensorFlow session
+    tensorflow::Session* session;
+    tensorflow::Status status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Load the model from the specified path
+    tensorflow::GraphDef graph_def;
+    status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), model_path, &graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error reading model: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Define input and output tensors
+    tensorflow::Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 784}));
+    auto input_map = input.tensor();
+    // Fill the input tensor with data (e.g., from an image)
+    // ...
+
+    // Run the session with the input tensor
+    std::vector outputs;
+    status = session->Run({{"input", input}}, {"output"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error running session: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Process the output tensor
+    auto output_map = output[0].tensor();
+    std::cout << "Model output: " << output_map(0, 0) << std::endl;
+
+    // Close the session
+    session->Close();
+}
+
+int main() {
+    // Path to the TensorFlow model (e.g., saved_model.pb)
+    std::string model_path = "/path/to/your/model.pb";
+
+    // Run the model
+    run_model(model_path);
+
+    return 0;
+}
