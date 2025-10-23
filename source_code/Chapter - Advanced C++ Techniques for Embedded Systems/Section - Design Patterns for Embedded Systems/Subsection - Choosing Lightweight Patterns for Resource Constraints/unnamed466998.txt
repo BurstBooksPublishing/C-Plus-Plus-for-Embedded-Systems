@@ -1,0 +1,22 @@
+class SensorConfig {
+public:
+    SensorConfig(int id, const std::string& type) : id(id), type(type) {}
+    int getId() const { return id; }
+    std::string getType() const { return type; }
+private:
+    int id;
+    std::string type;
+};
+
+class Sensor {
+public:
+    Sensor(SensorConfig* config, float value) : config(config), value(value) {}
+    void display() const {
+        std::cout << "Sensor ID: " << config->getId() 
+                  << ", Type: " << config->getType() 
+                  << ", Value: " << value << std::endl;
+    }
+private:
+    SensorConfig* config;
+    float value;
+};
