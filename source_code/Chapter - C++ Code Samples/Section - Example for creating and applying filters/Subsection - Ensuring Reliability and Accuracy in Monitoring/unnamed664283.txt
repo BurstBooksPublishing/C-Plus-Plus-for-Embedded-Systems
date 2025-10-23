@@ -1,0 +1,43 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    Scope root = Scope::NewRootScope();
+
+    // Input image tensor (e.g., 1 channel grayscale image)
+    Tensor input_image(DT_FLOAT, TensorShape({1, 5, 5, 1}));
+    auto input_map = input_image.tensor();
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            input_map(0, i, j, 0) = static_cast(i + j);
+        }
+    }
+
+    // Define a filter (e.g., 3x3 edge detection filter)
+    Tensor filter(DT_FLOAT, TensorShape({3, 3, 1, 1}));
+    auto filter_map = filter.tensor();
+    filter_map.setValues({{{-1, -1, -1}, {-1, 8, -1}, {-1, -1, -1}}});
+
+    // Apply convolution operation
+    auto conv = Conv2D(root, input_image, filter, {1, 1, 1, 1}, "SAME");
+
+    // Run the session to compute the output
+    ClientSession session(root);
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({conv}, &outputs));
+
+    // Output the result
+    auto output_map = output[0].tensor();
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            std::cout << output_map(0, i, j, 0) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0;
+}
