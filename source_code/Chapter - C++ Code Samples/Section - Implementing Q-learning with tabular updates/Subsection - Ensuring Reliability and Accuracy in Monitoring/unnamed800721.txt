@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <random>
+#include <algorithm>
+
+// Define the Q-learning parameters
+const double alpha = 0.1;   // Learning rate
+const double gamma = 0.9;   // Discount factor
+const double epsilon = 0.1; // Exploration rate
+
+// Define the state and action types
+using State = int;
+using Action = int;
+using QTable = std::unordered_map<State, std::unordered_map<Action, double>>;
+
+// Function to initialize the Q-table
+QTable initializeQTable(const std::vector<State>& states, 
+                        const std::vector<Action>& actions) {
+    QTable qTable;
+    for (const auto& state : states) {
+        for (const auto& action : actions) {
+            qTable[state][action] = 0.0; // Initialize Q-values to 0
+        }
+    }
+    return qTable;
+}
+
+// Function to choose an action using epsilon-greedy policy
+Action chooseAction(const QTable& qTable, State state, 
+                    const std::vector<Action>& actions) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+
+    if (dis(gen) < epsilon) {
+        // Explore: choose a random action
+        std::uniform_int_distribution<> actionDist(0, actions.size() - 1);
+        return actions[actionDist(gen)];
+    } else {
+        // Exploit: choose the action with the highest Q-value
+        const auto& actionValues = qTable.at(state);
+        return std::max_element(actionValues.begin(), actionValues.end(),
+                                [](const auto& a, const auto& b) {
+                                    return a.second < b.second;
+                                })->first;
+    }
+}
+
+// Function to update the Q-table using the Q-learning update rule
+void updateQTable(QTable& qTable, State state, Action action, 
+                  double reward, State nextState) {
+    double maxNextQ = std::max_element(qTable[nextState].begin(), 
+                                       qTable[nextState].end(),
+                                       [](const auto& a, const auto& b) {
+                                           return a.second < b.second;
+                                       })->second;
+    qTable[state][action] += alpha * (reward + gamma * maxNextQ - 
+                                      qTable[state][action]);
+}
+
+int main() {
+    // Define the states and actions
+    std::vector<State> states = {0, 1, 2, 3};
+    std::vector<Action> actions = {0, 1};
+
+    // Initialize the Q-table
+    QTable qTable = initializeQTable(states, actions);
+
+    // Example of Q-learning loop
+    State currentState = 0;
+    for (int episode = 0; episode < 1000; ++episode) {
+        Action action = chooseAction(qTable, currentState, actions);
+        // Simulate taking the action and receiving a reward
+        State nextState = (currentState + action) % states.size();
+        double reward = (nextState == 3) ? 1.0 : 0.0;
+
+        // Update the Q-table
+        updateQTable(qTable, currentState, action, reward, nextState);
+
+        // Move to the next state
+        currentState = nextState;
+    }
+
+    // Output the learned Q-values
+    for (const auto& state : states) {
+        for (const auto& action : actions) {
+            std::cout << "Q(" << state << ", " << action << ") = " 
+                      << qTable[state][action] << std::endl;
+        }
+    }
+
+    return 0;
+}
