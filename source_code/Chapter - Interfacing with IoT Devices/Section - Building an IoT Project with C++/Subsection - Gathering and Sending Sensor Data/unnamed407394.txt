@@ -1,0 +1,21 @@
+#include 
+
+void setup() {
+  Wire.begin(); // Initialize I2C
+  Serial.begin(9600); // Initialize serial communication
+}
+
+void loop() {
+  Wire.beginTransmission(0x48); // Start communication with sensor at address 0x48
+  Wire.write(0x00); // Select the temperature register
+  Wire.endTransmission();
+  Wire.requestFrom(0x48, 2); // Request 2 bytes of data
+
+  if (Wire.available() >= 2) {
+    int temp_raw = (Wire.read() << 8) | Wire.read(); // Combine the two bytes
+    float temperature = temp_raw * 0.02; // Convert to Celsius
+    Serial.println(temperature); // Print the temperature
+  }
+
+  delay(1000); // Wait for 1 second before next reading
+}
