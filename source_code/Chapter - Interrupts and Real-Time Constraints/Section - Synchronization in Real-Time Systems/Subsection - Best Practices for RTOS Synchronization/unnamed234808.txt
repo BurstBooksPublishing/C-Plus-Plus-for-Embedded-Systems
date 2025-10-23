@@ -1,0 +1,20 @@
+#include 
+#include 
+#include 
+
+std::queue messageQueue;
+std::mutex queueMutex;
+std::condition_variable queueCV;
+
+void senderTask() {
+    std::unique_lock lock(queueMutex);
+    messageQueue.push(42);
+    queueCV.notify_one();
+}
+
+void receiverTask() {
+    std::unique_lock lock(queueMutex);
+    queueCV.wait(lock, []{ return !messageQueue.empty(); });
+    int message = messageQueue.front();
+    messageQueue.pop();
+}
