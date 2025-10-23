@@ -1,0 +1,11 @@
+// Enable DMA transfer complete interrupt
+dmaBase[0x1C] |= 0x00000001; // Set interrupt enable bit
+
+// Define interrupt handler
+extern "C" void DMA1_Channel1_IRQHandler() {
+    // Clear interrupt flag
+    dmaBase[0x1C] &= ~0x00000001;
+    
+    // Handle the transferred data
+    // ...
+}
