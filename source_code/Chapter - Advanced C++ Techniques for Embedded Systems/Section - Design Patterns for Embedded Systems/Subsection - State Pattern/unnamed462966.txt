@@ -1,0 +1,39 @@
+class State {
+public:
+    virtual void handle() = 0;
+    virtual ~State() = default;
+};
+
+class StateA : public State {
+public:
+    void handle() override {
+        // Implementation for State A
+    }
+};
+
+class StateB : public State {
+public:
+    void handle() override {
+        // Implementation for State B
+    }
+};
+
+class Context {
+private:
+    State* currentState;
+public:
+    Context() : currentState(new StateA()) {}
+
+    void setState(State* newState) {
+        if (currentState) delete currentState;
+        currentState = newState;
+    }
+
+    void request() {
+        currentState->handle();
+    }
+
+    ~Context() {
+        delete currentState;
+    }
+};
