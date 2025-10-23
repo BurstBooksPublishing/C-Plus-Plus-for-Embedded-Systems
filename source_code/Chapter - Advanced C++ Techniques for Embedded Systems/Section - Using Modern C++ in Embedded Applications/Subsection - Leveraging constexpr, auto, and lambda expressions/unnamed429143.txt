@@ -1,0 +1,5 @@
+constexpr int calculateCircleArea(int radius) {
+    return 3.14159 * radius * radius;
+}
+
+constexpr int area = calculateCircleArea(5); // Computed at compile time
