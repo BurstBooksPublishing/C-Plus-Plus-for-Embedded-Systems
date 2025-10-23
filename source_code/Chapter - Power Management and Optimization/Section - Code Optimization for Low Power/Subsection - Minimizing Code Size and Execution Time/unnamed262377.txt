@@ -1,0 +1,1 @@
+g++ -Os -flto -o program program.cpp
