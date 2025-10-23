@@ -1,0 +1,12 @@
+class HardwareManager {
+public:
+    static HardwareManager& getInstance() {
+        static HardwareManager instance;
+        return instance;
+    }
+    void initialize() { /* Initialize hardware */ }
+private:
+    HardwareManager() {}
+    HardwareManager(const HardwareManager&) = delete;
+    HardwareManager& operator=(const HardwareManager&) = delete;
+};
