@@ -1,0 +1,11 @@
+#include 
+
+const int sensorPin = 0; // ADC channel for the sensor
+
+void setup() {
+    wiringPiSetup(); // Initialize WiringPi
+}
+
+int readAnalogSensor() {
+    return analogRead(sensorPin); // Read analog sensor value
+}
