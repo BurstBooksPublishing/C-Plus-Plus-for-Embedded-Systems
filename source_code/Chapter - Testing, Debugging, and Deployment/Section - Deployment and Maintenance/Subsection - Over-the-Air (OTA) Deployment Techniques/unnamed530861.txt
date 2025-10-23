@@ -1,0 +1,30 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+bool verify_signature(const std::vector& data, const std::vector& signature, RSA* public_key) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, data.data(), data.size());
+    SHA256_Final(hash, &sha256);
+
+    return RSA_verify(NID_sha256, hash, SHA256_DIGEST_LENGTH, signature.data(), signature.size(), public_key) == 1;
+}
+
+int main() {
+    RSA* public_key = PEM_read_RSA_PUBKEY(fopen("public_key.pem", "r"), nullptr, nullptr, nullptr);
+    std::vector data = {0x01, 0x02, 0x03, 0x04};
+    std::vector signature = { /* signature bytes */ };
+
+    if (verify_signature(data, signature, public_key)) {
+        std::cout << "Signature verified successfully." << std::endl;
+    } else {
+        std::cout << "Signature verification failed." << std::endl;
+    }
+
+    RSA_free(public_key);
+    return 0;
+}
