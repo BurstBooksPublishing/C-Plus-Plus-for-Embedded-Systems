@@ -1,0 +1,9 @@
+void timer_isr() {
+    // Task to be executed every 10 ms
+    update_system_state();
+}
+
+void setup_timer() {
+    // Configure timer to trigger every 10 ms
+    configure_timer(10, timer_isr);
+}
