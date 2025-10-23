@@ -1,0 +1,5 @@
+// Optimize for code size
+g++ -Os -o program program.cpp
+
+// Optimize for execution speed
+g++ -O3 -o program program.cpp
