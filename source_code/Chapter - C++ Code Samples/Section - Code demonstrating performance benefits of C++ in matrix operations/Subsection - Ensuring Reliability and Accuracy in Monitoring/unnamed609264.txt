@@ -1,0 +1,35 @@
+#include 
+#include 
+#include  // Eigen library for matrix operations
+
+using namespace Eigen;
+using namespace std;
+using namespace std::chrono;
+
+int main() {
+    // Define matrix size
+    const int size = 1000;
+    
+    // Initialize two large matrices
+    MatrixXd A = MatrixXd::Random(size, size);
+    MatrixXd B = MatrixXd::Random(size, size);
+    MatrixXd C(size, size); // Resultant matrix
+    
+    // Start timer
+    auto start = high_resolution_clock::now();
+    
+    // Perform matrix multiplication
+    C = A * B;
+    
+    // Stop timer
+    auto stop = high_resolution_clock::now();
+    
+    // Calculate duration
+    auto duration = duration_cast(stop - start);
+    
+    // Output execution time
+    cout << "Time taken for matrix multiplication: "
+         << duration.count() << " milliseconds" << endl;
+    
+    return 0;
+}
