@@ -1,0 +1,13 @@
+enum class ErrorCode {
+    Success,
+    InvalidParameter,
+    OutOfMemory,
+    HardwareFault
+};
+
+ErrorCode initialize_system() {
+    if (/* invalid parameter */) {
+        return ErrorCode::InvalidParameter;
+    }
+    return ErrorCode::Success;
+}
