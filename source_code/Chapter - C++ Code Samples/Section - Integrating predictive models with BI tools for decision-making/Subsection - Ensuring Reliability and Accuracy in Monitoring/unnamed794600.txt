@@ -1,0 +1,124 @@
+#include  // TensorFlow C API
+#include 
+#include 
+#include  // Example BI tool integration (ODBC)
+
+// Function to load a pre-trained TensorFlow model
+TF_Graph* load_model(const char* model_path) {
+    TF_Status* status = TF_NewStatus();
+    TF_Graph* graph = TF_NewGraph();
+    TF_SessionOptions* session_opts = TF_NewSessionOptions();
+    TF_Session* session = TF_NewSession(graph, session_opts, status);
+
+    if (TF_GetCode(status) != TF_OK) {
+        std::cerr << "Error loading model: " << TF_Message(status) << std::endl;
+        return nullptr;
+    }
+
+    // Load the model from the file
+    TF_Buffer* buffer = TF_NewBufferFromFile(model_path);
+    if (!buffer) {
+        std::cerr << "Failed to read model file: " << model_path << std::endl;
+        return nullptr;
+    }
+
+    TF_ImportGraphDefOptions* opts = TF_NewImportGraphDefOptions();
+    TF_GraphImportGraphDef(graph, buffer, opts, status);
+    TF_DeleteImportGraphDefOptions(opts);
+    TF_DeleteBuffer(buffer);
+
+    if (TF_GetCode(status) != TF_OK) {
+        std::cerr << "Error importing graph: " << TF_Message(status) << std::endl;
+        return nullptr;
+    }
+
+    return graph;
+}
+
+// Function to predict using the loaded model
+std::vector predict(TF_Graph* graph, const std::vector& input_data) {
+    TF_Status* status = TF_NewStatus();
+    TF_SessionOptions* session_opts = TF_NewSessionOptions();
+    TF_Session* session = TF_NewSession(graph, session_opts, status);
+
+    // Prepare input tensor
+    TF_Output input_op = {TF_GraphOperationByName(graph, "input"), 0};
+    TF_Tensor* input_tensor = TF_AllocateTensor(TF_FLOAT, nullptr, 0, input_data.size() * sizeof(float));
+    std::memcpy(TF_TensorData(input_tensor), input_data.data(), input_data.size() * sizeof(float));
+
+    // Prepare output tensor
+    TF_Output output_op = {TF_GraphOperationByName(graph, "output"), 0};
+    TF_Tensor* output_tensor = nullptr;
+
+    // Run the session
+    TF_SessionRun(session, nullptr, &input_op, &input_tensor, 1, &output_op, &output_tensor, 1, nullptr, 0, nullptr, status);
+
+    if (TF_GetCode(status) != TF_OK) {
+        std::cerr << "Error during prediction: " << TF_Message(status) << std::endl;
+        return {};
+    }
+
+    // Extract output data
+    float* output_data = static_cast(TF_TensorData(output_tensor));
+    std::vector result(output_data, output_data + TF_TensorByteSize(output_tensor) / sizeof(float));
+
+    // Clean up
+    TF_DeleteTensor(input_tensor);
+    TF_DeleteTensor(output_tensor);
+    TF_DeleteSession(session, status);
+    TF_DeleteSessionOptions(session_opts);
+    TF_DeleteStatus(status);
+
+    return result;
+}
+
+// Example function to integrate with BI tools (e.g., SQL)
+void integrate_with_bi(const std::vector& predictions) {
+    SQLHENV env;
+    SQLHDBC dbc;
+    SQLHSTMT stmt;
+
+    // Initialize ODBC environment
+    SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+    SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+    SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+
+    // Connect to the database
+    SQLDriverConnect(dbc, NULL, (SQLCHAR*)"DSN=YourDataSourceName;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_COMPLETE);
+
+    // Prepare SQL statement
+    SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
+    SQLPrepare(stmt, (SQLCHAR*)"INSERT INTO Predictions (value) VALUES (?)", SQL_NTS);
+
+    // Bind and execute the statement for each prediction
+    for (float value : predictions) {
+        SQLBindParameter(stmt, 1, SQL_PARAM_INPUT, SQL_C_FLOAT, SQL_FLOAT, 0, 0, &value, 0, NULL);
+        SQLExecute(stmt);
+    }
+
+    // Clean up
+    SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+    SQLDisconnect(dbc);
+    SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+    SQLFreeHandle(SQL_HANDLE_ENV, env);
+}
+
+int main() {
+    // Load the model
+    TF_Graph* graph = load_model("path/to/your/model.pb");
+    if (!graph) return -1;
+
+    // Example input data
+    std::vector input_data = {1.0, 2.0, 3.0, 4.0};
+
+    // Make a prediction
+    std::vector predictions = predict(graph, input_data);
+
+    // Integrate predictions with BI tools
+    integrate_with_bi(predictions);
+
+    // Clean up
+    TF_DeleteGraph(graph);
+
+    return 0;
+}
