@@ -1,0 +1,9 @@
+class TemperatureSensorSimulator {
+public:
+    TemperatureSensorSimulator(double k, double v0) : k_(k), v0_(v0) {}
+    double read(double temperature) const {
+        return k_ * temperature + v0_;
+    }
+private:
+    double k_, v0_;
+};
