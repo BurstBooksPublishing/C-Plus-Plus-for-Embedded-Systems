@@ -1,0 +1,3 @@
+struct alignas(64) CacheAlignedStruct {
+    int data[16];
+};
