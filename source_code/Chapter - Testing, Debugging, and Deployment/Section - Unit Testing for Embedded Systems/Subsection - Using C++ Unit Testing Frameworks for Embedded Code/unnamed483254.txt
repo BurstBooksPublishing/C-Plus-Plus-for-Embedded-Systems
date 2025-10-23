@@ -1,0 +1,5 @@
+class MockGPIO {
+public:
+    MOCK_METHOD(void, set, (int pin, bool value), (override));
+    MOCK_METHOD(bool, read, (int pin), (override));
+};
