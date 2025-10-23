@@ -1,0 +1,5 @@
+void LowPriorityTask() {
+osMutexAcquire(mutex_id, osWaitForever);  // Blocking call
+// Critical section
+osMutexRelease(mutex_id);
+}
