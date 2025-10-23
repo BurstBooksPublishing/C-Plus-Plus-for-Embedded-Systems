@@ -1,0 +1,5 @@
+constexpr int max_iterations = 1000;
+
+for (int i = 0; i < max_iterations; ++i) {
+    // Perform low-power operation
+}
