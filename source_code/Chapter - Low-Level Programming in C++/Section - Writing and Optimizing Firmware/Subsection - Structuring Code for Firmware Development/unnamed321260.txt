@@ -1,0 +1,15 @@
+enum class State { Idle, Active, Error };
+State currentState = State::Idle;
+
+void handleEvent(Event event) {
+    switch (currentState) {
+        case State::Idle:
+            if (event == Event::Start) currentState = State::Active;
+            break;
+        case State::Active:
+            if (event == Event::Stop) currentState = State::Idle;
+            break;
+        default:
+            break;
+    }
+}
