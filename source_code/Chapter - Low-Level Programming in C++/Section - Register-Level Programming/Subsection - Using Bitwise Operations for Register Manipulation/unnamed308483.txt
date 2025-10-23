@@ -1,0 +1,3 @@
+if (STATUS_REG & (1 << 4)) {
+    // Bit 4 is set
+}
