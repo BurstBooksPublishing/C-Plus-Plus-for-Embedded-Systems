@@ -1,0 +1,10 @@
+void setup() {
+  ADMUX = (1 << REFS0); // Set reference voltage to AVCC
+  ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Enable ADC and set prescaler
+}
+
+void loop() {
+  ADCSRA |= (1 << ADSC); // Start ADC conversion
+  while (ADCSRA & (1 << ADSC)); // Wait for conversion to complete
+  uint16_t adc_value = ADC; // Read the ADC value
+}
