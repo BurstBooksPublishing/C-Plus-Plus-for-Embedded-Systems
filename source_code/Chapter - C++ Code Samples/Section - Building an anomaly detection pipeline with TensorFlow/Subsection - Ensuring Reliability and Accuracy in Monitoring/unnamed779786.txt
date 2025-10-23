@@ -1,0 +1,66 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Define a simple autoencoder model for anomaly detection
+    Scope root = Scope::NewRootScope();
+
+    // Input placeholder
+    auto input = Placeholder(root, DT_FLOAT, Placeholder::Shape({-1, 10}));
+
+    // Encoder layers
+    auto encoder = FullyConnected(root, input, 5, FullyConnected::Attrs().Activation("relu"));
+    auto encoded = FullyConnected(root, encoder, 2, FullyConnected::Attrs().Activation("relu"));
+
+    // Decoder layers
+    auto decoder = FullyConnected(root, encoded, 5, FullyConnected::Attrs().Activation("relu"));
+    auto output = FullyConnected(root, decoder, 10, FullyConnected::Attrs().Activation("sigmoid"));
+
+    // Loss function (Mean Squared Error)
+    auto loss = ReduceMean(root, Square(root, Subtract(root, output, input)), {0, 1});
+
+    // Optimizer
+    auto optimizer = ApplyGradientDescent(root, loss, 0.01f);
+
+    // Initialize session
+    ClientSession session(root);
+    std::vector outputs;
+
+    // Example input data (10-dimensional)
+    Tensor input_data(DT_FLOAT, TensorShape({1, 10}));
+    auto input_data_mapped = input_data.tensor();
+    for (int i = 0; i < 10; ++i) {
+        input_data_mapped(0, i) = static_cast(i) / 10.0f;
+    }
+
+    // Train the model (single step for demonstration)
+    TF_CHECK_OK(session.Run({{input, input_data}}, {optimizer}, &outputs));
+
+    // Detect anomalies by comparing input and output
+    TF_CHECK_OK(session.Run({{input, input_data}}, {output}, &outputs));
+    Tensor output_data = output[0];
+    auto output_data_mapped = output_data.tensor();
+
+    // Calculate reconstruction error
+    float reconstruction_error = 0.0f;
+    for (int i = 0; i < 10; ++i) {
+        reconstruction_error += std::pow(input_data_mapped(0, i) - output_data_mapped(0, i), 2);
+    }
+    reconstruction_error /= 10.0f;
+
+    // Threshold for anomaly detection
+    float threshold = 0.1f;
+    if (reconstruction_error > threshold) {
+        std::cout << "Anomaly detected! Reconstruction error: " << reconstruction_error << std::endl;
+    } else {
+        std::cout << "No anomaly detected. Reconstruction error: " << reconstruction_error << std::endl;
+    }
+
+    return 0;
+}
