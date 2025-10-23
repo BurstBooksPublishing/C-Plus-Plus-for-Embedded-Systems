@@ -1,0 +1,25 @@
+enum class SensorStatus {
+    Ok,
+    ErrorConnection,
+    ErrorCalibration
+};
+
+SensorStatus readSensor() {
+    if (!isConnected()) return SensorStatus::ErrorConnection;
+    if (!isCalibrated()) return SensorStatus::ErrorCalibration;
+    return SensorStatus::Ok;
+}
+
+void handleSensor() {
+    SensorStatus status = readSensor();
+    switch (status) {
+        case SensorStatus::Ok:
+            break;
+        case SensorStatus::ErrorConnection:
+            LOG("Error: Sensor connection failed!");
+            break;
+        case SensorStatus::ErrorCalibration:
+            LOG("Error: Sensor calibration failed!");
+            break;
+    }
+}
