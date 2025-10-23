@@ -1,0 +1,2 @@
+add_job(job_id, deadline, data)
+get_next_job() -> (job_id, data)
