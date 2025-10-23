@@ -1,0 +1,16 @@
+#include 
+#include 
+
+void performTask() {
+    // Execute the required task
+    PORTA |= (1 << PA0); // Example: Turn on an LED
+    _delay_ms(100);
+    PORTA &= ~(1 << PA0); // Example: Turn off the LED
+}
+
+int main() {
+    while (1) {
+        performTask();
+        _delay_ms(1000); // Wait for 1 second
+    }
+}
