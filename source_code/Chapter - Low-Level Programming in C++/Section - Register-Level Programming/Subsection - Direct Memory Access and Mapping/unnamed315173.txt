@@ -1,0 +1,16 @@
+// Define the base address of the GPIO peripheral
+constexpr uint32_t GPIO_BASE_ADDR = 0x48000000;
+
+// Define the offsets for the GPIO registers
+constexpr uint32_t GPIO_DATA_OFFSET = 0x00;
+constexpr uint32_t GPIO_DIR_OFFSET = 0x04;
+
+// Toggle an LED connected to GPIO pin 0
+void toggle_led() {
+    // Set the direction of GPIO pin 0 to output
+    write_reg(GPIO_BASE_ADDR + GPIO_DIR_OFFSET, 1 << 0);
+
+    // Toggle the LED
+    uint32_t data = read_reg(GPIO_BASE_ADDR + GPIO_DATA_OFFSET);
+    write_reg(GPIO_BASE_ADDR + GPIO_DATA_OFFSET, data ^ (1 << 0));
+}
