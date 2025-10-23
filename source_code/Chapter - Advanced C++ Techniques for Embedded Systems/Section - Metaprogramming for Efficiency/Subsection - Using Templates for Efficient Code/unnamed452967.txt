@@ -1,0 +1,4 @@
+Unit length{2.5};
+auto inches = length.to();
+Unit time{10};
+// auto invalid = length + time;  // Compile error
