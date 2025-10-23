@@ -1,0 +1,58 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+
+// Load the pre-trained text classification model
+Status LoadModel(const std::string& export_dir, SavedModelBundle* bundle) {
+    SessionOptions session_options;
+    RunOptions run_options;
+    return LoadSavedModel(session_options, run_options, export_dir, 
+                          {"serve"}, bundle);
+}
+
+// Preprocess input text for the model
+Tensor PreprocessText(const std::string& text) {
+    // Tokenize and convert text to tensor (example placeholder)
+    Tensor input_tensor(DT_STRING, TensorShape({1}));
+    input_tensor.scalar()() = text;
+    return input_tensor;
+}
+
+// Perform real-time text classification
+Status ClassifyText(SavedModelBundle* bundle, const std::string& text, 
+                    Tensor* output) {
+    Tensor input_tensor = PreprocessText(text);
+    std::vector> inputs = {{"input_text", input_tensor}};
+    std::vector outputs;
+    TF_RETURN_IF_ERROR(bundle->session->Run(inputs, {"output_class"}, {}, &outputs));
+    *output = output[0];
+    return Status::OK();
+}
+
+int main() {
+    SavedModelBundle bundle;
+    std::string model_path = "path/to/saved_model";
+    std::string input_text = "This is a sample text for classification.";
+
+    // Load the model
+    if (!LoadModel(model_path, &bundle).ok()) {
+        std::cerr << "Failed to load model." << std::endl;
+        return -1;
+    }
+
+    // Perform classification
+    Tensor output;
+    if (!ClassifyText(&bundle, input_text, &output).ok()) {
+        std::cerr << "Failed to classify text." << std::endl;
+        return -1;
+    }
+
+    // Output the result
+    std::cout << "Classification result: " << output.DebugString() << std::endl;
+
+    return 0;
+}
