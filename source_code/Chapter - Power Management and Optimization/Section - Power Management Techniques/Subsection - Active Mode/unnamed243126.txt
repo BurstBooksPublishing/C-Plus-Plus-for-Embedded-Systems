@@ -1,0 +1,8 @@
+void processSensorData() {
+    while (true) {
+        int data = readSensor();
+        if (data > threshold) {
+            triggerAction();
+        }
+    }
+}
