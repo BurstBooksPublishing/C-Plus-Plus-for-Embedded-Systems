@@ -1,0 +1,10 @@
+#define EEPROM_SIZE 1024
+#define BUFFER_SIZE 64
+
+uint8_t ringBuffer[BUFFER_SIZE];
+int writeIndex = 0;
+
+void appendData(uint8_t data) {
+    EEPROM.write(writeIndex, data);
+    writeIndex = (writeIndex + 1) % EEPROM_SIZE;
+}
