@@ -1,0 +1,6 @@
+size_t largest_free_block = 0;
+for (const auto& block : free_blocks) {
+    if (block.size > largest_free_block) {
+        largest_free_block = block.size;
+    }
+}
