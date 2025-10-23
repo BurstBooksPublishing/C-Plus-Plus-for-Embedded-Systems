@@ -1,0 +1,30 @@
+#include 
+#include 
+
+int main() {
+    // Initialize the SDK
+    Aws::IoT::MqttClient::Initialize();
+
+    // Create a client
+    auto client = Aws::IoT::MqttClient::Create();
+
+    // Connect to the AWS IoT Core
+    Aws::IoT::MqttClient::ConnectOptions connectOptions;
+    connectOptions.SetClientId("myDevice");
+    connectOptions.SetEndpoint("my-endpoint.amazonaws.com");
+    connectOptions.SetCaPath("/path/to/ca.pem");
+    connectOptions.SetCertPath("/path/to/cert.pem");
+    connectOptions.SetKeyPath("/path/to/private-key.pem");
+
+    if (client->Connect(connectOptions)) {
+        // Connection successful
+        std::cout << "Connected to AWS IoT Core" << std::endl;
+    } else {
+        // Connection failed
+        std::cerr << "Failed to connect to AWS IoT Core" << std::endl;
+    }
+
+    // Clean up
+    Aws::IoT::MqttClient::Shutdown();
+    return 0;
+}
