@@ -1,0 +1,14 @@
+volatile bool data_ready = false;
+
+ISR(ADC_vect) {
+    data_ready = true;
+}
+
+void main() {
+    while (true) {
+        if (data_ready) {
+            process_data();
+            data_ready = false;
+        }
+    }
+}
