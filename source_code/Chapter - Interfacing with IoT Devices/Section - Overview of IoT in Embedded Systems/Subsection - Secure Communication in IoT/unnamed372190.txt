@@ -1,0 +1,11 @@
+#include 
+#include 
+
+SSL_CTX* create_ssl_context() {
+    SSL_CTX* ctx = SSL_CTX_new(TLS_client_method());
+    if (!ctx) {
+        ERR_print_errors_fp(stderr);
+        return nullptr;
+    }
+    return ctx;
+}
