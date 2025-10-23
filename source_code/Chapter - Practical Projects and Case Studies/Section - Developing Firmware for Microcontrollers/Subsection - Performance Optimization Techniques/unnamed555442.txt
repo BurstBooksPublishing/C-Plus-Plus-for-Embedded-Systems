@@ -1,0 +1,2 @@
+constexpr uint8_t max_value = 255;
+const char* flash_string = "Stored in flash";
