@@ -1,0 +1,85 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Load the pre-trained TensorFlow model
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Load the model from a file
+    GraphDef graph_def;
+    status = ReadBinaryProto(Env::Default(), "path/to/model.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Initialize OpenCV for real-time image capture
+    cv::VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        std::cerr << "Error opening video stream\n";
+        return 1;
+    }
+
+    cv::Mat frame;
+    while (true) {
+        cap >> frame;  // Capture frame-by-frame
+        if (frame.empty()) break;
+
+        // Preprocess the frame for the model
+        cv::resize(frame, frame, cv::Size(224, 224));  // Resize to model input size
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert to RGB
+        Tensor input_tensor(DT_FLOAT, TensorShape({1, 224, 224, 3}));
+        auto input_tensor_mapped = input_tensor.tensor();
+
+        // Copy the frame data to the input tensor
+        for (int y = 0; y < 224; ++y) {
+            for (int x = 0; x < 224; ++x) {
+                for (int c = 0; c < 3; ++c) {
+                    input_tensor_mapped(0, y, x, c) = frame.at(y, x[c] / 255.0f;
+                }
+            }
+        }
+
+        // Run the model
+        std::vector outputs;
+        status = session->Run({{"input_layer", input_tensor}}, {"output_layer"}, {}, &outputs);
+        if (!status.ok()) {
+            std::cerr << status.ToString() << "\n";
+            return 1;
+        }
+
+        // Process the output (e.g., display the predicted class)
+        auto output = output[0].tensor();
+        int predicted_class = std::distance(output.data(), std::max_element(output.data(), output.data() + 1000));
+        std::cout << "Predicted class: " << predicted_class << "\n";
+
+        // Display the frame
+        cv::imshow("Frame", frame);
+        if (cv::waitKey(1) >= 0) break;
+    }
+
+    // Release resources
+    cap.release();
+    cv::destroyAllWindows();
+    session->Close();
+    return 0;
+}
