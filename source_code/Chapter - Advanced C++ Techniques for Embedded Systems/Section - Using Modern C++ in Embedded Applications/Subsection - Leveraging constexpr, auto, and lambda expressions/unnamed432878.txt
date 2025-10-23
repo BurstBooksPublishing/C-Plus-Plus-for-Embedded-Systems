@@ -1,0 +1,4 @@
+template
+auto multiply(const T& a, const U& b) {
+// returns a*b where a and b are matrices
+}
