@@ -1,0 +1,5 @@
+constexpr uint16_t current_firmware_version = 0x0102;
+
+bool is_firmware_update_required(uint16_t new_version) {
+    return new_version > current_firmware_version;
+}
