@@ -1,0 +1,15 @@
+class MovingAverage {
+private:
+    std::vector buffer;
+    size_t index = 0;
+    float sum = 0.0f;
+public:
+    MovingAverage(size_t size) : buffer(size, 0.0f) {}
+    float update(float value) {
+        sum -= buffer[index];
+        buffer[index] = value;
+        sum += value;
+        index = (index + 1) % buffer.size();
+        return sum / buffer.size();
+    }
+};
