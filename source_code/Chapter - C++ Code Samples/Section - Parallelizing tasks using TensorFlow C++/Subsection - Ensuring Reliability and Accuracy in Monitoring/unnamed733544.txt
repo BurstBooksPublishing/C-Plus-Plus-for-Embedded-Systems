@@ -1,0 +1,78 @@
+#include "tensorflow/core/public/session.h"
+#include "tensorflow/core/platform/env.h"
+#include "tensorflow/core/framework/tensor.h"
+#include 
+
+using namespace tensorflow;
+
+void ParallelTaskExecution(Session* session) {
+    // Define input tensors for parallel tasks
+    Tensor input1(DT_FLOAT, TensorShape({1, 10}));
+    Tensor input2(DT_FLOAT, TensorShape({1, 10}));
+
+    // Fill input tensors with data
+    auto input1_map = input1.tensor();
+    auto input2_map = input2.tensor();
+    for (int i = 0; i < 10; ++i) {
+        input1_map(0, i) = static_cast(i);
+        input2_map(0, i) = static_cast(i + 10);
+    }
+
+    // Define output tensors
+    std::vector outputs1, outputs2;
+
+    // Run two tasks in parallel using separate threads
+    auto task1 =[&session, &input1, &outputs1]() {
+        session->Run({{"input", input1}}, {"output"}, {}, &outputs1);
+    };
+
+    auto task2 =[&session, &input2, &outputs2]() {
+        session->Run({{"input", input2}}, {"output"}, {}, &outputs2);
+    };
+
+    // Launch threads for parallel execution
+    std::thread thread1(task1);
+    std::thread thread2(task2);
+
+    // Wait for both threads to complete
+    thread1.join();
+    thread2.join();
+
+    // Process outputs (example: print results)
+    auto output1_map = outputs[0].tensor();
+    auto output2_map = outputs[0].tensor();
+    for (int i = 0; i < 10; ++i) {
+        std::cout << "Task 1 Output: " << output1_map(0, i) << "\n";
+        std::cout << "Task 2 Output: " << output2_map(0, i) << "\n";
+    }
+}
+
+int main() {
+    // Initialize TensorFlow session
+    Session* session;
+    Status status = NewSession(SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Load the model (assuming it's already saved)
+    GraphDef graph_def;
+    status = ReadBinaryProto(Env::Default(), "model.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << status.ToString() << "\n";
+        return 1;
+    }
+
+    // Execute parallel tasks
+    ParallelTaskExecution(session);
+
+    // Close the session
+    session->Close();
+    return 0;
+}
