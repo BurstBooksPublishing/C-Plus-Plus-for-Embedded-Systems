@@ -1,0 +1,3 @@
+#include 
+
+std::array fixedArray; // Fixed-size array with no dynamic allocation
