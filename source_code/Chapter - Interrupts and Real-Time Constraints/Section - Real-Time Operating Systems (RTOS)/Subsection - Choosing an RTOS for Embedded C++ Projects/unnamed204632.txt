@@ -1,0 +1,10 @@
+class MyTask {
+public:
+    void run() {
+        while (1) {
+            // Task code
+        }
+    }
+};
+MyTask task;
+OS_TASK_CREATE(&task, "Task", task.run, NULL, 1024, 3);
