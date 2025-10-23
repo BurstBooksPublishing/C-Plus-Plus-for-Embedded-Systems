@@ -1,0 +1,48 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+// Function to evaluate model performance with given hyperparameters
+float evaluateModel(float learning_rate, int num_layers) {
+    // Placeholder for model training and evaluation logic
+    // This function should return a performance metric (e.g., accuracy)
+    return 1.0f / (1.0f + std::abs(learning_rate - 0.01f) + std::abs(num_layers - 3));
+}
+
+void gridSearchHyperparameters() {
+    // Define the range of hyperparameters to search
+    std::vector learning_rates = {0.001f, 0.01f, 0.1f};
+    std::vector num_layers_options = {1, 2, 3};
+
+    float best_performance = 0.0f;
+    float best_learning_rate = 0.0f;
+    int best_num_layers = 0;
+
+    // Perform grid search
+    for (float lr : learning_rates) {
+        for (int layers : num_layers_options) {
+            float performance = evaluateModel(lr, layers);
+            if (performance > best_performance) {
+                best_performance = performance;
+                best_learning_rate = lr;
+                best_num_layers = layers;
+            }
+        }
+    }
+
+    // Output the best hyperparameters
+    std::cout << "Best Learning Rate: " << best_learning_rate << "\n";
+    std::cout << "Best Number of Layers: " << best_num_layers << "\n";
+    std::cout << "Best Performance: " << best_performance << "\n";
+}
+
+int main() {
+    gridSearchHyperparameters();
+    return 0;
+}
