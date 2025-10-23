@@ -1,0 +1,5 @@
+bool testSPIClockFrequency(double expectedFrequency, double tolerance) {
+    double measuredFrequency = measureSPIClockFrequency();
+    double error = fabs(measuredFrequency - expectedFrequency) / expectedFrequency;
+    return error <= tolerance;
+}
