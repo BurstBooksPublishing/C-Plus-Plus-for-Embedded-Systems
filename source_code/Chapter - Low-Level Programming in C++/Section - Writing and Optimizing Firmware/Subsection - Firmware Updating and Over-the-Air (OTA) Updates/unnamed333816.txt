@@ -1,0 +1,11 @@
+enum class FirmwareBank { BankA, BankB };
+
+FirmwareBank active_bank = FirmwareBank::BankA;
+
+bool switch_firmware_bank(FirmwareBank new_bank) {
+    if (new_bank == FirmwareBank::BankA || new_bank == FirmwareBank::BankB) {
+        active_bank = new_bank;
+        return true;
+    }
+    return false;
+}
