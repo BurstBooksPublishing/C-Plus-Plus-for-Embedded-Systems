@@ -1,0 +1,1 @@
+constexpr volatile uint32_t* const CONTROL_REGISTER = reinterpret_cast(0x4000000C);
