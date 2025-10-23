@@ -1,0 +1,6 @@
+#include 
+
+void updateFirmware(const uint8_t* data, size_t length) {
+    Flash.eraseSector(0); // Erase sector 0
+    Flash.write(0, data, length); // Write data to sector 0
+}
