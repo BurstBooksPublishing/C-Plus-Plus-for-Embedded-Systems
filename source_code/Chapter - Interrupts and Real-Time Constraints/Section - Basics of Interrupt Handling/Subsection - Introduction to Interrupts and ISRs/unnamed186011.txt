@@ -1,0 +1,7 @@
+extern "C" void TIM2_IRQHandler() {
+    // Clear the interrupt flag
+    TIM2->SR &= ~TIM_SR_UIF;
+    
+    // Handle the interrupt
+    // ...
+}
