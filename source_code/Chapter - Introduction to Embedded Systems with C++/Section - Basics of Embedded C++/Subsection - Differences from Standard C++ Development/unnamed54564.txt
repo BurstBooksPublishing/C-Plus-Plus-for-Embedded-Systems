@@ -1,0 +1,16 @@
+// Standard C++: Running on an OS
+#include 
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+
+// Embedded C++: Bare-metal programming
+void main() {
+    // Initialize hardware
+    initializeHardware();
+    // Main loop
+    while (true) {
+        handleTasks();
+    }
+}
