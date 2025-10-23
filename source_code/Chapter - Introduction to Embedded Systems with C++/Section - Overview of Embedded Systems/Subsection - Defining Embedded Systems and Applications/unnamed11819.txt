@@ -1,0 +1,4 @@
+void enter_sleep_mode() {
+    *reinterpret_cast(POWER_REGISTER) |= SLEEP_MASK;
+    asm volatile("sleep");
+}
