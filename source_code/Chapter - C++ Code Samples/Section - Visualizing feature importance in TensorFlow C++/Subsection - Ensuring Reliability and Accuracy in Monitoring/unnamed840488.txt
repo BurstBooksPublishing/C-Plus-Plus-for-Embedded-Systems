@@ -1,0 +1,44 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void visualize_feature_importance(const Tensor& feature_importance, 
+                                  const std::vector& feature_names) {
+    // Ensure the number of features matches the number of importance scores
+    if (feature_importance.NumElements() != feature_names.size()) {
+        std::cerr << "Mismatch between feature importance scores and feature names." << std::endl;
+        return;
+    }
+
+    // Print feature importance scores alongside feature names
+    auto importance_scores = feature_importance.flat();
+    for (int i = 0; i < feature_names.size(); ++i) {
+        std::cout << "Feature: " << feature_name[i] 
+                  << ", Importance: " << importance_scores(i) << std::endl;
+    }
+}
+
+int main() {
+    // Example feature importance tensor (e.g., from a trained model)
+    Tensor feature_importance(DT_FLOAT, TensorShape({5}));
+    auto importance_values = feature_importance.flat();
+    importance_values(0) = 0.1;
+    importance_values(1) = 0.4;
+    importance_values(2) = 0.3;
+    importance_values(3) = 0.15;
+    importance_values(4) = 0.05;
+
+    // Example feature names
+    std::vector feature_names = {"Age", "Income", "Education", "Debt", "Savings"};
+
+    // Visualize feature importance
+    visualize_feature_importance(feature_importance, feature_names);
+
+    return 0;
+}
