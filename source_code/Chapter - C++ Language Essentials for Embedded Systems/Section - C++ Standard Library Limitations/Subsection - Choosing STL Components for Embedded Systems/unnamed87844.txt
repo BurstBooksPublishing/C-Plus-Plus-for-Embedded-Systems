@@ -1,0 +1,9 @@
+#include 
+#include 
+
+template 
+class EmbeddedAllocator : public std::allocator {
+    // Custom memory management logic
+};
+
+std::vector> customVector;
