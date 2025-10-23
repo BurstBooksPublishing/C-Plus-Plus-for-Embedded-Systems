@@ -1,0 +1,1 @@
+arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -O2 -o hello_embedded hello.cpp
