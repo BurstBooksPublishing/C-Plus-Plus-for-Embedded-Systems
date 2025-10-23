@@ -1,0 +1,6 @@
+void uart_send(const char* data) {
+    while (*data) {
+        while (!(UCSR0A & (1 << UDRE0))); // Wait for buffer empty
+        UDR0 = *data++; // Send character
+    }
+}
