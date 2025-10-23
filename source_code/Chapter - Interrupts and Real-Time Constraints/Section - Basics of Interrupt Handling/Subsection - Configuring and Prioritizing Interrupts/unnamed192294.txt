@@ -1,0 +1,5 @@
+extern "C" void SysTick_Handler() {
+    static int counter = 0;
+    counter++;
+    // Handle the interrupt
+}
