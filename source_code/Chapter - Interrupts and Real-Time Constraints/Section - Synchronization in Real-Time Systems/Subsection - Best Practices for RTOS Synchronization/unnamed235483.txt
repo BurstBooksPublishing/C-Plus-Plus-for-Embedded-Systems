@@ -1,0 +1,14 @@
+#include 
+
+std::atomic eventFlag{false};
+
+void taskA() {
+    eventFlag.store(true);
+}
+
+void taskB() {
+    while (!eventFlag.load()) {
+        // Wait for event
+    }
+    // Handle event
+}
