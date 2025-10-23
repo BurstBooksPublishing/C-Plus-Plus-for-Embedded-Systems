@@ -1,0 +1,1 @@
+std::array<int, 3> arr = {1, 2, 3};  // Fixed-size array with bounds checking
