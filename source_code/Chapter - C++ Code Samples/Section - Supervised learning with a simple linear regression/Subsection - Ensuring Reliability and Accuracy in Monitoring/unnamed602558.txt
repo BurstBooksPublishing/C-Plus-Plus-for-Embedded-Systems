@@ -1,0 +1,54 @@
+#include 
+#include 
+#include 
+
+// Function to calculate the mean of a vector
+double mean(const std::vector& data) {
+    double sum = 0.0;
+    for (double value : data) {
+        sum += value;
+    }
+    return sum / data.size();
+}
+
+// Function to calculate the covariance between two vectors
+double covariance(const std::vector& x, const std::vector& y) {
+    double mean_x = mean(x);
+    double mean_y = mean(y);
+    double covar = 0.0;
+    for (size_t i = 0; i < x.size(); ++i) {
+        covar += ([i] - mean_x) * ([i] - mean_y);
+    }
+    return covar;
+}
+
+// Function to calculate the variance of a vector
+double variance(const std::vector& data) {
+    double mean_data = mean(data);
+    double var = 0.0;
+    for (double value : data) {
+        var += std::pow(value - mean_data, 2);
+    }
+    return var;
+}
+
+// Function to calculate the coefficients (slope and intercept) for linear regression
+std::pair coefficients(const std::vector& x, const std::vector& y) {
+    double slope = covariance(x, y) / variance(x);
+    double intercept = mean(y) - slope * mean(x);
+    return std::make_pair(slope, intercept);
+}
+
+int main() {
+    // Sample dataset
+    std::vector x = {1, 2, 3, 4, 5};
+    std::vector y = {2, 4, 5, 4, 5};
+
+    // Calculate the coefficients
+    auto[slope, intercept] = coefficients(x, y);
+
+    // Output the results
+    std::cout << "Linear Regression Model: y = " << slope << " * x + " << intercept << std::endl;
+
+    return 0;
+}
