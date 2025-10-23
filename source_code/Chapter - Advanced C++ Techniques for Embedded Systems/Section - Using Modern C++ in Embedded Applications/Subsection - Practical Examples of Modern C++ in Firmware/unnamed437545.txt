@@ -1,0 +1,3 @@
+std::variant value;
+value = 42;        // holds an int
+value = 3.14f;     // holds a float
