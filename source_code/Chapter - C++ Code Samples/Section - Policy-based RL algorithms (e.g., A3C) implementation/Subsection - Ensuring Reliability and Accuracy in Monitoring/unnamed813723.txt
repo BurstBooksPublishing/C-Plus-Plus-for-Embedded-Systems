@@ -1,0 +1,81 @@
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+
+// Define the A3C network architecture
+class A3CNetwork {
+public:
+    A3CNetwork() {
+        // Initialize TensorFlow session
+        SessionOptions options;
+        Status status = NewSession(options, &session);
+        if (!status.ok()) {
+            std::cerr << "Error creating session: " << status.ToString() << std::endl;
+            return;
+        }
+
+        // Define the policy and value networks
+        GraphDef graph_def;
+        status = ReadBinaryProto(Env::Default(), "a3c_model.pb", &graph_def);
+        if (!status.ok()) {
+            std::cerr << "Error reading model file: " << status.ToString() << std::endl;
+            return;
+        }
+
+        // Add the graph to the session
+        status = session->Create(graph_def);
+        if (!status.ok()) {
+            std::cerr << "Error creating graph: " << status.ToString() << std::endl;
+            return;
+        }
+    }
+
+    // Forward pass to get policy and value
+    std::pair, float> forward(const std::vector& state) {
+        Tensor input_tensor(DT_FLOAT, TensorShape({1, state.size()}));
+        std::copy_n(state.begin(), state.size(), input_tensor.flat().data());
+
+        std::vector> inputs = {
+            {"input_state", input_tensor}
+        };
+
+        std::vector outputs;
+        Status status = session->Run(inputs, {"policy_output", "value_output"}, {}, &outputs);
+        if (!status.ok()) {
+            std::cerr << "Error running session: " << status.ToString() << std::endl;
+            return {};
+        }
+
+        // Extract policy and value from outputs
+        auto policy = output[0].flat();
+        float value = output[1].scalar()(0);
+
+        std::vector policy_vec(policy.data(), policy.data() + policy.size());
+        return {policy_vec, value};
+    }
+
+private:
+    std::unique_ptr session;
+};
+
+int main() {
+    A3CNetwork network;
+
+    // Example state input
+    std::vector state = {0.5, 0.2, 0.8};
+
+    // Get policy and value from the network
+    auto[policy, value] = network.forward(state);
+
+    // Output the results
+    std::cout << "Policy: ";
+    for (float p : policy) {
+        std::cout << p << " ";
+    }
+    std::cout << "\nValue: " << value << std::endl;
+
+    return 0;
+}
