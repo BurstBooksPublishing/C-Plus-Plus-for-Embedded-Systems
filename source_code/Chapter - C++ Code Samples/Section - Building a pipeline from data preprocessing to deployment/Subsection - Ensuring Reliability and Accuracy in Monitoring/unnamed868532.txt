@@ -1,0 +1,78 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Load and preprocess data
+std::vector preprocess_data(const std::vector& raw_data) {
+    std::vector processed_data;
+    // Normalize data (example: divide by 255 for image data)
+    for (const auto& value : raw_data) {
+        processed_data.push_back(value / 255.0f);
+    }
+    return processed_data;
+}
+
+// Load a pre-trained TensorFlow model
+tensorflow::Status load_model(const std::string& model_path, 
+                              tensorflow::SavedModelBundle& bundle) {
+    tensorflow::SessionOptions session_options;
+    tensorflow::RunOptions run_options;
+    return tensorflow::LoadSavedModel(session_options, run_options, 
+                                      model_path, {tensorflow::kSavedModelTagServe}, 
+                                      &bundle);
+}
+
+// Run inference using the loaded model
+tensorflow::Status run_inference(tensorflow::SavedModelBundle& bundle, 
+                                 const std::vector& input_data, 
+                                 std::vector& output_data) {
+    tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, 
+                                    tensorflow::TensorShape({1, input_data.size()}));
+    std::copy_n(input_data.begin(), input_data.size(), 
+                input_tensor.flat().data());
+
+    std::vector outputs;
+    TF_RETURN_IF_ERROR(bundle.session->Run({{"input_tensor", input_tensor}}, 
+                                           {"output_tensor"}, {}, &outputs));
+
+    auto output_tensor = output[0].flat();
+    output_data.assign(output_tensor.data(), 
+                       output_tensor.data() + output_tensor.size());
+    return tensorflow::Status::OK();
+}
+
+int main() {
+    // Example raw data (e.g., image pixels)
+    std::vector raw_data = {128.0f, 64.0f, 32.0f, 16.0f};
+
+    // Preprocess data
+    std::vector processed_data = preprocess_data(raw_data);
+
+    // Load the model
+    tensorflow::SavedModelBundle bundle;
+    auto status = load_model("path/to/model", bundle);
+    if (!status.ok()) {
+        std::cerr << "Failed to load model: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Run inference
+    std::vector output_data;
+    status = run_inference(bundle, processed_data, output_data);
+    if (!status.ok()) {
+        std::cerr << "Inference failed: " << status.ToString() << std::endl;
+        return -1;
+    }
+
+    // Output the results
+    std::cout << "Inference results: ";
+    for (const auto& value : output_data) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
