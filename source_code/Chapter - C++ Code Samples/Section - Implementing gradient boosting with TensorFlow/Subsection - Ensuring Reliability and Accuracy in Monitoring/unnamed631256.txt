@@ -1,0 +1,40 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void GradientBoostingWithTensorFlow() {
+    // Initialize TensorFlow scope
+    Scope root = Scope::NewRootScope();
+
+    // Define input data (features and labels)
+    Tensor features(DT_FLOAT, TensorShape({4, 2}));
+    Tensor labels(DT_FLOAT, TensorShape({4, 1}));
+
+    // Fill features and labels with sample data
+    auto features_map = features.tensor();
+    auto labels_map = labels.tensor();
+    features_map.setValues({{1.0, 2.0}, {2.0, 3.0}, {3.0, 4.0}, {4.0, 5.0}});
+    labels_map.setValues({{1.0}, {2.0}, {3.0}, {4.0}});
+
+    // Define the model (e.g., a decision tree or ensemble)
+    auto model = Add(root, MatMul(root, features, Variable(root, {2, 1}, DT_FLOAT)), 
+                     Variable(root, {1}, DT_FLOAT));
+
+    // Define the loss function (e.g., mean squared error)
+    auto loss = ReduceMean(root, Square(root, Subtract(root, model, labels)), {0, 1});
+
+    // Define the optimizer (e.g., GradientDescentOptimizer)
+    auto optimizer = ApplyGradientDescent(root, Variable(root, {2, 1}, DT_FLOAT), 
+                                          Cast(root, 0.01, DT_FLOAT), loss);
+
+    // Create a session and run the optimization
+    ClientSession session(root);
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({optimizer}, &outputs));
+
+    // Output the optimized model parameters
+    std::cout << "Optimized model parameters: " << output[0].DebugString() << std::endl;
+}
