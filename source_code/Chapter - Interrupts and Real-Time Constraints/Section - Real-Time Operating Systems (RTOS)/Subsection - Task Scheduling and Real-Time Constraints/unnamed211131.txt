@@ -1,0 +1,13 @@
+rtos::Mutex resourceMutex;
+
+void highPriorityTask() {
+    resourceMutex.lock();
+    // Access shared resource
+    resourceMutex.unlock();
+}
+
+void lowPriorityTask() {
+    resourceMutex.lock();
+    // Access shared resource
+    resourceMutex.unlock();
+}
