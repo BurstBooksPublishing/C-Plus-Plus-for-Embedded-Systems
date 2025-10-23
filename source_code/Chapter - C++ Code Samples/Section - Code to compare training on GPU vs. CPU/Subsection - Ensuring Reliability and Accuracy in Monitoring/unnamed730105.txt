@@ -1,0 +1,52 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace std;
+
+void TrainModel(Session* session, const string& device) {
+    // Place the graph on the specified device (CPU or GPU)
+    GraphDef graph_def;
+    TF_CHECK_OK(ReadBinaryProto(Env::Default(), "model.pb", &graph_def));
+    session->Create(graph_def);
+
+    // Set up the input and output tensors
+    Tensor input_tensor(DT_FLOAT, TensorShape({1, 784}));
+    Tensor output_tensor(DT_FLOAT, TensorShape({1, 10}));
+
+    // Start the timer
+    auto start = chrono::high_resolution_clock::now();
+
+    // Run the session
+    TF_CHECK_OK(session->Run({{"input", input_tensor}}, {"output"}, {}, &output_tensor));
+
+    // Stop the timer
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast(end - start);
+
+    cout << "Training on " << device << " took " << duration.count() << " ms." << endl;
+}
+
+int main() {
+    // Create a new session for CPU
+    SessionOptions cpu_options;
+    cpu_options.config.mutable_device_count()->insert({"CPU", 1});
+    Session* cpu_session;
+    TF_CHECK_OK(NewSession(cpu_options, &cpu_session));
+    TrainModel(cpu_session, "CPU");
+
+    // Create a new session for GPU
+    SessionOptions gpu_options;
+    gpu_options.config.mutable_device_count()->insert({"GPU", 1});
+    Session* gpu_session;
+    TF_CHECK_OK(NewSession(gpu_options, &gpu_session));
+    TrainModel(gpu_session, "GPU");
+
+    // Clean up
+    cpu_session->Close();
+    gpu_session->Close();
+    return 0;
+}
