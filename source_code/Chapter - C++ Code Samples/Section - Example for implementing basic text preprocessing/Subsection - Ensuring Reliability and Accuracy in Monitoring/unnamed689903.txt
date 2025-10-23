@@ -1,0 +1,65 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Function to convert text to lowercase
+std::string toLowercase(const std::string& text) {
+    std::string lowerText = text;
+    std::transform(lowerText.begin(), lowerText.end(), lowerText.begin(), ::tolower);
+    return lowerText;
+}
+
+// Function to remove punctuation from text
+std::string removePunctuation(const std::string& text) {
+    std::string noPunctText;
+    std::copy_if(text.begin(), text.end(), std::back_inserter(noPunctText),
+                 [](char c) { return !std::ispunct(c); });
+    return noPunctText;
+}
+
+// Function to tokenize text into words
+std::vector tokenize(const std::string& text) {
+    std::vector tokens;
+    std::string word;
+    for (char ch : text) {
+        if (std::isspace(ch)) {
+            if (!word.empty()) {
+                tokens.push_back(word);
+                word.clear();
+            }
+        } else {
+            word += ch;
+        }
+    }
+    if (!word.empty()) {
+        tokens.push_back(word);
+    }
+    return tokens;
+}
+
+int main() {
+    std::string inputText = "Hello, World! This is an example of text preprocessing.";
+
+    // Step 1: Convert text to lowercase
+    std::string lowerText = toLowercase(inputText);
+
+    // Step 2: Remove punctuation
+    std::string noPunctText = removePunctuation(lowerText);
+
+    // Step 3: Tokenize the text
+    std::vector tokens = tokenize(noPunctText);
+
+    // Output the results
+    std::cout << "Original Text: " << inputText << std::endl;
+    std::cout << "Lowercase Text: " << lowerText << std::endl;
+    std::cout << "Text without Punctuation: " << noPunctText << std::endl;
+    std::cout << "Tokens: ";
+    for (const auto& token : tokens) {
+        std::cout << token << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
