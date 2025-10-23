@@ -1,0 +1,2 @@
+volatile uint32_t* GPIO_MODE = reinterpret_cast(0x40020000);
+*GPIO_MODE |= (1 << 2); // Set pin 2 as output
