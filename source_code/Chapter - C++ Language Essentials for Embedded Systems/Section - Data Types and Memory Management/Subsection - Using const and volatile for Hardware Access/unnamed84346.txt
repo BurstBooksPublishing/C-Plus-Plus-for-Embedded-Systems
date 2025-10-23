@@ -1,0 +1,5 @@
+typedef struct {
+volatile uint32_t MODER;   // Mode register
+const volatile uint32_t IDR;  // Input data register
+volatile uint32_t ODR;     // Output data register
+} GPIO_TypeDef;
