@@ -1,0 +1,58 @@
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+void trainCNN() {
+    // Define the input placeholder for the images
+    auto input = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                             Placeholder::Shape({-1, 28, 28, 1}));
+
+    // Define the labels placeholder
+    auto labels = Placeholder(Scope::NewRootScope(), DT_FLOAT, 
+                              Placeholder::Shape({-1, 10}));
+
+    // First convolutional layer
+    auto conv1 = Conv2D(Scope::NewRootScope(), input, {5, 5, 1, 32}, 
+                        {1, 1, 1, 1}, "SAME");
+    auto relu1 = Relu(Scope::NewRootScope(), conv1);
+    auto pool1 = MaxPool(Scope::NewRootScope(), relu1, {1, 2, 2, 1}, 
+                         {1, 2, 2, 1}, "SAME");
+
+    // Second convolutional layer
+    auto conv2 = Conv2D(Scope::NewRootScope(), pool1, {5, 5, 32, 64}, 
+                        {1, 1, 1, 1}, "SAME");
+    auto relu2 = Relu(Scope::NewRootScope(), conv2);
+    auto pool2 = MaxPool(Scope::NewRootScope(), relu2, {1, 2, 2, 1}, 
+                         {1, 2, 2, 1}, "SAME");
+
+    // Flatten the output for the fully connected layer
+    auto shape = pool2.shape();
+    auto flattened = Reshape(Scope::NewRootScope(), pool2, 
+                             {shape.dim_size(0), shape.dim_size(1) * 
+                              shape.dim_size(2) * shape.dim_size(3)});
+
+    // Fully connected layer
+    auto fc1 = FullyConnected(Scope::NewRootScope(), flattened, 1024);
+    auto relu3 = Relu(Scope::NewRootScope(), fc1);
+
+    // Output layer
+    auto logits = FullyConnected(Scope::NewRootScope(), relu3, 10);
+
+    // Define the loss function (cross-entropy)
+    auto loss = ReduceMean(Scope::NewRootScope(), 
+                           SoftmaxCrossEntropyWithLogits(
+                               Scope::NewRootScope(), logits, labels), 
+                           {0});
+
+    // Define the optimizer (Adam)
+    auto optimizer = AdamOptimizer(Scope::NewRootScope(), 0.001f);
+    auto train_op = optimizer.Minimize(loss);
+
+    // Start a session and run the training
+    ClientSession session(Scope::NewRootScope());
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({train_op}, &outputs));
+}
