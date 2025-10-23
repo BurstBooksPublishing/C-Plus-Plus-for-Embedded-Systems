@@ -1,0 +1,36 @@
+#include "tensorflow/cc/client/client_session.h"
+#include "tensorflow/cc/ops/standard_ops.h"
+#include "tensorflow/core/framework/tensor.h"
+
+using namespace tensorflow;
+using namespace tensorflow::ops;
+
+int main() {
+    // Create a new graph
+    Scope root = Scope::NewRootScope();
+
+    // Define placeholders for input data
+    auto x = Placeholder(root, DT_FLOAT);
+    auto y = Placeholder(root, DT_FLOAT);
+
+    // Define a simple computation: z = x + y
+    auto z = Add(root, x, y);
+
+    // Create a session to run the graph
+    ClientSession session(root);
+
+    // Define input tensors
+    Tensor x_data(DT_FLOAT, TensorShape({1}));
+    Tensor y_data(DT_FLOAT, TensorShape({1}));
+    x_data.vec()(0) = 2.0f;
+    y_data.vec()(0) = 3.0f;
+
+    // Run the graph with the input data
+    std::vector outputs;
+    TF_CHECK_OK(session.Run({{x, x_data}, {y, y_data}}, {z}, &outputs));
+
+    // Print the result
+    std::cout << "Output: " << output[0].scalar()() << std::endl;
+
+    return 0;
+}
