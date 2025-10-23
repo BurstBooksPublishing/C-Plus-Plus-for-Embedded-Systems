@@ -1,0 +1,10 @@
+// Enable DMA clock
+RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+
+// Configure DMA channel
+DMA1_Channel1->CCR &= ~DMA_CCR_EN;  // Disable the channel
+DMA1_Channel1->CPAR = reinterpret_cast(&USART1->DR);  // Peripheral address
+DMA1_Channel1->CMAR = reinterpret_cast(buffer);     // Memory address
+DMA1_Channel1->CNDTR = buffer_size;                         // Number of data items
+DMA1_Channel1->CCR |= DMA_CCR_MINC | DMA_CCR_DIR | DMA_CCR_TCIE;  // Enable memory increment, direction, and transfer complete interrupt
+DMA1_Channel1->CCR |= DMA_CCR_EN;  // Enable the channel
