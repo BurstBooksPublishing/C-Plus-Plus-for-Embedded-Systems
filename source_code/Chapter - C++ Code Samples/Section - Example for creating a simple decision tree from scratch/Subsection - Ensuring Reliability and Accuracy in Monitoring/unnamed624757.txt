@@ -1,0 +1,146 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+// Define a structure to represent a node in the decision tree
+struct Node {
+    int featureIndex; // Index of the feature to split on
+    double threshold; // Threshold value for the split
+    int label;        // Label if the node is a leaf
+    Node* left;       // Pointer to the left child
+    Node* right;      // Pointer to the right child
+
+    Node() : featureIndex(-1), threshold(0.0), label(-1), left(nullptr), right(nullptr) {}
+};
+
+// Function to calculate the Gini impurity of a dataset
+double calculateGini(const std::vector<int>& labels) {
+    if (labels.empty()) return 0.0;
+
+    int total = labels.size();
+    std::vector<int> classCounts(2, 0); // Assuming binary classification
+
+    for (int label : labels) {
+        classCounts[label]++;
+    }
+
+    double gini = 1.0;
+    for (int count : classCounts) {
+        double prob = static_cast<double>(count) / total;
+        gini -= prob * prob;
+    }
+
+    return gini;
+}
+
+// Function to split the dataset based on a feature and threshold
+std::pair<std::vector<int>, std::vector<int>> splitDataset(
+    const std::vector<std::vector<double>>& data, 
+    const std::vector<int>& labels, 
+    int featureIndex, 
+    double threshold) {
+
+    std::vector<int> leftLabels, rightLabels;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (data[i][featureIndex] <= threshold) {
+            leftLabels.push_back(labels[i]);
+        } else {
+            rightLabels.push_back(labels[i]);
+        }
+    }
+
+    return {leftLabels, rightLabels};
+}
+
+// Function to find the best split for the dataset
+std::pair<int, double> findBestSplit(
+    const std::vector<std::vector<double>>& data, 
+    const std::vector<int>& labels) {
+
+    int bestFeatureIndex = -1;
+    double bestThreshold = 0.0;
+    double bestGini = 1.0;
+
+    for (size_t featureIndex = 0; featureIndex < data[0].size(); ++featureIndex) {
+        for (size_t i = 0; i < data.size(); ++i) {
+            double threshold = data[i][featureIndex];
+            auto [leftLabels, rightLabels] = splitDataset(data, labels, featureIndex, threshold);
+
+            if (leftLabels.empty() || rightLabels.empty()) continue;
+
+            double giniLeft = calculateGini(leftLabels);
+            double giniRight = calculateGini(rightLabels);
+
+            double weightedGini = (leftLabels.size() * giniLeft + rightLabels.size() * giniRight) / labels.size();
+
+            if (weightedGini < bestGini) {
+                bestGini = weightedGini;
+                bestFeatureIndex = featureIndex;
+                bestThreshold = threshold;
+            }
+        }
+    }
+
+    return {bestFeatureIndex, bestThreshold};
+}
+
+// Function to build the decision tree recursively
+Node* buildTree(const std::vector<std::vector<double>>& data, const std::vector<int>& labels) {
+    Node* node = new Node();
+
+    // If all labels are the same, return a leaf node
+    if (std::all_of(labels.begin(), labels.end(), [&](int l) { return l == labels[0]; })) {
+        node->label = labels[0];
+        return node;
+    }
+
+    // Find the best split
+    auto [featureIndex, threshold] = findBestSplit(data, labels);
+
+    if (featureIndex == -1) {
+        node->label = labels[0]; // If no split found, return a leaf node with the majority label
+        return node;
+    }
+
+    node->featureIndex = featureIndex;
+    node->threshold = threshold;
+
+    // Split the dataset
+    auto [leftLabels, rightLabels] = splitDataset(data, labels, featureIndex, threshold);
+
+    // Recursively build the left and right subtrees
+    node->left = buildTree(data, leftLabels);
+    node->right = buildTree(data, rightLabels);
+
+    return node;
+}
+
+// Function to predict the label for a given input using the decision tree
+int predict(Node* root, const std::vector<double>& input) {
+    while (root->left != nullptr && root->right != nullptr) {
+        if (input[root->featureIndex] <= root->threshold) {
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    return root->label;
+}
+
+int main() {
+    // Example dataset: features and corresponding labels
+    std::vector<std::vector<double>> data = {{2.0, 3.0}, {1.0, 2.0}, {3.0, 4.0}, {4.0, 5.0}};
+    std::vector<int> labels = {0, 0, 1, 1};
+
+    // Build the decision tree
+    Node* root = buildTree(data, labels);
+
+    // Predict the label for a new input
+    std::vector<double> input = {2.5, 3.5};
+    int predictedLabel = predict(root, input);
+
+    std::cout << "Predicted Label: " << predictedLabel << std::endl;
+
+    return 0;
+}
