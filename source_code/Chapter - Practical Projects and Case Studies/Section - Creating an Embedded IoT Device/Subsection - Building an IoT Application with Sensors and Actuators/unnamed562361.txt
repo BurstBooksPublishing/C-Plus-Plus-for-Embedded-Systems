@@ -1,0 +1,12 @@
+#include 
+
+const int sensorPin = 0; // GPIO pin for the sensor
+
+void setup() {
+    wiringPiSetup(); // Initialize WiringPi
+    pinMode(sensorPin, INPUT); // Set pin as input
+}
+
+int readSensor() {
+    return digitalRead(sensorPin); // Read sensor value
+}
