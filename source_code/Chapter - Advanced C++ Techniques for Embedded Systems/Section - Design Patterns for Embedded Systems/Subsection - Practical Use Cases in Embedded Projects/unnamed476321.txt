@@ -1,0 +1,33 @@
+class MicrowaveState {
+public:
+    virtual void start(Microwave* microwave) = 0;
+    virtual void stop(Microwave* microwave) = 0;
+};
+
+class IdleState : public MicrowaveState {
+public:
+    void start(Microwave* microwave) override {
+        // Transition to HeatingState
+    }
+    void stop(Microwave* microwave) override {
+        // Do nothing
+    }
+};
+
+class Microwave {
+private:
+    MicrowaveState* state;
+
+public:
+    void setState(MicrowaveState* newState) {
+        state = newState;
+    }
+
+    void start() {
+        state->start(this);
+    }
+
+    void stop() {
+        state->stop(this);
+    }
+};
