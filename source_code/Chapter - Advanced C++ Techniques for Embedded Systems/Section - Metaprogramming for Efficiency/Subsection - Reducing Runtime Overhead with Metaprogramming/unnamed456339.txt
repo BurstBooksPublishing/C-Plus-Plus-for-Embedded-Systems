@@ -1,0 +1,4 @@
+constexpr const char* str = "Embedded";
+constexpr std::size_t len = [] consteval (const char (&s)[N]) {
+    return N - 1;
+}(str);
