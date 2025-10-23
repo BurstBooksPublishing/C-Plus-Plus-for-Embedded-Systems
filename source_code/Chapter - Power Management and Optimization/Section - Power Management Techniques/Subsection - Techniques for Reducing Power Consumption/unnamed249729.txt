@@ -1,0 +1,4 @@
+void set_cpu_frequency(uint32_t frequency) {
+    // Hypothetical function to set CPU frequency
+    *reinterpret_cast(0x40021000) = frequency;
+}
