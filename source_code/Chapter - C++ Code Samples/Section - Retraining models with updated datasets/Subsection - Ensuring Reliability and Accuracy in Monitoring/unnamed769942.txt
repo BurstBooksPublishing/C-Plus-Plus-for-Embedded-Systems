@@ -1,0 +1,63 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+#include 
+
+using namespace tensorflow;
+
+void retrainModel(const std::string& modelPath, const std::string& newDatasetPath) {
+    // Load the saved model
+    SavedModelBundle bundle;
+    SessionOptions session_options;
+    RunOptions run_options;
+    Status status = LoadSavedModel(session_options, run_options, modelPath,
+                                   {kSavedModelTagTrain}, &bundle);
+    if (!status.ok()) {
+        std::cerr << "Error loading model: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Load the new dataset
+    Tensor newData(DT_FLOAT, TensorShape({100, 784})); // Example: 100 samples, 784 features
+    Tensor newLabels(DT_FLOAT, TensorShape({100, 10})); // Example: 100 labels, 10 classes
+
+    // Placeholder for the input data and labels
+    auto input = ops::Placeholder(bundle.session->graph(), DT_FLOAT);
+    auto labels = ops::Placeholder(bundle.session->graph(), DT_FLOAT);
+
+    // Define the retraining operation (e.g., minimize loss)
+    auto loss = ops::ReduceMean(bundle.session->graph(),
+                                ops::Square(bundle.session->graph(),
+                                            ops::Sub(bundle.session->graph(),
+                                                     bundle.session->graph()->outputs([0],
+                                                     labels)));
+    auto optimizer = ops::ApplyGradientDescent(bundle.session->graph(),
+                                               bundle.session->graph()->variables([0],
+                                               0.01f, loss);
+
+    // Run the retraining session
+    std::vector outputs;
+    status = bundle.session->Run({{input, newData}, {labels, newLabels}},
+                                 {optimizer}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error during retraining: " << status.ToString() << std::endl;
+        return;
+    }
+
+    // Save the retrained model
+    status = bundle.session->Save(modelPath + "_retrained", false);
+    if (!status.ok()) {
+        std::cerr << "Error saving retrained model: " << status.ToString() << std::endl;
+        return;
+    }
+
+    std::cout << "Model retrained and saved successfully." << std::endl;
+}
+
+int main() {
+    retrainModel("path/to/saved_model", "path/to/new_dataset");
+    return 0;
+}
