@@ -1,0 +1,75 @@
+#include 
+#include 
+#include 
+#include 
+
+// Function to prune weights by setting small values to zero
+void pruneWeights(tensorflow::Tensor& weights, float threshold) {
+    auto weightMatrix = weights.matrix();
+    for (int i = 0; i < weightMatrix.dimension(0); ++i) {
+        for (int j = 0; j < weightMatrix.dimension(1); ++j) {
+            if (std::abs(weightMatrix(i, j)) < threshold) {
+                weightMatrix(i, j) = 0.0f; // Prune small weights
+            }
+        }
+    }
+}
+
+int main() {
+    // Load the pre-trained model
+    tensorflow::Session* session;
+    tensorflow::Status status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
+    if (!status.ok()) {
+        std::cerr << "Error creating session: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Load the model graph
+    tensorflow::GraphDef graph_def;
+    status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), "model.pb", &graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error reading model file: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Add the graph to the session
+    status = session->Create(graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error creating graph in session: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Fetch the weights tensor from the model
+    std::vector outputs;
+    status = session->Run({}, {"weights_tensor_name"}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error fetching weights tensor: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Prune the weights
+    float pruningThreshold = 0.01f; // Define a threshold for pruning
+    pruneWeights(output[0], pruningThreshold);
+
+    // Update the model with pruned weights
+    status = session->Run({{"weights_tensor_name", output[0]}}, {}, {}, &outputs);
+    if (!status.ok()) {
+        std::cerr << "Error updating weights tensor: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Save the pruned model
+    tensorflow::GraphDef pruned_graph_def;
+    session->Finalize(&pruned_graph_def);
+    status = tensorflow::WriteBinaryProto(tensorflow::Env::Default(), "pruned_model.pb", pruned_graph_def);
+    if (!status.ok()) {
+        std::cerr << "Error saving pruned model: " << status.ToString() << std::endl;
+        return 1;
+    }
+
+    // Clean up
+    session->Close();
+    delete session;
+
+    return 0;
+}
