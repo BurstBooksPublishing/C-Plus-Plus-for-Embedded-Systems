@@ -1,0 +1,14 @@
+#define DEBUG_MODE 1
+
+#if DEBUG_MODE
+#define LOG(message) std::cout << message << std::endl
+#else
+#define LOG(message)
+#endif
+
+void checkTemperatureSensor() {
+    int temperature = readSensor();
+    if (temperature > 100) {
+        LOG("Warning: Temperature exceeds safe limit!");
+    }
+}
