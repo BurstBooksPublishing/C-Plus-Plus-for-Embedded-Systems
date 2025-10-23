@@ -1,0 +1,6 @@
+void receive_data(int sock, char* buffer, size_t len) {
+    int bytes_received = recv(sock, buffer, len, 0);
+    if (bytes_received < 0) {
+        // Handle error
+    }
+}
