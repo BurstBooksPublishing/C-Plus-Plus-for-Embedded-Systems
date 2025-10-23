@@ -1,0 +1,9 @@
+#include 
+
+void saveConfig(uint8_t value, int address) {
+    EEPROM.write(address, value);
+}
+
+uint8_t loadConfig(int address) {
+    return EEPROM.read(address);
+}
