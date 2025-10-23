@@ -1,0 +1,25 @@
+#include 
+#include 
+
+#define LOG_BUFFER_SIZE 1024
+
+class Logger {
+public:
+    Logger() : head(0), tail(0) {}
+
+    void log(const char* message) {
+        int len = snprintf(buffer + head, LOG_BUFFER_SIZE - head, "%s", message);
+        head = (head + len) % LOG_BUFFER_SIZE;
+    }
+
+    void print_logs() {
+        while (tail != head) {
+            putchar(buffer[tail]);
+            tail = (tail + 1) % LOG_BUFFER_SIZE;
+        }
+    }
+
+private:
+    char buffer[LOG_BUFFER_SIZE];
+    uint16_t head, tail;
+};
