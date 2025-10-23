@@ -1,0 +1,50 @@
+#include 
+#include 
+#include 
+#include 
+#include 
+
+// Function to perform random search for hyperparameter optimization
+void randomSearch(tensorflow::Session* session, int num_iterations) {
+    std::random_device rd;  // Random device for seeding
+    std::mt19937 gen(rd()); // Mersenne Twister random number generator
+    std::uniform_real_distribution<> lr_dist(0.0001, 0.1); // Learning rate range
+    std::uniform_int_distribution<> batch_dist(16, 256);   // Batch size range
+
+    for (int i = 0; i < num_iterations; ++i) {
+        float learning_rate = lr_dist(gen); // Random learning rate
+        int batch_size = batch_dist(gen);   // Random batch size
+
+        // Set hyperparameters in the TensorFlow session
+        tensorflow::Tensor lr_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({}));
+        lr_tensor.scalar()() = learning_rate;
+        tensorflow::Tensor bs_tensor(tensorflow::DT_INT32, tensorflow::TensorShape({}));
+        bs_tensor.scalar()() = batch_size;
+
+        // Run the session with the new hyperparameters
+        std::vector outputs;
+        TF_CHECK_OK(session->Run({{"learning_rate", lr_tensor}, {"batch_size", bs_tensor}},
+                                 {"loss"}, {}, &outputs));
+
+        // Retrieve and print the loss
+        float loss = output[0].scalar()();
+        std::cout << "Iteration " << i + 1 << ": Learning Rate = " << learning_rate
+                  << ", Batch Size = " << batch_size << ", Loss = " << loss << std::endl;
+    }
+}
+
+int main() {
+    // Initialize TensorFlow session
+    tensorflow::Session* session;
+    TF_CHECK_OK(tensorflow::NewSession(tensorflow::SessionOptions(), &session));
+
+    // Load the model (assuming it's already saved)
+    TF_CHECK_OK(session->Create(tensorflow::GraphDef()));
+
+    // Perform random search for hyperparameter optimization
+    randomSearch(session, 10); // 10 iterations of random search
+
+    // Close the session
+    session->Close();
+    return 0;
+}
