@@ -1,0 +1,3 @@
+client->Disconnect();
+delete client;
+Aws::IoT::MqttClient::Shutdown();
