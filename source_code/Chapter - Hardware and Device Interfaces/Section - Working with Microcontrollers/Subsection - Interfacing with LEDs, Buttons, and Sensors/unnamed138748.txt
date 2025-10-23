@@ -1,0 +1,10 @@
+#include 
+#include 
+
+int main() {
+    DDRB |= (1 << DDB0); // Set PB0 as output
+    while (1) {
+        PORTB ^= (1 << PB0); // Toggle PB0
+        _delay_ms(500); // Delay for 500ms
+    }
+}
