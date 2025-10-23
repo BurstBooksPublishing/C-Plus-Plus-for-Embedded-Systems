@@ -1,0 +1,17 @@
+Assembler}]
+foo:
+push    rbp
+mov     rbp, rsp
+sub     rsp, 16
+mov     DWORD PTR [rbp-4], edi
+mov     DWORD PTR [rbp-8], esi
+mov     edx, DWORD PTR [rbp-4]
+mov     eax, DWORD PTR [rbp-8]
+add     eax, edx
+mov     DWORD PTR [rbp-12], eax
+mov     eax, DWORD PTR [rbp-12]
+add     eax, eax
+mov     DWORD PTR [rbp-16], eax
+mov     eax, DWORD PTR [rbp-16]
+leave
+ret
