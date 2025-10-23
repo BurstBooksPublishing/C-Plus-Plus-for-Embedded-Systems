@@ -1,0 +1,10 @@
+void send_bit(uint8_t bit) {
+  digitalWrite(DATA_PIN, bit ? HIGH : LOW);
+  delayMicroseconds(10); // Wait for the bit to be sampled
+}
+
+void send_byte(uint8_t byte) {
+  for (int i = 0; i < 8; i++) {
+    send_bit(byte & (1 << (7 - i))); // Send each bit individually
+  }
+}
